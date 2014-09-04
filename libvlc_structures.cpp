@@ -48,11 +48,9 @@ const std::string& ModuleDescription::help() const
 
 std::list<ModuleDescription> ModuleDescription::makeList(libvlc_module_description_t* head) 
 {
-    if (!head) 
-    {
-        throw Exception("Can't construct std::list<ModuleDescription>");
-    }
     std::list<ModuleDescription> result;
+    if ( head == NULL )
+        return result;
     libvlc_module_description_t* current = head;
     while (current) 
     {
@@ -140,11 +138,9 @@ const std::string& AudioOutputDescription::description() const
 
 std::list<AudioOutputDescription> AudioOutputDescription::makeList(libvlc_audio_output_t* head) 
 {
-    if (!head) 
-    {
-        throw Exception("Can't construct std::list<AudioOutputDescription>");
-    }
     std::list<AudioOutputDescription> result;
+    if ( head == NULL )
+        return result;
     libvlc_audio_output_t* current = head;
     while (current) 
     {
@@ -172,11 +168,9 @@ const std::string& TrackDescription::name() const
 
 std::list<TrackDescription> TrackDescription::makeList(libvlc_track_description_t* head) 
 {
-    if (!head) 
-    {
-        throw Exception("Can't construct std::list<TrackDescription>");
-    }
     std::list<TrackDescription> result;
+    if ( head == NULL )
+        return result;
     libvlc_track_description_t* current = head;
     while (current) 
     {
