@@ -34,6 +34,8 @@
 namespace VLC 
 {
 
+class MediaList;
+class MediaPlayer;
 
 class Media : public Internal<libvlc_media_t>
 {
@@ -353,6 +355,9 @@ private:
      * not be used again.
      */
     void release();
+
+    friend class MediaList;
+    friend class MediaPlayer;
 };
 
 } // namespace VLC

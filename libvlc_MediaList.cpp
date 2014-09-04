@@ -55,58 +55,53 @@ MediaList::~MediaList()
     release();
 }
 
-
-MediaList::MediaList(Media & p_md) 
+MediaList*MediaList::fromMedia(Media& md)
 {
-    m_obj = libvlc_media_subitems(p_md.get_c_object());
-    if (!m_obj) 
-    {
-        throw Exception("Can't construct MediaList");
-    }
+    InternalPtr ptr = libvlc_media_subitems( md );
+    if ( ptr == NULL )
+        return NULL;
+    return new MediaList( ptr );
 }
 
-MediaList::MediaList(MediaDiscoverer & p_mdis) 
+MediaList* MediaList::fromMediaDiscoverer( MediaDiscoverer& mdis )
 {
-    m_obj = libvlc_media_discoverer_media_list(p_mdis.get_c_object());
-    if (!m_obj) 
-    {
-        throw Exception("Can't construct MediaList");
-    }
+    InternalPtr ptr = libvlc_media_discoverer_media_list( mdis );
+    if ( ptr == NULL )
+        return NULL;
+    return new MediaList( ptr );
 }
 
-MediaList::MediaList(MediaLibrary & p_mlib) 
+MediaList*MediaList::fromMediaLibrary(MediaLibrary& mlib)
 {
-    m_obj = libvlc_media_library_media_list(p_mlib.get_c_object());
-    if (!m_obj) 
-    {
-        throw Exception("Can't construct MediaList");
-    }
+    InternalPtr ptr = libvlc_media_library_media_list( mlib );
+    if ( ptr == NULL )
+        return NULL;
+    return new MediaList( ptr );
 }
 
-MediaList::MediaList(Instance & p_instance) 
+MediaList*MediaList::create( Instance& instance )
 {
-    m_obj = libvlc_media_list_new(p_instance.get_c_object());
-    if (!m_obj) 
-    {
-        throw Exception("Can't construct MediaList");
-    }
+    InternalPtr ptr = libvlc_media_list_new( instance );
+    if ( ptr == NULL )
+        return NULL;
+    return new MediaList( ptr );
 }
 
-void MediaList::setMedia(Media & p_md) 
+void MediaList::setMedia( Media &md )
 {
-    libvlc_media_list_set_media(m_obj, p_md.get_c_object());
+    libvlc_media_list_set_media( m_obj, md );
 }
 
-int MediaList::addMedia(Media & p_md) 
+int MediaList::addMedia(Media& p_md)
 {
-    int c_result = libvlc_media_list_add_media(m_obj, p_md.get_c_object());
+    int c_result = libvlc_media_list_add_media( m_obj, p_md );
     int result = c_result;
     return result;
 }
 
-int MediaList::insertMedia(Media & p_md, int i_pos) 
+int MediaList::insertMedia( Media& md, int pos )
 {
-    int c_result = libvlc_media_list_insert_media(m_obj, p_md.get_c_object(), i_pos);
+    int c_result = libvlc_media_list_insert_media( m_obj, md, pos );
     int result = c_result;
     return result;
 }
@@ -132,9 +127,9 @@ Media MediaList::itemAtIndex(int i_pos)
     return result;
 }
 
-int MediaList::indexOfItem(Media & p_md) 
+int MediaList::indexOfItem( Media &md )
 {
-    int c_result = libvlc_media_list_index_of_item(m_obj, p_md.get_c_object());
+    int c_result = libvlc_media_list_index_of_item( m_obj, md );
     int result = c_result;
     return result;
 }
@@ -161,6 +156,11 @@ libvlc_event_manager_t * MediaList::eventManager()
     libvlc_event_manager_t * c_result = libvlc_media_list_event_manager(m_obj);
     libvlc_event_manager_t * result = c_result;
     return result;
+}
+
+MediaList::MediaList( Internal::InternalPtr ptr )
+    : Internal( ptr )
+{
 }
 
 void MediaList::release() 

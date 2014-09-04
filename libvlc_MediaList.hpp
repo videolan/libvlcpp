@@ -67,7 +67,7 @@ public:
      *
      * \param p_md  media descriptor object
      */
-    MediaList(Media & p_md);
+    static MediaList* fromMedia(Media &md);
 
     // libvlc_media_discoverer_media_list
     /**
@@ -75,7 +75,7 @@ public:
      *
      * \param p_mdis  media service discover object
      */
-    MediaList(MediaDiscoverer & p_mdis);
+    static MediaList* fromMediaDiscoverer(MediaDiscoverer & mdis);
 
     // libvlc_media_library_media_list
     /**
@@ -83,7 +83,7 @@ public:
      *
      * \param p_mlib  media library object
      */
-    MediaList(MediaLibrary & p_mlib);
+    static MediaList* fromMediaLibrary( MediaLibrary &mlib );
 
     // libvlc_media_list_new
     /**
@@ -91,7 +91,7 @@ public:
      *
      * \param p_instance  libvlc instance
      */
-    MediaList(Instance & p_instance);
+    static MediaList* create(Instance &instance);
 
     /**
      * Associate media instance with this media list instance. If another
@@ -122,7 +122,7 @@ public:
      *
      * \return 0 on success, -1 if the media list is read-only
      */
-    int insertMedia(Media & p_md, int i_pos);
+    int insertMedia(Media & md, int pos);
 
     /**
      * Remove media instance from media list on a position The
@@ -164,7 +164,7 @@ public:
      *
      * \return position of media instance or -1 if media not found
      */
-    int indexOfItem(Media & p_md);
+    int indexOfItem(Media & md);
 
     /**
      * This indicates if this media list is read-only from a user point of
@@ -194,6 +194,7 @@ public:
     libvlc_event_manager_t * eventManager();
 
 private:
+    MediaList(InternalPtr ptr);
     /**
      * Release media list created with MediaList::MediaList() .
      */
