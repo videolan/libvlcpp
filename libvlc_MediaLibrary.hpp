@@ -38,6 +38,12 @@ class MediaLibrary : public Internal<libvlc_media_library_t>
 {
 public:
     /**
+     * Create an new Media Library object
+     *
+     * \param p_instance  the libvlc instance
+     */
+    static MediaLibrary* create(Instance & p_instance);
+    /**
      * Copy libvlc_media_library_t from another to new MediaLibrary object.
      * \param another existing MediaLibrary
      */
@@ -59,14 +65,6 @@ public:
 
     ~MediaLibrary();
 
-    // libvlc_media_library_new
-    /**
-     * Create an new Media Library object
-     *
-     * \param p_instance  the libvlc instance
-     */
-    MediaLibrary(Instance & p_instance);
-
     /**
      * Load media library.
      *
@@ -75,6 +73,7 @@ public:
     int load();
 
 private:
+    MediaLibrary(InternalPtr ptr);
     /**
      * Release media library object. This functions decrements the reference
      * count of the media library object. If it reaches 0, then the object
