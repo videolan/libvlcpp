@@ -4,6 +4,7 @@
  * Copyright © 2014 the VideoLAN team
  *
  * Authors: Alexey Sokolov <alexey@alexeysokolov.co.cc>
+ *          Hugo Beauzée-Luyssen <hugo@beauzee.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -56,14 +57,12 @@ MediaListPlayer::~MediaListPlayer()
     release();
 }
 
-
-MediaListPlayer::MediaListPlayer(Instance & p_instance) 
+MediaListPlayer* MediaListPlayer::create(Instance& instance)
 {
-    m_obj = libvlc_media_list_player_new(p_instance.get_c_object());
-    if (!m_obj) 
-    {
-        throw Exception("Can't construct MediaListPlayer");
-    }
+    InternalPtr ptr = libvlc_media_list_player_new( instance );
+    if ( ptr == NULL )
+        return NULL;
+    return new MediaListPlayer( ptr );
 }
 
 libvlc_event_manager_t * MediaListPlayer::eventManager() 
@@ -73,14 +72,14 @@ libvlc_event_manager_t * MediaListPlayer::eventManager()
     return result;
 }
 
-void MediaListPlayer::setMediaPlayer(MediaPlayer & p_mi) 
+void MediaListPlayer::setMediaPlayer( MediaPlayer &mi )
 {
-    libvlc_media_list_player_set_media_player(m_obj, p_mi.get_c_object());
+    libvlc_media_list_player_set_media_player( m_obj, mi );
 }
 
-void MediaListPlayer::setMediaList(MediaList & p_mlist) 
+void MediaListPlayer::setMediaList( MediaList &mlist )
 {
-    libvlc_media_list_player_set_media_list(m_obj, p_mlist.get_c_object());
+    libvlc_media_list_player_set_media_list( m_obj, mlist );
 }
 
 void MediaListPlayer::play() 
@@ -114,9 +113,9 @@ int MediaListPlayer::playItemAtIndex(int i_index)
     return result;
 }
 
-int MediaListPlayer::playItem(Media & p_md) 
+int MediaListPlayer::playItem(Media & p_md)
 {
-    int c_result = libvlc_media_list_player_play_item(m_obj, p_md.get_c_object());
+    int c_result = libvlc_media_list_player_play_item( m_obj, p_md );
     int result = c_result;
     return result;
 }
@@ -143,6 +142,11 @@ int MediaListPlayer::previous()
 void MediaListPlayer::setPlaybackMode(libvlc_playback_mode_t e_mode) 
 {
     libvlc_media_list_player_set_playback_mode(m_obj, e_mode);
+}
+
+MediaListPlayer::MediaListPlayer(Internal::InternalPtr ptr)
+    : Internal( ptr )
+{
 }
 
 void MediaListPlayer::release() 

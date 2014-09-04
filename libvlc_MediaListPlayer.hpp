@@ -4,6 +4,7 @@
  * Copyright © 2014 the VideoLAN team
  *
  * Authors: Alexey Sokolov <alexey@alexeysokolov.co.cc>
+ *          Hugo Beauzée-Luyssen <hugo@beauzee.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -65,7 +66,7 @@ public:
      *
      * \param p_instance  libvlc instance
      */
-    MediaListPlayer(Instance & p_instance);
+    static MediaListPlayer* create(Instance & instance);
 
     /**
      * Return the event manager of this media_list_player.
@@ -86,7 +87,7 @@ public:
      *
      * \param p_mlist  list of media
      */
-    void setMediaList(MediaList & p_mlist);
+    void setMediaList(MediaList & mlist);
 
     /**
      * Play media list
@@ -157,6 +158,7 @@ public:
     void setPlaybackMode(libvlc_playback_mode_t e_mode);
 
 private:
+    MediaListPlayer(InternalPtr ptr);
     /**
      * Release a media_list_player after use Decrement the reference count of
      * a media player object. If the reference count is 0, then
