@@ -56,28 +56,25 @@ MediaPlayer::~MediaPlayer()
     release();
 }
 
-
-MediaPlayer::MediaPlayer(Instance & p_libvlc_instance) 
+MediaPlayer*MediaPlayer::create( Instance& instance )
 {
-    m_obj = libvlc_media_player_new(p_libvlc_instance.get_c_object());
-    if (!m_obj) 
-    {
-        throw Exception("Can't construct MediaPlayer");
-    }
+    InternalPtr ptr = libvlc_media_player_new( instance );
+    if ( ptr == NULL )
+        return NULL;
+    return new MediaPlayer( ptr );
 }
 
-MediaPlayer::MediaPlayer(Media & p_md) 
+MediaPlayer*MediaPlayer::fromMedia( Media& md )
 {
-    m_obj = libvlc_media_player_new_from_media(p_md.get_c_object());
-    if (!m_obj) 
-    {
-        throw Exception("Can't construct MediaPlayer");
-    }
+    InternalPtr ptr = libvlc_media_player_new_from_media( md );
+    if ( ptr == NULL )
+        return NULL;
+    return new MediaPlayer( ptr );
 }
 
-void MediaPlayer::setMedia(Media & p_md) 
+void MediaPlayer::setMedia( Media& md )
 {
-    libvlc_media_player_set_media(m_obj, p_md.get_c_object());
+    libvlc_media_player_set_media( m_obj, md );
 }
 
 Media MediaPlayer::media() 
@@ -364,17 +361,6 @@ int MediaPlayer::setEqualizer(libvlc_equalizer_t * p_equalizer)
     return result;
 }
 
-void MediaPlayer::release() 
-{
-    libvlc_media_player_release(m_obj);
-}
-
-void MediaPlayer::retain() 
-{
-    libvlc_media_player_retain(m_obj);
-}
-
-
 void MediaPlayer::setCallbacks(libvlc_audio_play_cb play, libvlc_audio_pause_cb pause, libvlc_audio_resume_cb resume, libvlc_audio_flush_cb flush, libvlc_audio_drain_cb drain, void * opaque)
 {
     libvlc_audio_set_callbacks(m_obj, play, pause, resume, flush, drain, opaque);
@@ -460,14 +446,14 @@ std::list<TrackDescription> MediaPlayer::audioTrackDescription()
     return result;
 }
 
-int MediaPlayer::videoTrack()
+int MediaPlayer::audioTrack()
 {
     int c_result = libvlc_audio_get_track(m_obj);
     int result = c_result;
     return result;
 }
 
-int MediaPlayer::setVideoTrack(int i_track)
+int MediaPlayer::setAudioTrack(int i_track)
 {
     int c_result = libvlc_audio_set_track(m_obj, i_track);
     int result = c_result;
@@ -657,14 +643,14 @@ void MediaPlayer::setTeletext(int i_page)
     libvlc_video_set_teletext(m_obj, i_page);
 }
 
-int MediaPlayer::trackCount()
+int MediaPlayer::videoTrackCount()
 {
     int c_result = libvlc_video_get_track_count(m_obj);
     int result = c_result;
     return result;
 }
 
-std::list<TrackDescription> MediaPlayer::trackDescription()
+std::list<TrackDescription> MediaPlayer::videoTrackDescription()
 {
     libvlc_track_description_t * c_result = libvlc_video_get_track_description(m_obj);
     std::list<TrackDescription> result = TrackDescription::makeList(c_result);
@@ -672,14 +658,14 @@ std::list<TrackDescription> MediaPlayer::trackDescription()
     return result;
 }
 
-int MediaPlayer::track()
+int MediaPlayer::videoTrack()
 {
     int c_result = libvlc_video_get_track(m_obj);
     int result = c_result;
     return result;
 }
 
-int MediaPlayer::setTrack(int i_track)
+int MediaPlayer::setVideoTrack(int i_track)
 {
     int c_result = libvlc_video_set_track(m_obj, i_track);
     int result = c_result;
@@ -762,6 +748,11 @@ float MediaPlayer::adjustFloat(unsigned option)
 void MediaPlayer::setAdjustFloat(unsigned option, float value)
 {
     libvlc_video_set_adjust_float(m_obj, option, value);
+}
+
+MediaPlayer::MediaPlayer( Internal::InternalPtr ptr )
+    : Internal( ptr )
+{
 }
 
 

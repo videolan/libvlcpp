@@ -66,7 +66,7 @@ public:
      * \param p_libvlc_instance  the libvlc instance in which the Media
      * Player should be created.
      */
-    MediaPlayer(Instance & p_libvlc_instance);
+    static MediaPlayer* create( Instance& instance );
 
     // libvlc_media_player_new_from_media
     /**
@@ -74,7 +74,7 @@ public:
      *
      * \param p_md  the media. Afterwards the p_md can be safely destroyed.
      */
-    MediaPlayer(Media & p_md);
+    static MediaPlayer* fromMedia( Media &md );
 
     /**
      * Set the media that will be used by the media_player. If any, previous
@@ -82,7 +82,7 @@ public:
      *
      * \param p_md  the Media. Afterwards the p_md can be safely destroyed.
      */
-    void setMedia(Media & p_md);
+    void setMedia(Media & md);
 
     /**
      * Get the media used by the media_player.
@@ -1205,6 +1205,7 @@ public:
     void setAdjustFloat(unsigned option, float value);
 
 private:
+    MediaPlayer( InternalPtr ptr );
     /**
      * Release a media_player after use Decrement the reference count of a
      * media player object. If the reference count is 0, then
