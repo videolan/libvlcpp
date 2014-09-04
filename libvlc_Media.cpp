@@ -96,19 +96,6 @@ Media::~Media()
     release();
 }
 
-std::vector<MediaTrackInfo> Media::tracksInfo() {
-    libvlc_media_track_info_t* infos;
-    int num = libvlc_media_get_tracks_info(m_obj, &infos);
-    std::vector<MediaTrackInfo> result;
-    result.reserve(num);
-    for (int i = 0; i < num; ++i) {
-        result.push_back(MediaTrackInfo(infos+i));
-    }
-    libvlc_free(infos);
-    return result;
-}
-
-
 void Media::addOption(const std::string& psz_options) 
 {
     libvlc_media_add_option(m_obj, psz_options.c_str());

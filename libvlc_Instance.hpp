@@ -113,15 +113,6 @@ public:
     void setExitHandler(void(*cb)(void *), void * opaque);
 
     /**
-     * Waits until an interface causes the instance to exit. You should start
-     * at least one interface first, using Instance::addIntf() .
-     *
-     * \warning This function wastes one thread doing basically nothing.
-     * Instance::setExitHandler() should be used instead.
-     */
-    void wait();
-
-    /**
      * Sets the application name. LibVLC passes this as the user agent string
      * when a protocol requires it.
      *
@@ -188,30 +179,6 @@ public:
      * \version LibVLC 2.1.0 or later
      */
     void logSetFile(FILE * stream);
-
-    /**
-     * Always returns minus one. This function is only provided for backward
-     * compatibility.
-     *
-     * \return always -1
-     */
-    unsigned logVerbosity();
-
-    /**
-     * This function does nothing. It is only provided for backward
-     * compatibility.
-     *
-     * \param level  ignored
-     */
-    void setLogVerbosity(unsigned level);
-
-    /**
-     * This function does nothing useful. It is only provided for backward
-     * compatibility.
-     *
-     * \return an unique pointer or NULL on error
-     */
-    libvlc_log_t * logOpen();
 
     /**
      * Returns a list of audio filters that are available.

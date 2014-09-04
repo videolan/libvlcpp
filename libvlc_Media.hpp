@@ -130,11 +130,6 @@ public:
     ~Media();
 
     /**
-     * Foo bar
-     */
-    std::vector<MediaTrackInfo> tracksInfo();
-
-    /**
      * Add an option to the media.
      *
      * This option will be used to determine how the media_player will read

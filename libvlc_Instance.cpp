@@ -77,11 +77,6 @@ void Instance::setExitHandler(void(*cb)(void *), void * opaque)
     libvlc_set_exit_handler(m_obj, cb, opaque);
 }
 
-void Instance::wait() 
-{
-    libvlc_wait(m_obj);
-}
-
 void Instance::setUserAgent(const std::string& name, const std::string& http) 
 {
     libvlc_set_user_agent(m_obj, name.c_str(), http.c_str());
@@ -105,25 +100,6 @@ void Instance::logSet(libvlc_log_cb cb, void * data)
 void Instance::logSetFile(FILE * stream) 
 {
     libvlc_log_set_file(m_obj, stream);
-}
-
-unsigned Instance::logVerbosity() 
-{
-    unsigned c_result = libvlc_get_log_verbosity(m_obj);
-    unsigned result = c_result;
-    return result;
-}
-
-void Instance::setLogVerbosity(unsigned level) 
-{
-    libvlc_set_log_verbosity(m_obj, level);
-}
-
-libvlc_log_t * Instance::logOpen() 
-{
-    libvlc_log_t * c_result = libvlc_log_open(m_obj);
-    libvlc_log_t * result = c_result;
-    return result;
 }
 
 std::list<ModuleDescription> Instance::audioFilterList() 
