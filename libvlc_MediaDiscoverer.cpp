@@ -28,16 +28,6 @@
 namespace VLC {
 
 
-MediaDiscoverer::MediaDiscoverer(libvlc_media_discoverer_t* obj) 
-{
-    if (!obj) 
-    {
-        throw Exception("Can't construct MediaDiscoverer");
-    }
-    m_obj = obj;
-    m_own = true;
-}
-
 MediaDiscoverer::MediaDiscoverer(MediaDiscoverer&& another) 
 {
     m_obj = another.m_obj;

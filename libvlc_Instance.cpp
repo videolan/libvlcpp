@@ -28,16 +28,7 @@
 namespace VLC {
 
 
-Instance::Instance(libvlc_instance_t* obj) 
-{
-    if (!obj) 
-    {
-        throw Exception("Can't construct Instance");
-    }
-    m_obj = obj;
-}
-
-Instance::Instance(const Instance& another) 
+Instance::Instance(const Instance& another)
 {
     m_obj = another.m_obj;
     retain();

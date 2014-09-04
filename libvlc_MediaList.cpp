@@ -27,16 +27,6 @@
 
 namespace VLC {
 
-
-MediaList::MediaList(libvlc_media_list_t* obj) 
-{
-    if (!obj) 
-    {
-        throw Exception("Can't construct MediaList");
-    }
-    m_obj = obj;
-}
-
 MediaList::MediaList(const MediaList& another) 
 {
     m_obj = another.m_obj;

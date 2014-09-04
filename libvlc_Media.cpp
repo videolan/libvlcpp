@@ -27,15 +27,6 @@
 
 namespace VLC {
 
-Media::Media(libvlc_media_t* obj) 
-{
-    if (!obj) 
-    {
-        throw Exception("Can't construct Media");
-    }
-    m_obj = obj;
-}
-
 Media::Media(const Media& another) 
 {
     m_obj = another.m_obj;
