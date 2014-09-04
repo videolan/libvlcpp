@@ -28,12 +28,12 @@
 #define LIBVLC_CXX_INSTANCE_H
 
 #include <libvlc_common.hpp>
-
+#include "libvlcpp.hpp"
 namespace VLC 
 {
 
 
-class Instance 
+class Instance : public Internal<libvlc_instance_t>
 {
 public:
     /**
@@ -295,9 +295,6 @@ private:
      * reference count is 1 after Instance::Instance() returns.
      */
     void retain();
-
-
-    libvlc_instance_t* m_obj;
 };
 
 } // namespace VLC

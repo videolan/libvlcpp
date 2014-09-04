@@ -28,12 +28,13 @@
 #define LIBVLC_CXX_MEDIAPLAYER_H
 
 #include <libvlc_common.hpp>
+#include "libvlcpp.hpp"
 
 namespace VLC 
 {
 
 
-class MediaPlayer 
+class MediaPlayer : public Internal<libvlc_media_player_t>
 {
 public:
     /**
@@ -1218,9 +1219,6 @@ private:
      * MediaPlayer::release() to decrement reference count.
      */
     void retain();
-
-
-    libvlc_media_player_t* m_obj;
 };
 
 } // namespace VLC

@@ -28,12 +28,13 @@
 #define LIBVLC_CXX_MEDIALIBRARY_H
 
 #include <libvlc_common.hpp>
+#include "libvlcpp.hpp"
 
 namespace VLC 
 {
 
 
-class MediaLibrary 
+class MediaLibrary : public Internal<libvlc_media_library_t>
 {
 public:
     /**
@@ -87,9 +88,6 @@ private:
      * MediaLibrary::release() to decrement the reference count.
      */
     void retain();
-
-
-    libvlc_media_library_t* m_obj;
 };
 
 } // namespace VLC

@@ -28,12 +28,13 @@
 #define LIBVLC_CXX_MEDIADISCOVERER_H
 
 #include <libvlc_common.hpp>
+#include "libvlcpp.hpp"
 
 namespace VLC 
 {
 
 
-class MediaDiscoverer 
+class MediaDiscoverer : public Internal<libvlc_media_discoverer_t>
 {
 public:
     /**
@@ -96,8 +97,6 @@ private:
     MediaDiscoverer& operator=(const MediaDiscoverer& another);
     MediaDiscoverer(const MediaDiscoverer& another);
     bool operator==(const MediaDiscoverer& another);
-
-    libvlc_media_discoverer_t* m_obj;
 };
 
 } // namespace VLC

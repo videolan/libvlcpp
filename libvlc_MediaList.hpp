@@ -28,12 +28,13 @@
 #define LIBVLC_CXX_MEDIALIST_H
 
 #include <libvlc_common.hpp>
+#include "libvlcpp.hpp"
 
 namespace VLC 
 {
 
 
-class MediaList 
+class MediaList : public Internal<libvlc_media_list_t>
 {
 public:
     /**
@@ -202,9 +203,6 @@ private:
      * Retain reference to a media list
      */
     void retain();
-
-
-    libvlc_media_list_t* m_obj;
 };
 
 } // namespace VLC

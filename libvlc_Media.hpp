@@ -28,12 +28,13 @@
 #define LIBVLC_CXX_MEDIA_H
 
 #include <libvlc_common.hpp>
+#include "libvlcpp.hpp"
 
 namespace VLC 
 {
 
 
-class Media 
+class Media : public Internal<libvlc_media_t>
 {
 public:
     /**
@@ -358,9 +359,6 @@ private:
      * not be used again.
      */
     void release();
-
-
-    libvlc_media_t* m_obj;
 };
 
 } // namespace VLC
