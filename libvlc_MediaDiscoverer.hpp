@@ -4,6 +4,7 @@
  * Copyright © 2014 the VideoLAN team
  *
  * Authors: Alexey Sokolov <alexey@alexeysokolov.co.cc>
+ *          Hugo Beauzée-Luyssen <hugo@beauzee.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -37,21 +38,6 @@ namespace VLC
 class MediaDiscoverer : public Internal<libvlc_media_discoverer_t>
 {
 public:
-    /**
-     * Move underlying libvlc_media_discoverer_t object from
-     * MediaDiscoverer another to new MediaDiscoverer.
-     * \param another existing MediaDiscoverer
-     */
-    MediaDiscoverer(MediaDiscoverer&& another);
-
-    /**
-     * Move underlying libvlc_media_discoverer_t object from
-     * MediaDiscoverer another to this MediaDiscoverer.
-     * \param another existing MediaDiscoverer
-     * \return this
-     */
-    const MediaDiscoverer& operator=(MediaDiscoverer&& another);
-
     ~MediaDiscoverer();
 
     // libvlc_media_discoverer_new_from_name
@@ -62,7 +48,7 @@ public:
      *
      * \param psz_name  service name
      */
-    MediaDiscoverer(Instance & p_inst, const std::string& psz_name);
+    static MediaDiscoverer* create(Instance & inst, const std::string& name);
 
     /**
      * Get media service discover object its localized name.
@@ -86,17 +72,15 @@ public:
     bool isRunning();
 
 private:
+    MediaDiscoverer(InternalPtr ptr);
     /**
      * Release media discover object. If the reference count reaches 0, then
      * the object will be released.
      */
     void release();
 
-
-    bool m_own;
-    MediaDiscoverer& operator=(const MediaDiscoverer& another);
     MediaDiscoverer(const MediaDiscoverer& another);
-    bool operator==(const MediaDiscoverer& another);
+    const MediaDiscoverer& operator=(const MediaDiscoverer& another);
 };
 
 } // namespace VLC

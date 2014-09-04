@@ -4,6 +4,7 @@
  * Copyright © 2014 the VideoLAN team
  *
  * Authors: Alexey Sokolov <alexey@alexeysokolov.co.cc>
+ *          Hugo Beauzée-Luyssen <hugo@beauzee.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -28,58 +29,17 @@
 namespace VLC {
 
 
-MediaDiscoverer::MediaDiscoverer(MediaDiscoverer&& another) 
-{
-    m_obj = another.m_obj;
-    m_own = another.m_own;
-    another.m_obj = NULL;
-    another.m_own = false;
-}
-
-const MediaDiscoverer& MediaDiscoverer::operator=(MediaDiscoverer&& another) 
-{
-    if (this == &another) 
-    {
-        return *this;
-    }
-    if (m_own) 
-    {
-        libvlc_media_discoverer_release(m_obj);
-    }
-    m_obj = another.m_obj;
-    m_own = another.m_own;
-    another.m_obj = NULL;
-    another.m_own = false;
-    return *this;
-}
-
-libvlc_media_discoverer_t* MediaDiscoverer::get_c_object() 
-{
-    return m_obj;
-}
-
-const libvlc_media_discoverer_t* MediaDiscoverer::get_c_object() const 
-{
-    return m_obj;
-}
-
 MediaDiscoverer::~MediaDiscoverer() 
 {
-    if (m_own) 
-    {
-        libvlc_media_discoverer_release(m_obj);
-    }
+    release();
 }
 
-
-MediaDiscoverer::MediaDiscoverer(Instance & p_inst, const std::string& psz_name) 
+MediaDiscoverer* MediaDiscoverer::create( Instance &inst, const std::string& name )
 {
-    m_obj = libvlc_media_discoverer_new_from_name(p_inst.get_c_object(), psz_name.c_str());
-    if (!m_obj) 
-    {
-        throw Exception("Can't construct MediaDiscoverer");
-    }
-    m_own = true;
+    InternalPtr ptr = libvlc_media_discoverer_new_from_name(inst, name.c_str());
+    if ( ptr == NULL )
+        return NULL;
+    return new MediaDiscoverer( ptr );
 }
 
 std::string MediaDiscoverer::localizedName() 
@@ -102,6 +62,11 @@ bool MediaDiscoverer::isRunning()
     int c_result = libvlc_media_discoverer_is_running(m_obj);
     bool result = c_result;
     return result;
+}
+
+MediaDiscoverer::MediaDiscoverer(Internal::InternalPtr ptr)
+    : Internal( ptr )
+{
 }
 
 void MediaDiscoverer::release() 
