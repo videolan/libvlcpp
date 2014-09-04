@@ -4,6 +4,7 @@
  * Copyright © 2014 the VideoLAN team
  *
  * Authors: Alexey Sokolov <alexey@alexeysokolov.co.cc>
+ *          Hugo Beauzée-Luyssen <hugo@beauzee.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -38,6 +39,73 @@ class Media : public Internal<libvlc_media_t>
 {
 public:
     /**
+     * Create a media for a certain file path.
+     *
+     * \param instance the instance
+     * \param path local filesystem path
+     * \return the newly created media or NULL on error
+     */
+    static Media* fromPath(Instance& instance, const std::string& path);
+
+    /**
+     * Create a media with a certain given media resource location,
+     * for instance a valid URL.
+     *
+     * \note To refer to a local file with this function,
+     * the file://... URI syntax <b>must</b> be used (see IETF RFC3986).
+     * We recommend using libvlc_media_new_path() instead when dealing with
+     * local files.
+     *
+     * \see libvlc_media_release
+     *
+     * \param instance the instance
+     * \param psz_mrl the media location
+     * \return the newly created media or NULL on error
+     */
+    static Media* fromLocation(Instance& instance, const std::string& location);
+
+    /**
+     * Create a media for an already open file descriptor.
+     * The file descriptor shall be open for reading (or reading and writing).
+     *
+     * Regular file descriptors, pipe read descriptors and character device
+     * descriptors (including TTYs) are supported on all platforms.
+     * Block device descriptors are supported where available.
+     * Directory descriptors are supported on systems that provide fdopendir().
+     * Sockets are supported on all platforms where they are file descriptors,
+     * i.e. all except Windows.
+     *
+     * \note This library will <b>not</b> automatically close the file descriptor
+     * under any circumstance. Nevertheless, a file descriptor can usually only be
+     * rendered once in a media player. To render it a second time, the file
+     * descriptor should probably be rewound to the beginning with lseek().
+     *
+     * \param p_instance the instance
+     * \param fd open file descriptor
+     * \return the newly created media or NULL on error
+     */
+    static Media* fromFileDescriptor(Instance& instance, int fd);
+
+    /**
+     * Get media instance from this media list instance. This action will increase
+     * the refcount on the media instance.
+     * The libvlc_media_list_lock should NOT be held upon entering this function.
+     *
+     * \param p_ml a media list instance
+     * \return media instance
+     */
+    static Media* fromList(MediaList& list );
+
+    /**
+     * Create a media as an empty node with a given name.
+     *
+     * \param p_instance the instance
+     * \param psz_name the name of the node
+     * \return the new empty media or NULL on error
+     */
+    static Media* asNode(Instance& instance, const std::string& nodeName);
+
+    /**
      * Copy libvlc_media_t from another to new Media object.
      * \param another existing Media
      */
@@ -58,81 +126,6 @@ public:
     bool operator==(const Media& another) const;
 
     ~Media();
-
-
-    enum ConstructorType {
-        Location,
-        Path,
-        Node,
-    };
-
-    // overriden_media_new
-    /**
-     * Create a media from a location (URI), a path or as an empty node with
-     * a given name.
-     *
-     * \param p_inst  libvlc instance
-     *
-     * \param src  wanted location, path, or name
-     *
-     * \param t  how to create the media - from location, from path or as
-     * node
-     */
-    Media(Instance & p_inst, const std::string& src, ConstructorType t);
-
-    // libvlc_media_new_location
-    /**
-     * Create a media with a certain given media resource location, for
-     * instance a valid URL.
-     *
-     * \note To refer to a local file with this function, the . URI syntax be
-     * used (see IETF RFC3986). We recommend using libvlc_media_new_path()
-     * instead when dealing with local files.
-     *
-     * \see Media::release()
-     *
-     * \param p_instance  the instance
-     *
-     * \param psz_mrl  the media location
-     */
-    Media(Instance & p_instance, const std::string& psz_mrl);
-
-    // libvlc_media_new_fd
-    /**
-     * Create a media for an already open file descriptor. The file
-     * descriptor shall be open for reading (or reading and writing).
-     *
-     * Regular file descriptors, pipe read descriptors and character device
-     * descriptors (including TTYs) are supported on all platforms. Block
-     * device descriptors are supported where available. Directory
-     * descriptors are supported on systems that provide fdopendir(). Sockets
-     * are supported on all platforms where they are file descriptors, i.e.
-     * all except Windows.
-     *
-     * \note This library will automatically close the file descriptor under
-     * any circumstance. Nevertheless, a file descriptor can usually only be
-     * rendered once in a media player. To render it a second time, the file
-     * descriptor should probably be rewound to the beginning with lseek().
-     *
-     * \see Media::release()
-     *
-     * \version LibVLC 1.1.5 and later.
-     *
-     * \param p_instance  the instance
-     *
-     * \param fd  open file descriptor
-     */
-    Media(Instance & p_instance, int fd);
-
-    // libvlc_media_list_media
-    /**
-     * Get media instance from this media list instance. This action will
-     * increase the refcount on the media instance. The
-     * libvlc_media_list_lock should NOT be held upon entering this function.
-     *
-     * \param p_ml  a media list instance
-     */
-    Media(MediaList & p_ml);
 
     /**
      * Foo bar
@@ -344,6 +337,7 @@ public:
     unsigned tracks(libvlc_media_track_t *** tracks);
 
 private:
+    Media(InternalPtr ptr);
     /**
      * Retain a reference to a media descriptor object (libvlc_media_t). Use
      * Media::release() to decrement the reference count of a media

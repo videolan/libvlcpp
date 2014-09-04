@@ -34,19 +34,18 @@ template < typename T >
 class   Internal
 {
     public:
-        typedef     T*      internalPtr;
-        T*                  getInternalPtr()
+        typedef     T*      InternalPtr;
+        InternalPtr         getInternalPtr()
         {
             assert( m_obj != NULL );
             return m_obj;
         }
         operator T*() { return m_obj; }
     protected:
-        Internal() : m_obj( NULL ) {}
-        Internal(T* obj) : m_obj( obj ) {}
+        Internal(InternalPtr obj = NULL ) : m_obj( obj ) {}
         ~Internal(){}
 
-        T*                  m_obj;
+        InternalPtr         m_obj;
 };
 
 }

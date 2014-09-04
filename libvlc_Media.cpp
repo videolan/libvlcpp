@@ -4,6 +4,7 @@
  * Copyright © 2014 the VideoLAN team
  *
  * Authors: Alexey Sokolov <alexey@alexeysokolov.co.cc>
+ *          Hugo Beauzée-Luyssen <hugo@beauzee.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -27,7 +28,47 @@
 
 namespace VLC {
 
-Media::Media(const Media& another) 
+Media* Media::fromPath(Instance& instance, const std::string& path)
+{
+    InternalPtr ptr = libvlc_media_new_path( instance, path.c_str() );
+    if ( ptr == NULL )
+        return NULL;
+    return new Media(ptr);
+}
+
+Media*Media::fromLocation(Instance& instance, const std::string& location)
+{
+    InternalPtr ptr = libvlc_media_new_location( instance, location.c_str() );
+    if ( ptr == NULL )
+        return NULL;
+    return new Media(ptr);
+}
+
+Media*Media::fromFileDescriptor(Instance& instance, int fd)
+{
+    InternalPtr ptr = libvlc_media_new_fd( instance, fd );
+    if ( ptr == NULL )
+        return NULL;
+    return new Media( ptr );
+}
+
+Media*Media::fromList(MediaList& list)
+{
+    InternalPtr ptr = libvlc_media_list_media( list );
+    if ( ptr == NULL )
+        return NULL;
+    return new Media( ptr );
+}
+
+Media*Media::asNode(Instance& instance, const std::string& nodeName)
+{
+    InternalPtr ptr = libvlc_media_new_as_node( instance, nodeName.c_str() );
+    if ( ptr == NULL )
+        return NULL;
+    return new Media( ptr );
+}
+
+Media::Media(const Media& another)
 {
     m_obj = another.m_obj;
     retain();
@@ -53,53 +94,6 @@ bool Media::operator==(const Media& another) const
 Media::~Media() 
 {
     release();
-}
-
-
-Media::Media(Instance& inst, const std::string& s, ConstructorType t) {
-    m_obj = NULL;
-    switch (t) {
-        case Location:
-            m_obj = libvlc_media_new_location(inst.get_c_object(), s.c_str());
-            break;
-        case Path:
-            m_obj = libvlc_media_new_path(inst.get_c_object(), s.c_str());
-            break;
-        case Node:
-            m_obj = libvlc_media_new_as_node(inst.get_c_object(), s.c_str());
-            break;
-    }
-    if (!m_obj) {
-        throw Exception();
-    }
-}
-
-
-Media::Media(Instance & p_instance, const std::string& psz_mrl) 
-{
-    m_obj = libvlc_media_new_location(p_instance.get_c_object(), psz_mrl.c_str());
-    if (!m_obj) 
-    {
-        throw Exception("Can't construct Media");
-    }
-}
-
-Media::Media(Instance & p_instance, int fd) 
-{
-    m_obj = libvlc_media_new_fd(p_instance.get_c_object(), fd);
-    if (!m_obj) 
-    {
-        throw Exception("Can't construct Media");
-    }
-}
-
-Media::Media(MediaList & p_ml) 
-{
-    m_obj = libvlc_media_list_media(p_ml.get_c_object());
-    if (!m_obj) 
-    {
-        throw Exception("Can't construct Media");
-    }
 }
 
 std::vector<MediaTrackInfo> Media::tracksInfo() {
@@ -222,6 +216,11 @@ unsigned Media::tracks(libvlc_media_track_t *** tracks)
     unsigned c_result = libvlc_media_tracks_get(m_obj, tracks);
     unsigned result = c_result;
     return result;
+}
+
+Media::Media(Internal::InternalPtr ptr)
+    : Internal(ptr)
+{
 }
 
 void Media::retain() 
