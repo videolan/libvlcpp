@@ -35,13 +35,6 @@ namespace VLC {
 class ModuleDescription 
 {
 public:
-    /** Not to be used
-     */
-    ModuleDescription() 
-    {
-        throw std::logic_error("This constructor shouldn't be called.");
-    }
-
     const std::string& name() const;
     const std::string& shortname() const;
     const std::string& longname() const;
@@ -60,13 +53,6 @@ private:
 class MediaTrackInfo 
 {
 public:
-    /** Not to be used
-     */
-    MediaTrackInfo() 
-    {
-        throw std::logic_error("This constructor shouldn't be called.");
-    }
-
     uint32_t codec() const;
     int id() const;
     libvlc_track_type_t type() const;
@@ -94,13 +80,6 @@ private:
 class AudioOutputDescription 
 {
 public:
-    /** Not to be used
-     */
-    AudioOutputDescription() 
-    {
-        throw std::logic_error("This constructor shouldn't be called.");
-    }
-
     const std::string& name() const;
     const std::string& description() const;
 
@@ -115,13 +94,6 @@ private:
 class TrackDescription 
 {
 public:
-    /** Not to be used
-     */
-    TrackDescription() 
-    {
-        throw std::logic_error("This constructor shouldn't be called.");
-    }
-
     int id() const;
     const std::string& name() const;
 
