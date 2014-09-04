@@ -57,21 +57,12 @@ Instance::~Instance()
 }
 
 
-Instance::Instance() {
-    m_obj = libvlc_new(0, NULL);
-    if (!m_obj) {
-        throw Exception();
-    }
-}
-
-
-Instance::Instance(int argc, const char *const * argv) 
+Instance* Instance::create(int argc, const char *const * argv)
 {
-    m_obj = libvlc_new(argc, argv);
-    if (!m_obj) 
-    {
-        throw Exception("Can't construct Instance");
-    }
+    InternalPtr ptr = libvlc_new(argc, argv);
+    if ( ptr == NULL )
+        return NULL;
+    return new Instance(ptr);
 }
 
 int Instance::addIntf(const std::string& name) 
@@ -164,6 +155,11 @@ libvlc_audio_output_device_t * Instance::audioOutputDeviceList(const std::string
     libvlc_audio_output_device_t * c_result = libvlc_audio_output_device_list_get(m_obj, aout.c_str());
     libvlc_audio_output_device_t * result = c_result;
     return result;
+}
+
+Instance::Instance(Internal::InternalPtr ptr)
+    : Internal( ptr )
+{
 }
 
 void Instance::release() 

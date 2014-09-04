@@ -58,13 +58,6 @@ public:
 
     ~Instance();
 
-    // overriden_libvlc_new
-    /**
-     * Create and initialize a libvlc instance.
-     */
-    Instance();
-
-    // libvlc_new
     /**
      * Create and initialize a libvlc instance. This functions accept a list
      * of "command line" arguments similar to the main(). These arguments
@@ -87,7 +80,7 @@ public:
      *
      * \param argv  list of arguments (should be NULL)
      */
-    Instance(int argc, const char *const * argv);
+    static Instance* create(int argc, const char *const * argv);
 
     /**
      * Try to start a user interface for the libvlc instance.
@@ -284,6 +277,7 @@ public:
     libvlc_audio_output_device_t * audioOutputDeviceList(const std::string& aout);
 
 private:
+    Instance(InternalPtr ptr);
     /**
      * Decrement the reference count of a libvlc instance, and destroy it if
      * it reaches zero.
