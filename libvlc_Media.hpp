@@ -286,7 +286,7 @@ public:
      *
      * \see Media::meta()
      *
-     * \see Media::tracksInfo()
+     * \see Media::tracks()
      */
     void parseAsync();
 
@@ -325,13 +325,9 @@ public:
      *
      * \version LibVLC 2.1.0 and later.
      *
-     * \param tracks  address to store an allocated array of Elementary
-     * Streams descriptions (must be freed with libvlc_media_tracks_release
-     * by the caller) [OUT]
-     *
-     * \return the number of Elementary Streams (zero on error)
+     * \return a vector containing all tracks
      */
-    unsigned tracks(libvlc_media_track_t *** tracks);
+    std::vector<MediaTrack> tracks();
 
 private:
     Media(InternalPtr ptr);

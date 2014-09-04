@@ -198,11 +198,19 @@ void * Media::userData()
     return result;
 }
 
-unsigned Media::tracks(libvlc_media_track_t *** tracks) 
+std::vector<MediaTrack> Media::tracks()
 {
-    unsigned c_result = libvlc_media_tracks_get(m_obj, tracks);
-    unsigned result = c_result;
-    return result;
+    libvlc_media_track_t**  tracks;
+    uint32_t                nbTracks = libvlc_media_tracks_get(m_obj, &tracks);
+    std::vector<MediaTrack> res;
+
+    if ( nbTracks == 0 )
+        return res;
+
+    for ( uint32_t i = 0; i < nbTracks; ++i )
+        res.push_back( MediaTrack(tracks[i]));
+    libvlc_media_tracks_release( tracks, nbTracks );
+    return res;
 }
 
 Media::Media(Internal::InternalPtr ptr)
