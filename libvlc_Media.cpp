@@ -27,7 +27,6 @@
 
 namespace VLC {
 
-
 Media::Media(libvlc_media_t* obj) 
 {
     if (!obj) 

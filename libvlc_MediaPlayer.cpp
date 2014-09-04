@@ -84,18 +84,6 @@ MediaPlayer::MediaPlayer(Media & p_md)
     }
 }
 
-Audio MediaPlayer::audio() {
-    retain();
-    return Audio(m_obj);
-}
-
-
-Video MediaPlayer::video() {
-    retain();
-    return Video(m_obj);
-}
-
-
 void MediaPlayer::setMedia(Media & p_md) 
 {
     libvlc_media_player_set_media(m_obj, p_md.get_c_object());
@@ -393,6 +381,406 @@ void MediaPlayer::release()
 void MediaPlayer::retain() 
 {
     libvlc_media_player_retain(m_obj);
+}
+
+
+void MediaPlayer::setCallbacks(libvlc_audio_play_cb play, libvlc_audio_pause_cb pause, libvlc_audio_resume_cb resume, libvlc_audio_flush_cb flush, libvlc_audio_drain_cb drain, void * opaque)
+{
+    libvlc_audio_set_callbacks(m_obj, play, pause, resume, flush, drain, opaque);
+}
+
+void MediaPlayer::setVolumeCallback(libvlc_audio_set_volume_cb set_volume)
+{
+    libvlc_audio_set_volume_callback(m_obj, set_volume);
+}
+
+void MediaPlayer::setFormatCallbacks(libvlc_audio_setup_cb setup, libvlc_audio_cleanup_cb cleanup)
+{
+    libvlc_audio_set_format_callbacks(m_obj, setup, cleanup);
+}
+
+void MediaPlayer::setFormat(const std::string& format, unsigned rate, unsigned channels)
+{
+    libvlc_audio_set_format(m_obj, format.c_str(), rate, channels);
+}
+
+int MediaPlayer::outputSet(const std::string& psz_name)
+{
+    int c_result = libvlc_audio_output_set(m_obj, psz_name.c_str());
+    int result = c_result;
+    return result;
+}
+
+libvlc_audio_output_device_t * MediaPlayer::outputDeviceEnum()
+{
+    libvlc_audio_output_device_t * c_result = libvlc_audio_output_device_enum(m_obj);
+    libvlc_audio_output_device_t * result = c_result;
+    return result;
+}
+
+void MediaPlayer::outputDeviceSet(const std::string& module, const std::string& device_id)
+{
+    libvlc_audio_output_device_set(m_obj, module.c_str(), device_id.c_str());
+}
+
+void MediaPlayer::toggleMute()
+{
+    libvlc_audio_toggle_mute(m_obj);
+}
+
+int MediaPlayer::mute()
+{
+    int c_result = libvlc_audio_get_mute(m_obj);
+    int result = c_result;
+    return result;
+}
+
+void MediaPlayer::setMute(int status)
+{
+    libvlc_audio_set_mute(m_obj, status);
+}
+
+int MediaPlayer::volume()
+{
+    int c_result = libvlc_audio_get_volume(m_obj);
+    int result = c_result;
+    return result;
+}
+
+int MediaPlayer::setVolume(int i_volume)
+{
+    int c_result = libvlc_audio_set_volume(m_obj, i_volume);
+    int result = c_result;
+    return result;
+}
+
+int MediaPlayer::audioTrackCount()
+{
+    int c_result = libvlc_audio_get_track_count(m_obj);
+    int result = c_result;
+    return result;
+}
+
+std::list<TrackDescription> MediaPlayer::audioTrackDescription()
+{
+    libvlc_track_description_t * c_result = libvlc_audio_get_track_description(m_obj);
+    std::list<TrackDescription> result = TrackDescription::makeList(c_result);
+    libvlc_track_description_list_release(c_result);
+    return result;
+}
+
+int MediaPlayer::videoTrack()
+{
+    int c_result = libvlc_audio_get_track(m_obj);
+    int result = c_result;
+    return result;
+}
+
+int MediaPlayer::setVideoTrack(int i_track)
+{
+    int c_result = libvlc_audio_set_track(m_obj, i_track);
+    int result = c_result;
+    return result;
+}
+
+int MediaPlayer::channel()
+{
+    int c_result = libvlc_audio_get_channel(m_obj);
+    int result = c_result;
+    return result;
+}
+
+int MediaPlayer::setChannel(int channel)
+{
+    int c_result = libvlc_audio_set_channel(m_obj, channel);
+    int result = c_result;
+    return result;
+}
+
+int64_t MediaPlayer::delay()
+{
+    int64_t c_result = libvlc_audio_get_delay(m_obj);
+    int64_t result = c_result;
+    return result;
+}
+
+int MediaPlayer::setDelay(int64_t i_delay)
+{
+    int c_result = libvlc_audio_set_delay(m_obj, i_delay);
+    int result = c_result;
+    return result;
+}
+
+void MediaPlayer::setCallbacks(libvlc_video_lock_cb lock, libvlc_video_unlock_cb unlock, libvlc_video_display_cb display, void * opaque)
+{
+    libvlc_video_set_callbacks(m_obj, lock, unlock, display, opaque);
+}
+
+void MediaPlayer::setFormat(const std::string& chroma, unsigned width, unsigned height, unsigned pitch)
+{
+    libvlc_video_set_format(m_obj, chroma.c_str(), width, height, pitch);
+}
+
+void MediaPlayer::setFormatCallbacks(libvlc_video_format_cb setup, libvlc_video_cleanup_cb cleanup)
+{
+    libvlc_video_set_format_callbacks(m_obj, setup, cleanup);
+}
+
+void MediaPlayer::setKeyInput(unsigned on)
+{
+    libvlc_video_set_key_input(m_obj, on);
+}
+
+void MediaPlayer::setMouseInput(unsigned on)
+{
+    libvlc_video_set_mouse_input(m_obj, on);
+}
+
+int MediaPlayer::size(unsigned num, unsigned * px, unsigned * py)
+{
+    int c_result = libvlc_video_get_size(m_obj, num, px, py);
+    int result = c_result;
+    return result;
+}
+
+int MediaPlayer::cursor(unsigned num, int * px, int * py)
+{
+    int c_result = libvlc_video_get_cursor(m_obj, num, px, py);
+    int result = c_result;
+    return result;
+}
+
+float MediaPlayer::scale()
+{
+    float c_result = libvlc_video_get_scale(m_obj);
+    float result = c_result;
+    return result;
+}
+
+void MediaPlayer::setScale(float f_factor)
+{
+    libvlc_video_set_scale(m_obj, f_factor);
+}
+
+std::string MediaPlayer::aspectRatio()
+{
+    char * c_result = libvlc_video_get_aspect_ratio(m_obj);
+    std::string result = c_result;
+    libvlc_free(c_result);
+    return result;
+}
+
+void MediaPlayer::setAspectRatio(const std::string& psz_aspect)
+{
+    libvlc_video_set_aspect_ratio(m_obj, psz_aspect.c_str());
+}
+
+int MediaPlayer::spu()
+{
+    int c_result = libvlc_video_get_spu(m_obj);
+    int result = c_result;
+    return result;
+}
+
+int MediaPlayer::spuCount()
+{
+    int c_result = libvlc_video_get_spu_count(m_obj);
+    int result = c_result;
+    return result;
+}
+
+std::list<TrackDescription> MediaPlayer::spuDescription()
+{
+    libvlc_track_description_t * c_result = libvlc_video_get_spu_description(m_obj);
+    std::list<TrackDescription> result = TrackDescription::makeList(c_result);
+    libvlc_track_description_list_release(c_result);
+    return result;
+}
+
+int MediaPlayer::setSpu(int i_spu)
+{
+    int c_result = libvlc_video_set_spu(m_obj, i_spu);
+    int result = c_result;
+    return result;
+}
+
+int MediaPlayer::setSubtitleFile(const std::string& psz_subtitle)
+{
+    int c_result = libvlc_video_set_subtitle_file(m_obj, psz_subtitle.c_str());
+    int result = c_result;
+    return result;
+}
+
+int64_t MediaPlayer::spuDelay()
+{
+    int64_t c_result = libvlc_video_get_spu_delay(m_obj);
+    int64_t result = c_result;
+    return result;
+}
+
+int MediaPlayer::setSpuDelay(int64_t i_delay)
+{
+    int c_result = libvlc_video_set_spu_delay(m_obj, i_delay);
+    int result = c_result;
+    return result;
+}
+
+std::list<TrackDescription> MediaPlayer::titleDescription()
+{
+    libvlc_track_description_t * c_result = libvlc_video_get_title_description(m_obj);
+    std::list<TrackDescription> result = TrackDescription::makeList(c_result);
+    libvlc_track_description_list_release(c_result);
+    return result;
+}
+
+std::list<TrackDescription> MediaPlayer::chapterDescription(int i_title)
+{
+    libvlc_track_description_t * c_result = libvlc_video_get_chapter_description(m_obj, i_title);
+    std::list<TrackDescription> result = TrackDescription::makeList(c_result);
+    libvlc_track_description_list_release(c_result);
+    return result;
+}
+
+std::string MediaPlayer::cropGeometry()
+{
+    char * c_result = libvlc_video_get_crop_geometry(m_obj);
+    std::string result = c_result;
+    libvlc_free(c_result);
+    return result;
+}
+
+void MediaPlayer::setCropGeometry(const std::string& psz_geometry)
+{
+    libvlc_video_set_crop_geometry(m_obj, psz_geometry.c_str());
+}
+
+int MediaPlayer::teletext()
+{
+    int c_result = libvlc_video_get_teletext(m_obj);
+    int result = c_result;
+    return result;
+}
+
+void MediaPlayer::setTeletext(int i_page)
+{
+    libvlc_video_set_teletext(m_obj, i_page);
+}
+
+int MediaPlayer::trackCount()
+{
+    int c_result = libvlc_video_get_track_count(m_obj);
+    int result = c_result;
+    return result;
+}
+
+std::list<TrackDescription> MediaPlayer::trackDescription()
+{
+    libvlc_track_description_t * c_result = libvlc_video_get_track_description(m_obj);
+    std::list<TrackDescription> result = TrackDescription::makeList(c_result);
+    libvlc_track_description_list_release(c_result);
+    return result;
+}
+
+int MediaPlayer::track()
+{
+    int c_result = libvlc_video_get_track(m_obj);
+    int result = c_result;
+    return result;
+}
+
+int MediaPlayer::setTrack(int i_track)
+{
+    int c_result = libvlc_video_set_track(m_obj, i_track);
+    int result = c_result;
+    return result;
+}
+
+int MediaPlayer::takeSnapshot(unsigned num, const std::string& psz_filepath, unsigned int i_width, unsigned int i_height)
+{
+    int c_result = libvlc_video_take_snapshot(m_obj, num, psz_filepath.c_str(), i_width, i_height);
+    int result = c_result;
+    return result;
+}
+
+void MediaPlayer::setDeinterlace(const std::string& psz_mode)
+{
+    libvlc_video_set_deinterlace(m_obj, psz_mode.c_str());
+}
+
+int MediaPlayer::marqueeInt(unsigned option)
+{
+    int c_result = libvlc_video_get_marquee_int(m_obj, option);
+    int result = c_result;
+    return result;
+}
+
+std::string MediaPlayer::marqueeString(unsigned option)
+{
+    char * c_result = libvlc_video_get_marquee_string(m_obj, option);
+    std::string result = c_result;
+    libvlc_free(c_result);
+    return result;
+}
+
+void MediaPlayer::setMarqueeInt(unsigned option, int i_val)
+{
+    libvlc_video_set_marquee_int(m_obj, option, i_val);
+}
+
+void MediaPlayer::setMarqueeString(unsigned option, const std::string& psz_text)
+{
+    libvlc_video_set_marquee_string(m_obj, option, psz_text.c_str());
+}
+
+int MediaPlayer::logoInt(unsigned option)
+{
+    int c_result = libvlc_video_get_logo_int(m_obj, option);
+    int result = c_result;
+    return result;
+}
+
+void MediaPlayer::setLogoInt(unsigned option, int value)
+{
+    libvlc_video_set_logo_int(m_obj, option, value);
+}
+
+void MediaPlayer::setLogoString(unsigned option, const std::string& psz_value)
+{
+    libvlc_video_set_logo_string(m_obj, option, psz_value.c_str());
+}
+
+int MediaPlayer::adjustInt(unsigned option)
+{
+    int c_result = libvlc_video_get_adjust_int(m_obj, option);
+    int result = c_result;
+    return result;
+}
+
+void MediaPlayer::setAdjustInt(unsigned option, int value)
+{
+    libvlc_video_set_adjust_int(m_obj, option, value);
+}
+
+float MediaPlayer::adjustFloat(unsigned option)
+{
+    float c_result = libvlc_video_get_adjust_float(m_obj, option);
+    float result = c_result;
+    return result;
+}
+
+void MediaPlayer::setAdjustFloat(unsigned option, float value)
+{
+    libvlc_video_set_adjust_float(m_obj, option, value);
+}
+
+
+void MediaPlayer::retain() {
+    libvlc_media_player_retain(m_obj);
+}
+
+
+void MediaPlayer::release() {
+    libvlc_media_player_release(m_obj);
 }
 
 } // namespace VLC
