@@ -46,12 +46,16 @@ const std::string& ModuleDescription::help() const
     return m_help;
 }
 
-ModuleDescription::ModuleDescription(libvlc_module_description_t* c)
+ModuleDescription::ModuleDescription( libvlc_module_description_t* c )
 {
-    m_name = c->psz_name ? c->psz_name : "";
-    m_shortname = c->psz_shortname ? c->psz_shortname : "";
-    m_longname = c->psz_longname ? c->psz_longname : "";
-    m_help = c->psz_help ? c->psz_help : "";
+    if ( c->psz_name != NULL )
+        m_name = c->psz_name;
+    if ( c->psz_shortname != NULL )
+        m_shortname = c->psz_shortname;
+    if ( c->psz_longname != NULL )
+        m_longname = c->psz_longname;
+    if ( c->psz_help != NULL )
+        m_help = c->psz_help;
 }
 
 uint32_t MediaTrack::codec() const
@@ -176,8 +180,10 @@ const std::string& AudioOutputDescription::description() const
 
 AudioOutputDescription::AudioOutputDescription( libvlc_audio_output_t* c )
 {
-    m_name = c->psz_name ? c->psz_name : "";
-    m_description = c->psz_description ? c->psz_description : "";
+    if ( c->psz_name != NULL )
+        m_name = c->psz_name;
+    if ( c->psz_description != NULL )
+        m_description = c->psz_description;
 }
 
 int TrackDescription::id() const
@@ -190,10 +196,11 @@ const std::string& TrackDescription::name() const
     return m_name;
 }
 
-TrackDescription::TrackDescription(libvlc_track_description_t* c)
+TrackDescription::TrackDescription( libvlc_track_description_t* c )
+    : m_id( c->i_id )
 {
-    m_id = c->i_id;
-    m_name = c->psz_name ? c->psz_name : "";
+    if ( c->psz_name != NULL )
+        m_name = c->psz_name;
 }
 
 } // namespace VLC

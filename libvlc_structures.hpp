@@ -114,7 +114,7 @@ public:
     const std::string& description() const;
 
 private:
-    AudioOutputDescription(libvlc_audio_output_t* c);
+    AudioOutputDescription( libvlc_audio_output_t* c );
     std::string m_name;
     std::string m_description;
 
@@ -129,7 +129,7 @@ public:
     const std::string& name() const;
 
 private:
-    TrackDescription(libvlc_track_description_t* c);
+    TrackDescription( libvlc_track_description_t* c );
     int m_id;
     std::string m_name;
 
