@@ -23,7 +23,8 @@
 
 #include <vlc.hpp>
 
-namespace VLC {
+namespace VLC
+{
 
 MediaLibrary*MediaLibrary::create(Instance& instance)
 {
@@ -39,9 +40,9 @@ MediaLibrary::MediaLibrary(const MediaLibrary& another)
     retain();
 }
 
-const MediaLibrary& MediaLibrary::operator=(const MediaLibrary& another) 
+const MediaLibrary& MediaLibrary::operator=(const MediaLibrary& another)
 {
-    if (this == &another) 
+    if (this == &another)
     {
         return *this;
     }
@@ -51,21 +52,19 @@ const MediaLibrary& MediaLibrary::operator=(const MediaLibrary& another)
     return *this;
 }
 
-bool MediaLibrary::operator==(const MediaLibrary& another) const 
+bool MediaLibrary::operator==(const MediaLibrary& another) const
 {
     return m_obj == another.m_obj;
 }
 
-MediaLibrary::~MediaLibrary() 
+MediaLibrary::~MediaLibrary()
 {
     release();
 }
 
-int MediaLibrary::load() 
+int MediaLibrary::load()
 {
-    int c_result = libvlc_media_library_load(m_obj);
-    int result = c_result;
-    return result;
+    return libvlc_media_library_load(m_obj);
 }
 
 MediaLibrary::MediaLibrary(Internal::InternalPtr ptr)
@@ -73,12 +72,12 @@ MediaLibrary::MediaLibrary(Internal::InternalPtr ptr)
 {
 }
 
-void MediaLibrary::release() 
+void MediaLibrary::release()
 {
     libvlc_media_library_release(m_obj);
 }
 
-void MediaLibrary::retain() 
+void MediaLibrary::retain()
 {
     libvlc_media_library_retain(m_obj);
 }
