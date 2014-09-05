@@ -97,28 +97,52 @@ void Instance::logSetFile( FILE * stream )
     libvlc_log_set_file( m_obj, stream );
 }
 
-std::list<ModuleDescription> Instance::audioFilterList()
+std::vector<ModuleDescription> Instance::audioFilterList()
 {
-    libvlc_module_description_t* c_result = libvlc_audio_filter_list_get(m_obj);
-    std::list<ModuleDescription> result = ModuleDescription::makeList(c_result);
-    libvlc_module_description_list_release( c_result );
-    return result;
+    libvlc_module_description_t* result = libvlc_audio_filter_list_get(m_obj);
+    std::vector<ModuleDescription> res;
+    if ( result == NULL )
+        return res;
+    libvlc_module_description_t* p = result;
+    while ( p != NULL )
+    {
+        res.push_back( ModuleDescription( p ) );
+        p = p->p_next;
+    }
+    libvlc_module_description_list_release( result );
+    return res;
 }
 
-std::list<ModuleDescription> Instance::videoFilterList()
+std::vector<ModuleDescription> Instance::videoFilterList()
 {
-    libvlc_module_description_t * c_result = libvlc_video_filter_list_get(m_obj);
-    std::list<ModuleDescription> result = ModuleDescription::makeList(c_result);
-    libvlc_module_description_list_release(c_result);
-    return result;
+    libvlc_module_description_t* result = libvlc_video_filter_list_get(m_obj);
+    std::vector<ModuleDescription> res;
+    if ( result == NULL )
+        return res;
+    libvlc_module_description_t* p = result;
+    while ( p != NULL )
+    {
+        res.push_back( ModuleDescription( p ) );
+        p = p->p_next;
+    }
+    libvlc_module_description_list_release( result );
+    return res;
 }
 
-std::list<AudioOutputDescription> Instance::audioOutputList()
+std::vector<AudioOutputDescription> Instance::audioOutputList()
 {
-    libvlc_audio_output_t * c_result = libvlc_audio_output_list_get(m_obj);
-    std::list<AudioOutputDescription> result = AudioOutputDescription::makeList(c_result);
-    libvlc_audio_output_list_release(c_result);
-    return result;
+    libvlc_audio_output_t* result = libvlc_audio_output_list_get(m_obj);
+    std::vector<AudioOutputDescription> res;
+    if ( result == NULL )
+        return res;
+    libvlc_audio_output_t* p = result;
+    while ( p != NULL )
+    {
+        res.push_back( AudioOutputDescription( p ) );
+        p = p->p_next;
+    }
+    libvlc_audio_output_list_release(result);
+    return res;
 }
 
 libvlc_audio_output_device_t * Instance::audioOutputDeviceList(const std::string& aout)

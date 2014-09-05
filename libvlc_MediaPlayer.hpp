@@ -30,7 +30,7 @@
 #include <libvlc_common.hpp>
 #include "libvlcpp.hpp"
 
-namespace VLC 
+namespace VLC
 {
 
 
@@ -697,7 +697,7 @@ public:
      *
      * \return list with description of available audio tracks, or NULL
      */
-    std::list<TrackDescription> audioTrackDescription();
+    std::vector<TrackDescription> audioTrackDescription();
 
     /**
      * Get current audio track.
@@ -932,7 +932,7 @@ public:
      *
      * \return list containing description of available video subtitles
      */
-    std::list<TrackDescription> spuDescription();
+    std::vector<TrackDescription> spuDescription();
 
     /**
      * Set new video subtitle.
@@ -986,7 +986,7 @@ public:
      *
      * \return list containing description of available titles
      */
-    std::list<TrackDescription> titleDescription();
+    std::vector<TrackDescription> titleDescription();
 
     /**
      * Get the description of available chapters for specific title.
@@ -996,7 +996,7 @@ public:
      * \return list containing description of available chapter for title
      * i_title
      */
-    std::list<TrackDescription> chapterDescription(int i_title);
+    std::vector<TrackDescription> chapterDescription(int i_title);
 
     /**
      * Get current crop filter geometry.
@@ -1039,7 +1039,7 @@ public:
      * \return list with description of available video tracks, or NULL on
      * error
      */
-    std::list<TrackDescription> videoTrackDescription();
+    std::vector<TrackDescription> videoTrackDescription();
 
     /**
      * Get current video track.
@@ -1220,6 +1220,8 @@ private:
      * MediaPlayer::release() to decrement reference count.
      */
     void retain();
+
+    std::vector<TrackDescription> getTracksDescription( libvlc_track_description_t* tracks ) const;
 };
 
 } // namespace VLC

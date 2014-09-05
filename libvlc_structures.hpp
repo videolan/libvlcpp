@@ -24,15 +24,15 @@
 #ifndef LIBVLC_CXX_STRUCTURES_H
 #define LIBVLC_CXX_STRUCTURES_H
 
-#include <list>
 #include <vector>
 
 namespace VLC
 {
 
+class Instance;
 class Media;
 
-class ModuleDescription 
+class ModuleDescription
 {
 public:
     const std::string& name() const;
@@ -40,13 +40,14 @@ public:
     const std::string& longname() const;
     const std::string& help() const;
 
-    static std::list<ModuleDescription> makeList(libvlc_module_description_t* head);
 private:
-    ModuleDescription(libvlc_module_description_t* c);
+    ModuleDescription( libvlc_module_description_t* c );
     std::string m_name;
     std::string m_shortname;
     std::string m_longname;
     std::string m_help;
+
+    friend class Instance;
 };
 
 
@@ -58,7 +59,7 @@ public:
         Unknown = -1,
         Audio,
         Video,
-        Subtitle,
+        Subtitle
     };
 
     uint32_t codec() const;
@@ -106,31 +107,33 @@ private:
 };
 
 
-class AudioOutputDescription 
+class AudioOutputDescription
 {
 public:
     const std::string& name() const;
     const std::string& description() const;
 
-    static std::list<AudioOutputDescription> makeList(libvlc_audio_output_t* head);
 private:
     AudioOutputDescription(libvlc_audio_output_t* c);
     std::string m_name;
     std::string m_description;
+
+    friend class Instance;
 };
 
 
-class TrackDescription 
+class TrackDescription
 {
 public:
     int id() const;
     const std::string& name() const;
 
-    static std::list<TrackDescription> makeList(libvlc_track_description_t* head);
 private:
     TrackDescription(libvlc_track_description_t* c);
     int m_id;
     std::string m_name;
+
+    friend class MediaPlayer;
 };
 
 } // namespace VLC

@@ -188,7 +188,7 @@ public:
      *
      * \see ModuleDescription::moduleDescriptionListRelease()
      */
-    std::list<ModuleDescription> audioFilterList();
+    std::vector<ModuleDescription> audioFilterList();
 
     /**
      * Returns a list of video filters that are available.
@@ -201,7 +201,7 @@ public:
      *
      * \see ModuleDescription::moduleDescriptionListRelease()
      */
-    std::list<ModuleDescription> videoFilterList();
+    std::vector<ModuleDescription> videoFilterList();
 
     /**
      * Gets the list of available audio output modules.
@@ -212,7 +212,7 @@ public:
      *
      * \see AudioOutputDescription . In case of error, NULL is returned.
      */
-    std::list<AudioOutputDescription> audioOutputList();
+    std::vector<AudioOutputDescription> audioOutputList();
 
     /**
      * Gets a list of audio output devices for a given audio output module,

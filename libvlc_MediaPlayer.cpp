@@ -28,15 +28,15 @@
 namespace VLC {
 
 
-MediaPlayer::MediaPlayer(const MediaPlayer& another) 
+MediaPlayer::MediaPlayer(const MediaPlayer& another)
 {
     m_obj = another.m_obj;
     retain();
 }
 
-const MediaPlayer& MediaPlayer::operator=(const MediaPlayer& another) 
+const MediaPlayer& MediaPlayer::operator=(const MediaPlayer& another)
 {
-    if (this == &another) 
+    if (this == &another)
     {
         return *this;
     }
@@ -46,12 +46,12 @@ const MediaPlayer& MediaPlayer::operator=(const MediaPlayer& another)
     return *this;
 }
 
-bool MediaPlayer::operator==(const MediaPlayer& another) const 
+bool MediaPlayer::operator==(const MediaPlayer& another) const
 {
     return m_obj == another.m_obj;
 }
 
-MediaPlayer::~MediaPlayer() 
+MediaPlayer::~MediaPlayer()
 {
     release();
 }
@@ -77,284 +77,284 @@ void MediaPlayer::setMedia( Media& md )
     libvlc_media_player_set_media( m_obj, md );
 }
 
-Media MediaPlayer::media() 
+Media MediaPlayer::media()
 {
     libvlc_media_t * c_result = libvlc_media_player_get_media(m_obj);
     Media result = c_result;
     return result;
 }
 
-libvlc_event_manager_t * MediaPlayer::eventManager() 
+libvlc_event_manager_t * MediaPlayer::eventManager()
 {
     libvlc_event_manager_t * c_result = libvlc_media_player_event_manager(m_obj);
     libvlc_event_manager_t * result = c_result;
     return result;
 }
 
-bool MediaPlayer::isPlaying() 
+bool MediaPlayer::isPlaying()
 {
     int c_result = libvlc_media_player_is_playing(m_obj);
     bool result = c_result;
     return result;
 }
 
-int MediaPlayer::play() 
+int MediaPlayer::play()
 {
     int c_result = libvlc_media_player_play(m_obj);
     int result = c_result;
     return result;
 }
 
-void MediaPlayer::setPause(int do_pause) 
+void MediaPlayer::setPause(int do_pause)
 {
     libvlc_media_player_set_pause(m_obj, do_pause);
 }
 
-void MediaPlayer::pause() 
+void MediaPlayer::pause()
 {
     libvlc_media_player_pause(m_obj);
 }
 
-void MediaPlayer::stop() 
+void MediaPlayer::stop()
 {
     libvlc_media_player_stop(m_obj);
 }
 
-void MediaPlayer::setNsobject(void * drawable) 
+void MediaPlayer::setNsobject(void * drawable)
 {
     libvlc_media_player_set_nsobject(m_obj, drawable);
 }
 
-void * MediaPlayer::nsobject() 
+void * MediaPlayer::nsobject()
 {
     void * c_result = libvlc_media_player_get_nsobject(m_obj);
     void * result = c_result;
     return result;
 }
 
-void MediaPlayer::setAgl(uint32_t drawable) 
+void MediaPlayer::setAgl(uint32_t drawable)
 {
     libvlc_media_player_set_agl(m_obj, drawable);
 }
 
-uint32_t MediaPlayer::agl() 
+uint32_t MediaPlayer::agl()
 {
     uint32_t c_result = libvlc_media_player_get_agl(m_obj);
     uint32_t result = c_result;
     return result;
 }
 
-void MediaPlayer::setXwindow(uint32_t drawable) 
+void MediaPlayer::setXwindow(uint32_t drawable)
 {
     libvlc_media_player_set_xwindow(m_obj, drawable);
 }
 
-uint32_t MediaPlayer::xwindow() 
+uint32_t MediaPlayer::xwindow()
 {
     uint32_t c_result = libvlc_media_player_get_xwindow(m_obj);
     uint32_t result = c_result;
     return result;
 }
 
-void MediaPlayer::setHwnd(void * drawable) 
+void MediaPlayer::setHwnd(void * drawable)
 {
     libvlc_media_player_set_hwnd(m_obj, drawable);
 }
 
-void * MediaPlayer::hwnd() 
+void * MediaPlayer::hwnd()
 {
     void * c_result = libvlc_media_player_get_hwnd(m_obj);
     void * result = c_result;
     return result;
 }
 
-libvlc_time_t MediaPlayer::length() 
+libvlc_time_t MediaPlayer::length()
 {
     libvlc_time_t c_result = libvlc_media_player_get_length(m_obj);
     libvlc_time_t result = c_result;
     return result;
 }
 
-libvlc_time_t MediaPlayer::time() 
+libvlc_time_t MediaPlayer::time()
 {
     libvlc_time_t c_result = libvlc_media_player_get_time(m_obj);
     libvlc_time_t result = c_result;
     return result;
 }
 
-void MediaPlayer::setTime(libvlc_time_t i_time) 
+void MediaPlayer::setTime(libvlc_time_t i_time)
 {
     libvlc_media_player_set_time(m_obj, i_time);
 }
 
-float MediaPlayer::position() 
+float MediaPlayer::position()
 {
     float c_result = libvlc_media_player_get_position(m_obj);
     float result = c_result;
     return result;
 }
 
-void MediaPlayer::setPosition(float f_pos) 
+void MediaPlayer::setPosition(float f_pos)
 {
     libvlc_media_player_set_position(m_obj, f_pos);
 }
 
-void MediaPlayer::setChapter(int i_chapter) 
+void MediaPlayer::setChapter(int i_chapter)
 {
     libvlc_media_player_set_chapter(m_obj, i_chapter);
 }
 
-int MediaPlayer::chapter() 
+int MediaPlayer::chapter()
 {
     int c_result = libvlc_media_player_get_chapter(m_obj);
     int result = c_result;
     return result;
 }
 
-int MediaPlayer::chapterCount() 
+int MediaPlayer::chapterCount()
 {
     int c_result = libvlc_media_player_get_chapter_count(m_obj);
     int result = c_result;
     return result;
 }
 
-bool MediaPlayer::willPlay() 
+bool MediaPlayer::willPlay()
 {
     int c_result = libvlc_media_player_will_play(m_obj);
     bool result = c_result;
     return result;
 }
 
-int MediaPlayer::chapterCountForTitle(int i_title) 
+int MediaPlayer::chapterCountForTitle(int i_title)
 {
     int c_result = libvlc_media_player_get_chapter_count_for_title(m_obj, i_title);
     int result = c_result;
     return result;
 }
 
-void MediaPlayer::setTitle(int i_title) 
+void MediaPlayer::setTitle(int i_title)
 {
     libvlc_media_player_set_title(m_obj, i_title);
 }
 
-int MediaPlayer::title() 
+int MediaPlayer::title()
 {
     int c_result = libvlc_media_player_get_title(m_obj);
     int result = c_result;
     return result;
 }
 
-int MediaPlayer::titleCount() 
+int MediaPlayer::titleCount()
 {
     int c_result = libvlc_media_player_get_title_count(m_obj);
     int result = c_result;
     return result;
 }
 
-void MediaPlayer::previousChapter() 
+void MediaPlayer::previousChapter()
 {
     libvlc_media_player_previous_chapter(m_obj);
 }
 
-void MediaPlayer::nextChapter() 
+void MediaPlayer::nextChapter()
 {
     libvlc_media_player_next_chapter(m_obj);
 }
 
-float MediaPlayer::rate() 
+float MediaPlayer::rate()
 {
     float c_result = libvlc_media_player_get_rate(m_obj);
     float result = c_result;
     return result;
 }
 
-int MediaPlayer::setRate(float rate) 
+int MediaPlayer::setRate(float rate)
 {
     int c_result = libvlc_media_player_set_rate(m_obj, rate);
     int result = c_result;
     return result;
 }
 
-libvlc_state_t MediaPlayer::state() 
+libvlc_state_t MediaPlayer::state()
 {
     libvlc_state_t c_result = libvlc_media_player_get_state(m_obj);
     libvlc_state_t result = c_result;
     return result;
 }
 
-float MediaPlayer::fps() 
+float MediaPlayer::fps()
 {
     float c_result = libvlc_media_player_get_fps(m_obj);
     float result = c_result;
     return result;
 }
 
-unsigned MediaPlayer::hasVout() 
+unsigned MediaPlayer::hasVout()
 {
     unsigned c_result = libvlc_media_player_has_vout(m_obj);
     unsigned result = c_result;
     return result;
 }
 
-bool MediaPlayer::isSeekable() 
+bool MediaPlayer::isSeekable()
 {
     int c_result = libvlc_media_player_is_seekable(m_obj);
     bool result = c_result;
     return result;
 }
 
-bool MediaPlayer::canPause() 
+bool MediaPlayer::canPause()
 {
     int c_result = libvlc_media_player_can_pause(m_obj);
     bool result = c_result;
     return result;
 }
 
-bool MediaPlayer::programScrambled() 
+bool MediaPlayer::programScrambled()
 {
     int c_result = libvlc_media_player_program_scrambled(m_obj);
     bool result = c_result;
     return result;
 }
 
-void MediaPlayer::nextFrame() 
+void MediaPlayer::nextFrame()
 {
     libvlc_media_player_next_frame(m_obj);
 }
 
-void MediaPlayer::navigate(unsigned navigate) 
+void MediaPlayer::navigate(unsigned navigate)
 {
     libvlc_media_player_navigate(m_obj, navigate);
 }
 
-void MediaPlayer::setVideoTitleDisplay(libvlc_position_t position, unsigned int timeout) 
+void MediaPlayer::setVideoTitleDisplay(libvlc_position_t position, unsigned int timeout)
 {
     libvlc_media_player_set_video_title_display(m_obj, position, timeout);
 }
 
-void MediaPlayer::toggleFullscreen() 
+void MediaPlayer::toggleFullscreen()
 {
     libvlc_toggle_fullscreen(m_obj);
 }
 
-void MediaPlayer::setFullscreen(int b_fullscreen) 
+void MediaPlayer::setFullscreen(int b_fullscreen)
 {
     libvlc_set_fullscreen(m_obj, b_fullscreen);
 }
 
-bool MediaPlayer::fullscreen() 
+bool MediaPlayer::fullscreen()
 {
     int c_result = libvlc_get_fullscreen(m_obj);
     bool result = c_result;
     return result;
 }
 
-void MediaPlayer::toggleTeletext() 
+void MediaPlayer::toggleTeletext()
 {
     libvlc_toggle_teletext(m_obj);
 }
 
-int MediaPlayer::setEqualizer(libvlc_equalizer_t * p_equalizer) 
+int MediaPlayer::setEqualizer(libvlc_equalizer_t * p_equalizer)
 {
     int c_result = libvlc_media_player_set_equalizer(m_obj, p_equalizer);
     int result = c_result;
@@ -438,12 +438,10 @@ int MediaPlayer::audioTrackCount()
     return result;
 }
 
-std::list<TrackDescription> MediaPlayer::audioTrackDescription()
+std::vector<TrackDescription> MediaPlayer::audioTrackDescription()
 {
-    libvlc_track_description_t * c_result = libvlc_audio_get_track_description(m_obj);
-    std::list<TrackDescription> result = TrackDescription::makeList(c_result);
-    libvlc_track_description_list_release(c_result);
-    return result;
+    libvlc_track_description_t* result = libvlc_audio_get_track_description( m_obj );
+    return getTracksDescription( result );
 }
 
 int MediaPlayer::audioTrack()
@@ -566,12 +564,10 @@ int MediaPlayer::spuCount()
     return result;
 }
 
-std::list<TrackDescription> MediaPlayer::spuDescription()
+std::vector<TrackDescription> MediaPlayer::spuDescription()
 {
-    libvlc_track_description_t * c_result = libvlc_video_get_spu_description(m_obj);
-    std::list<TrackDescription> result = TrackDescription::makeList(c_result);
-    libvlc_track_description_list_release(c_result);
-    return result;
+    libvlc_track_description_t* result = libvlc_video_get_spu_description( m_obj );
+    return getTracksDescription( result );
 }
 
 int MediaPlayer::setSpu(int i_spu)
@@ -602,20 +598,16 @@ int MediaPlayer::setSpuDelay(int64_t i_delay)
     return result;
 }
 
-std::list<TrackDescription> MediaPlayer::titleDescription()
+std::vector<TrackDescription> MediaPlayer::titleDescription()
 {
-    libvlc_track_description_t * c_result = libvlc_video_get_title_description(m_obj);
-    std::list<TrackDescription> result = TrackDescription::makeList(c_result);
-    libvlc_track_description_list_release(c_result);
-    return result;
+    libvlc_track_description_t* result = libvlc_video_get_title_description( m_obj );
+    return getTracksDescription( result );
 }
 
-std::list<TrackDescription> MediaPlayer::chapterDescription(int i_title)
+std::vector<TrackDescription> MediaPlayer::chapterDescription(int i_title)
 {
-    libvlc_track_description_t * c_result = libvlc_video_get_chapter_description(m_obj, i_title);
-    std::list<TrackDescription> result = TrackDescription::makeList(c_result);
-    libvlc_track_description_list_release(c_result);
-    return result;
+    libvlc_track_description_t* result = libvlc_video_get_chapter_description( m_obj, i_title );
+    return getTracksDescription( result );
 }
 
 std::string MediaPlayer::cropGeometry()
@@ -650,12 +642,10 @@ int MediaPlayer::videoTrackCount()
     return result;
 }
 
-std::list<TrackDescription> MediaPlayer::videoTrackDescription()
+std::vector<TrackDescription> MediaPlayer::videoTrackDescription()
 {
-    libvlc_track_description_t * c_result = libvlc_video_get_track_description(m_obj);
-    std::list<TrackDescription> result = TrackDescription::makeList(c_result);
-    libvlc_track_description_list_release(c_result);
-    return result;
+    libvlc_track_description_t* result = libvlc_video_get_track_description( m_obj );
+    return getTracksDescription( result );
 }
 
 int MediaPlayer::videoTrack()
@@ -755,9 +745,23 @@ MediaPlayer::MediaPlayer( Internal::InternalPtr ptr )
 {
 }
 
+void MediaPlayer::retain()
+{
+    libvlc_media_player_retain( m_obj );
+}
 
-void MediaPlayer::retain() {
-    libvlc_media_player_retain(m_obj);
+std::vector<TrackDescription> MediaPlayer::getTracksDescription(libvlc_track_description_t* tracks) const
+{
+    std::vector<TrackDescription> result;
+    if ( tracks == NULL )
+        return result;
+    libvlc_track_description_t* p = tracks;
+    while ( p != NULL )
+    {
+        result.push_back( TrackDescription( p ) );
+        p = p->p_next;
+    }
+    return result;
 }
 
 

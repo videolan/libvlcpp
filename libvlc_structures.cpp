@@ -46,21 +46,7 @@ const std::string& ModuleDescription::help() const
     return m_help;
 }
 
-std::list<ModuleDescription> ModuleDescription::makeList(libvlc_module_description_t* head) 
-{
-    std::list<ModuleDescription> result;
-    if ( head == NULL )
-        return result;
-    libvlc_module_description_t* current = head;
-    while (current) 
-    {
-        result.push_back(ModuleDescription(current));
-        current = current->p_next;
-    }
-    return result;
-}
-
-ModuleDescription::ModuleDescription(libvlc_module_description_t* c) 
+ModuleDescription::ModuleDescription(libvlc_module_description_t* c)
 {
     m_name = c->psz_name ? c->psz_name : "";
     m_shortname = c->psz_shortname ? c->psz_shortname : "";
@@ -188,21 +174,7 @@ const std::string& AudioOutputDescription::description() const
     return m_description;
 }
 
-std::list<AudioOutputDescription> AudioOutputDescription::makeList(libvlc_audio_output_t* head) 
-{
-    std::list<AudioOutputDescription> result;
-    if ( head == NULL )
-        return result;
-    libvlc_audio_output_t* current = head;
-    while (current) 
-    {
-        result.push_back(AudioOutputDescription(current));
-        current = current->p_next;
-    }
-    return result;
-}
-
-AudioOutputDescription::AudioOutputDescription(libvlc_audio_output_t* c) 
+AudioOutputDescription::AudioOutputDescription( libvlc_audio_output_t* c )
 {
     m_name = c->psz_name ? c->psz_name : "";
     m_description = c->psz_description ? c->psz_description : "";
@@ -218,21 +190,7 @@ const std::string& TrackDescription::name() const
     return m_name;
 }
 
-std::list<TrackDescription> TrackDescription::makeList(libvlc_track_description_t* head) 
-{
-    std::list<TrackDescription> result;
-    if ( head == NULL )
-        return result;
-    libvlc_track_description_t* current = head;
-    while (current) 
-    {
-        result.push_back(TrackDescription(current));
-        current = current->p_next;
-    }
-    return result;
-}
-
-TrackDescription::TrackDescription(libvlc_track_description_t* c) 
+TrackDescription::TrackDescription(libvlc_track_description_t* c)
 {
     m_id = c->i_id;
     m_name = c->psz_name ? c->psz_name : "";
