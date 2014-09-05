@@ -331,9 +331,16 @@ int MediaPlayer::outputSet(const std::string& psz_name)
     return libvlc_audio_output_set(m_obj, psz_name.c_str());
 }
 
-libvlc_audio_output_device_t * MediaPlayer::outputDeviceEnum()
+std::vector<AudioOutputDeviceDescription> MediaPlayer::outputDeviceEnum()
 {
-    return libvlc_audio_output_device_enum(m_obj);
+    libvlc_audio_output_device_t* devices = libvlc_audio_output_device_enum(m_obj);
+    std::vector<AudioOutputDeviceDescription> res;
+    if ( devices == NULL )
+        return res;
+    for ( libvlc_audio_output_device_t* p = devices; p != NULL; p = p->p_next )
+        res.push_back( AudioOutputDeviceDescription( p ) );
+    libvlc_audio_output_device_list_release( devices );
+    return res;
 }
 
 void MediaPlayer::outputDeviceSet(const std::string& module, const std::string& device_id)

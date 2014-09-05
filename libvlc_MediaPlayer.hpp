@@ -588,7 +588,7 @@ public:
      *
      * \version LibVLC 2.2.0 or later.
      */
-    libvlc_audio_output_device_t * outputDeviceEnum();
+    std::vector<AudioOutputDeviceDescription> outputDeviceEnum();
 
     /**
      * Configures an explicit audio output device.

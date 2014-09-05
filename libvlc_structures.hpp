@@ -121,6 +121,23 @@ private:
     friend class Instance;
 };
 
+class AudioOutputDeviceDescription
+{
+    public:
+        /**< Device identifier string */
+        const std::string& device() const;
+        /**< User-friendly device description */
+        const std::string& description() const;
+
+    private:
+        AudioOutputDeviceDescription( libvlc_audio_output_device_t* d );
+
+        std::string m_device;
+        std::string m_description;
+
+        friend class Instance;
+        friend class MediaPlayer;
+};
 
 class TrackDescription
 {

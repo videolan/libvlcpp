@@ -145,9 +145,16 @@ std::vector<AudioOutputDescription> Instance::audioOutputList()
     return res;
 }
 
-libvlc_audio_output_device_t * Instance::audioOutputDeviceList(const std::string& aout)
+std::vector<AudioOutputDeviceDescription> Instance::audioOutputDeviceList(const std::string& aout)
 {
-    return libvlc_audio_output_device_list_get(m_obj, aout.c_str());
+    libvlc_audio_output_device_t* devices = libvlc_audio_output_device_list_get( m_obj, aout.c_str() );
+    std::vector<AudioOutputDeviceDescription> res;
+    if ( devices == NULL )
+        return res;
+    for ( libvlc_audio_output_device_t* p = devices; p != NULL; p = p->p_next )
+        res.push_back( AudioOutputDeviceDescription( p ) );
+    libvlc_audio_output_device_list_release( devices );
+    return res;
 }
 
 Instance::Instance(Internal::InternalPtr ptr)

@@ -203,4 +203,22 @@ TrackDescription::TrackDescription( libvlc_track_description_t* c )
         m_name = c->psz_name;
 }
 
+const std::string&AudioOutputDeviceDescription::device() const
+{
+    return m_device;
+}
+
+const std::string&AudioOutputDeviceDescription::description() const
+{
+    return m_description;
+}
+
+AudioOutputDeviceDescription::AudioOutputDeviceDescription( libvlc_audio_output_device_t* d )
+{
+    if ( d->psz_device != NULL )
+        m_device = d->psz_device;
+    if ( d->psz_description != NULL )
+        m_device = d->psz_description;
+}
+
 } // namespace VLC

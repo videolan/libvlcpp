@@ -238,7 +238,7 @@ public:
      *
      * \version LibVLC 2.1.0 or later.
      */
-    libvlc_audio_output_device_t * audioOutputDeviceList(const std::string& aout);
+    std::vector<AudioOutputDeviceDescription> audioOutputDeviceList(const std::string& aout);
 
 private:
     Instance(InternalPtr ptr);
