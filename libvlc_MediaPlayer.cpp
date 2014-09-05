@@ -27,8 +27,8 @@ namespace VLC
 {
 
 MediaPlayer::MediaPlayer(const MediaPlayer& another)
+    : Internal( another )
 {
-    m_obj = another.m_obj;
     retain();
 }
 

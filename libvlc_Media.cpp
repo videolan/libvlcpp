@@ -67,8 +67,8 @@ Media*Media::asNode(Instance& instance, const std::string& nodeName)
 }
 
 Media::Media(const Media& another)
+    : Internal(another)
 {
-    m_obj = another.m_obj;
     retain();
 }
 

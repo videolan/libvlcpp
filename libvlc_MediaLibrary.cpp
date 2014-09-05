@@ -35,8 +35,8 @@ MediaLibrary*MediaLibrary::create(Instance& instance)
 }
 
 MediaLibrary::MediaLibrary(const MediaLibrary& another)
+    : Internal( another )
 {
-    m_obj = another.m_obj;
     retain();
 }
 

@@ -43,6 +43,7 @@ class   Internal
         operator T*() { return m_obj; }
     protected:
         Internal(InternalPtr obj = NULL ) : m_obj( obj ) {}
+        Internal( const Internal& copied ) : m_obj( copied.m_obj ) {}
         ~Internal(){}
 
         InternalPtr         m_obj;

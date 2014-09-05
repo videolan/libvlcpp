@@ -27,8 +27,8 @@ namespace VLC
 {
 
 Instance::Instance( const Instance& another )
+    : Internal( another )
 {
-    m_obj = another.m_obj;
     retain();
 }
 
