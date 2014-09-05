@@ -47,6 +47,9 @@ class   Internal
         ~Internal(){}
 
         InternalPtr         m_obj;
+
+    private:
+        Internal& operator=(const Internal&);
 };
 
 }
