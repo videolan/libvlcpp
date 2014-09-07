@@ -23,12 +23,16 @@
 
 #include <vlc.hpp>
 
+#include "libvlc_EventManager.hpp"
+
 namespace VLC
 {
 
 MediaPlayer::MediaPlayer(const MediaPlayer& another)
     : Internal( another )
 {
+    if ( another.m_eventManager != NULL )
+        m_eventManager = new EventManager( *another.m_eventManager );
     retain();
 }
 
@@ -40,6 +44,9 @@ const MediaPlayer& MediaPlayer::operator=(const MediaPlayer& another)
     }
     release();
     m_obj = another.m_obj;
+    delete m_eventManager;
+    if ( another.m_eventManager != NULL )
+        m_eventManager = new EventManager( *another.m_eventManager );
     retain();
     return *this;
 }
@@ -81,9 +88,14 @@ Media* MediaPlayer::media()
     return new Media(media);
 }
 
-libvlc_event_manager_t * MediaPlayer::eventManager()
+EventManager& MediaPlayer::eventManager()
 {
-    return libvlc_media_player_event_manager(m_obj);
+    if ( m_eventManager == NULL )
+    {
+        libvlc_event_manager_t* obj = libvlc_media_player_event_manager( m_obj );
+        m_eventManager = new EventManager( obj );
+    }
+    return *m_eventManager;
 }
 
 bool MediaPlayer::isPlaying()
@@ -634,8 +646,9 @@ void MediaPlayer::setAdjustFloat(unsigned option, float value)
     libvlc_video_set_adjust_float(m_obj, option, value);
 }
 
-MediaPlayer::MediaPlayer( Internal::InternalPtr ptr )
+MediaPlayer::MediaPlayer( InternalPtr ptr )
     : Internal( ptr )
+    , m_eventManager( NULL )
 {
 }
 

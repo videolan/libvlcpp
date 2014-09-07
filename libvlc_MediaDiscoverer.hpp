@@ -30,6 +30,7 @@
 namespace VLC
 {
 
+class EventManager;
 
 class MediaDiscoverer : public Internal<libvlc_media_discoverer_t>
 {
@@ -58,7 +59,7 @@ public:
      *
      * \return event manager object.
      */
-    libvlc_event_manager_t * eventManager();
+    EventManager& eventManager();
 
     /**
      * Query if media service discover object is running.
@@ -77,6 +78,9 @@ private:
 
     MediaDiscoverer(const MediaDiscoverer& another);
     const MediaDiscoverer& operator=(const MediaDiscoverer& another);
+
+private:
+    EventManager* m_eventManager;
 };
 
 } // namespace VLC

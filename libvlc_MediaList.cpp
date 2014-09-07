@@ -23,12 +23,16 @@
 
 #include <vlc.hpp>
 
+#include "libvlc_EventManager.hpp"
+
 namespace VLC
 {
 
 MediaList::MediaList(const MediaList& another)
     : Internal( another )
 {
+    if ( another.m_eventManager )
+        m_eventManager = new EventManager( *another.m_eventManager );
     retain();
 }
 
@@ -40,6 +44,9 @@ const MediaList& MediaList::operator=(const MediaList& another)
     }
     release();
     m_obj = another.m_obj;
+    delete m_eventManager;
+    if ( another.m_eventManager != NULL )
+        m_eventManager = new EventManager( *another.m_eventManager );
     retain();
     return *this;
 }
@@ -51,6 +58,7 @@ bool MediaList::operator==(const MediaList& another) const
 
 MediaList::~MediaList()
 {
+    delete m_eventManager;
     release();
 }
 
@@ -136,13 +144,19 @@ void MediaList::unlock()
     libvlc_media_list_unlock(m_obj);
 }
 
-libvlc_event_manager_t * MediaList::eventManager()
+EventManager& MediaList::eventManager()
 {
-    return libvlc_media_list_event_manager(m_obj);
+    if ( m_eventManager == NULL )
+    {
+        libvlc_event_manager_t* obj = libvlc_media_list_event_manager( *this );
+        m_eventManager = new EventManager( obj );
+    }
+    return *m_eventManager;
 }
 
 MediaList::MediaList( Internal::InternalPtr ptr )
     : Internal( ptr )
+    , m_eventManager( NULL )
 {
 }
 

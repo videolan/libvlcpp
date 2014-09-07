@@ -30,6 +30,7 @@
 namespace VLC
 {
 
+class EventManager;
 
 class MediaPlayer : public Internal<libvlc_media_player_t>
 {
@@ -94,7 +95,7 @@ public:
      *
      * \return the event manager associated with p_mi
      */
-    libvlc_event_manager_t * eventManager();
+    VLC::EventManager& eventManager();
 
     /**
      * is_playing
@@ -1219,6 +1220,10 @@ private:
     void retain();
 
     std::vector<TrackDescription> getTracksDescription( libvlc_track_description_t* tracks ) const;
+
+private:
+    EventManager* m_eventManager;
+
 };
 
 } // namespace VLC

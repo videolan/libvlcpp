@@ -23,12 +23,16 @@
 
 #include <vlc.hpp>
 
+#include "libvlc_EventManager.hpp"
+
 namespace VLC
 {
 
 MediaListPlayer::MediaListPlayer(const MediaListPlayer& another)
     : Internal( another )
 {
+    if ( another.m_eventManager )
+        m_eventManager = new EventManager( *another.m_eventManager );
     retain();
 }
 
@@ -40,6 +44,9 @@ const MediaListPlayer& MediaListPlayer::operator=(const MediaListPlayer& another
     }
     release();
     m_obj = another.m_obj;
+    delete m_eventManager;
+    if ( another.m_eventManager )
+        m_eventManager = new EventManager( *another.m_eventManager );
     retain();
     return *this;
 }
@@ -62,9 +69,14 @@ MediaListPlayer* MediaListPlayer::create(Instance& instance)
     return new MediaListPlayer( ptr );
 }
 
-libvlc_event_manager_t * MediaListPlayer::eventManager()
+EventManager& MediaListPlayer::eventManager()
 {
-    return libvlc_media_list_player_event_manager(m_obj);
+    if ( m_eventManager == NULL )
+    {
+        libvlc_event_manager_t* obj = libvlc_media_list_player_event_manager(m_obj);
+        m_eventManager = new EventManager( obj );
+    }
+    return *m_eventManager;
 }
 
 void MediaListPlayer::setMediaPlayer( MediaPlayer &mi )
@@ -127,8 +139,9 @@ void MediaListPlayer::setPlaybackMode(libvlc_playback_mode_t e_mode)
     libvlc_media_list_player_set_playback_mode(m_obj, e_mode);
 }
 
-MediaListPlayer::MediaListPlayer(Internal::InternalPtr ptr)
+MediaListPlayer::MediaListPlayer( InternalPtr ptr )
     : Internal( ptr )
+    , m_eventManager( NULL )
 {
 }
 

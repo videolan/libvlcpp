@@ -23,6 +23,8 @@
 
 #include <vlc.hpp>
 
+#include "libvlc_EventManager.hpp"
+
 namespace VLC
 {
 
@@ -70,6 +72,8 @@ Media::Media(const Media& another)
     : Internal(another)
 {
     retain();
+    if ( another.m_eventManager != NULL )
+        m_eventManager = new EventManager( *another.m_eventManager );
 }
 
 const Media& Media::operator=(const Media& another)
@@ -80,6 +84,9 @@ const Media& Media::operator=(const Media& another)
     }
     release();
     m_obj = another.m_obj;
+    delete m_eventManager;
+    if ( another.m_eventManager != NULL )
+        m_eventManager = new EventManager( *another.m_eventManager );
     retain();
     return *this;
 }
@@ -91,6 +98,7 @@ bool Media::operator==(const Media& another) const
 
 Media::~Media()
 {
+    delete m_eventManager;
     release();
 }
 
@@ -145,9 +153,14 @@ bool Media::stats(libvlc_media_stats_t * p_stats)
     return libvlc_media_get_stats(m_obj, p_stats);
 }
 
-libvlc_event_manager_t * Media::eventManager()
+EventManager& Media::eventManager()
 {
-    return libvlc_media_event_manager(m_obj);
+    if ( m_eventManager == NULL )
+    {
+        libvlc_event_manager_t* obj = libvlc_media_event_manager(m_obj);
+        m_eventManager = new EventManager( obj );
+    }
+    return *m_eventManager;
 }
 
 libvlc_time_t Media::duration()
@@ -197,6 +210,7 @@ std::vector<MediaTrack> Media::tracks()
 
 Media::Media(Internal::InternalPtr ptr)
     : Internal(ptr)
+    , m_eventManager( NULL )
 {
 }
 

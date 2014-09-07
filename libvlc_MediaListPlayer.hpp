@@ -30,6 +30,8 @@
 namespace VLC
 {
 
+class EventManager;
+
 class MediaListPlayer : public Internal<libvlc_media_list_player_t>
 {
 public:
@@ -68,7 +70,7 @@ public:
      *
      * \return the event manager
      */
-    libvlc_event_manager_t * eventManager();
+    EventManager& eventManager();
 
     /**
      * Replace media player in media_list_player with this instance.
@@ -168,6 +170,10 @@ private:
      * MediaListPlayer::release() to decrement reference count.
      */
     void retain();
+
+private:
+    EventManager* m_eventManager;
+
 };
 
 } // namespace VLC

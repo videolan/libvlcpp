@@ -23,11 +23,14 @@
 
 #include <vlc.hpp>
 
+#include "libvlc_EventManager.hpp"
+
 namespace VLC
 {
 
 MediaDiscoverer::~MediaDiscoverer()
 {
+    delete m_eventManager;
     release();
 }
 
@@ -41,15 +44,20 @@ MediaDiscoverer* MediaDiscoverer::create( Instance &inst, const std::string& nam
 
 std::string MediaDiscoverer::localizedName()
 {
-    char * c_result = libvlc_media_discoverer_localized_name(m_obj);
+    char* c_result = libvlc_media_discoverer_localized_name(m_obj);
     std::string result = c_result;
     libvlc_free(c_result);
     return result;
 }
 
-libvlc_event_manager_t * MediaDiscoverer::eventManager()
+EventManager& MediaDiscoverer::eventManager()
 {
-    return libvlc_media_discoverer_event_manager(m_obj);
+    if ( m_eventManager == NULL )
+    {
+        libvlc_event_manager_t* obj = libvlc_media_discoverer_event_manager( m_obj );
+        m_eventManager = new EventManager( obj );
+    }
+    return *m_eventManager;
 }
 
 bool MediaDiscoverer::isRunning()
@@ -59,6 +67,7 @@ bool MediaDiscoverer::isRunning()
 
 MediaDiscoverer::MediaDiscoverer(Internal::InternalPtr ptr)
     : Internal( ptr )
+    , m_eventManager( NULL )
 {
 }
 

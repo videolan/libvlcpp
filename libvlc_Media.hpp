@@ -32,6 +32,7 @@ namespace VLC
 
 class MediaList;
 class MediaPlayer;
+class EventManager;
 
 class Media : public Internal<libvlc_media_t>
 {
@@ -243,7 +244,7 @@ public:
      *
      * \return event manager object
      */
-    libvlc_event_manager_t * eventManager();
+    EventManager& eventManager();
 
     /**
      * Get duration (in ms) of media descriptor object item.
@@ -343,8 +344,12 @@ private:
      */
     void release();
 
+private:
+    EventManager* m_eventManager;
+
     friend class MediaList;
     friend class MediaPlayer;
+    friend class EventManager;
 };
 
 } // namespace VLC

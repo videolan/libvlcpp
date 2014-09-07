@@ -30,6 +30,8 @@
 namespace VLC
 {
 
+class EventManager;
+
 class MediaList : public Internal<libvlc_media_list_t>
 {
 public:
@@ -187,7 +189,7 @@ public:
      *
      * \return libvlc_event_manager
      */
-    libvlc_event_manager_t * eventManager();
+    VLC::EventManager& eventManager();
 
 private:
     MediaList(InternalPtr ptr);
@@ -200,6 +202,9 @@ private:
      * Retain reference to a media list
      */
     void retain();
+
+private:
+    EventManager* m_eventManager;
 };
 
 } // namespace VLC

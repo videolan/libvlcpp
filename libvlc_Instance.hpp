@@ -232,9 +232,7 @@ public:
      * \param psz_aout  audio output name (as returned by
      * Instance::audioOutputList() )
      *
-     * \return A NULL-terminated linked list of potential audio output
-     * devices. It must be freed it with
-     * libvlc_audio_output_device_list_release()
+     * \return A vector containing all audio output devices for this module
      *
      * \version LibVLC 2.1.0 or later.
      */

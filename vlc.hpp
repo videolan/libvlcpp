@@ -34,5 +34,6 @@
 #include <libvlc_Media.hpp>
 #include <libvlc_MediaLibrary.hpp>
 #include <libvlc_MediaList.hpp>
+#include <libvlc_EventManager.hpp>
 
 #endif
