@@ -1,5 +1,5 @@
 /*****************************************************************************
- * libvlcpp.hpp: Handles an internal vlc type.
+ * libvlc_Internal.hpp: Handles an internal vlc type.
  *****************************************************************************
  * Copyright (C) 2008-2014 VideoLAN
  *
