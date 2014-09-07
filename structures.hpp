@@ -24,6 +24,7 @@
 #ifndef LIBVLC_CXX_STRUCTURES_H
 #define LIBVLC_CXX_STRUCTURES_H
 
+#include "common.hpp"
 #include <vector>
 
 namespace VLC
@@ -32,7 +33,7 @@ namespace VLC
 class Instance;
 class Media;
 
-class ModuleDescription
+class VLCPP_API ModuleDescription
 {
 public:
     const std::string& name() const;
@@ -51,7 +52,7 @@ private:
 };
 
 
-class MediaTrack
+class VLCPP_API MediaTrack
 {
 public:
     enum Type
@@ -107,7 +108,7 @@ private:
 };
 
 
-class AudioOutputDescription
+class VLCPP_API AudioOutputDescription
 {
 public:
     const std::string& name() const;
@@ -121,7 +122,7 @@ private:
     friend class Instance;
 };
 
-class AudioOutputDeviceDescription
+class VLCPP_API AudioOutputDeviceDescription
 {
     public:
         /**< Device identifier string */
@@ -139,7 +140,7 @@ class AudioOutputDeviceDescription
         friend class MediaPlayer;
 };
 
-class TrackDescription
+class VLCPP_API TrackDescription
 {
 public:
     int id() const;

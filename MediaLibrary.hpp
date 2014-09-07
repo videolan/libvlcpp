@@ -24,13 +24,13 @@
 #ifndef LIBVLC_CXX_MEDIALIBRARY_H
 #define LIBVLC_CXX_MEDIALIBRARY_H
 
-#include <common.hpp>
+#include "common.hpp"
 #include "Internal.hpp"
 
 namespace VLC
 {
 
-class MediaLibrary : public Internal<libvlc_media_library_t>
+class VLCPP_API MediaLibrary : public Internal<libvlc_media_library_t>
 {
 public:
     /**

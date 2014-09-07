@@ -24,13 +24,16 @@
 #ifndef LIBVLC_CXX_INSTANCE_H
 #define LIBVLC_CXX_INSTANCE_H
 
-#include <common.hpp>
+#include <string>
+#include <vector>
+#include "common.hpp"
 #include "Internal.hpp"
+#include "structures.hpp"
 
 namespace VLC
 {
 
-class Instance : public Internal<libvlc_instance_t>
+class VLCPP_API Instance : public Internal<libvlc_instance_t>
 {
 public:
     /**

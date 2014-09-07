@@ -24,7 +24,7 @@
 #define LIBVLC_EVENTMANAGER_HPP
 
 #include <string>
-#include <vlc/vlc.h>
+#include "common.hpp"
 #include "Internal.hpp"
 
 namespace VLC
@@ -120,7 +120,7 @@ class IVLMEventCb
         virtual void mediaInstanceStatusError( const std::string&, const std::string& ) {}
 };
 
-class EventManager : Internal<libvlc_event_manager_t>
+class VLCPP_API EventManager : public Internal<libvlc_event_manager_t>
 {
     public:
         EventManager( const EventManager& em );

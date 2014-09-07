@@ -24,7 +24,7 @@
 #ifndef LIBVLC_CXX_MEDIADISCOVERER_H
 #define LIBVLC_CXX_MEDIADISCOVERER_H
 
-#include <common.hpp>
+#include "common.hpp"
 #include "Internal.hpp"
 
 namespace VLC
@@ -32,7 +32,7 @@ namespace VLC
 
 class EventManager;
 
-class MediaDiscoverer : public Internal<libvlc_media_discoverer_t>
+class VLCPP_API MediaDiscoverer : public Internal<libvlc_media_discoverer_t>
 {
 public:
     ~MediaDiscoverer();

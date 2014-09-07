@@ -24,8 +24,10 @@
 #ifndef LIBVLC_CXX_MEDIA_H
 #define LIBVLC_CXX_MEDIA_H
 
-#include <common.hpp>
+#include <vector>
+#include "common.hpp"
 #include "Internal.hpp"
+#include "structures.hpp"
 
 namespace VLC
 {
@@ -34,7 +36,7 @@ class MediaList;
 class MediaPlayer;
 class EventManager;
 
-class Media : public Internal<libvlc_media_t>
+class VLCPP_API Media : public Internal<libvlc_media_t>
 {
 public:
     /**

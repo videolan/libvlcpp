@@ -27,13 +27,13 @@
 #ifndef LIBVLC_CXX_VLC_H
 #define LIBVLC_CXX_VLC_H
 
-#include <Instance.hpp>
-#include <MediaListPlayer.hpp>
-#include <MediaDiscoverer.hpp>
-#include <MediaPlayer.hpp>
-#include <Media.hpp>
-#include <MediaLibrary.hpp>
-#include <MediaList.hpp>
-#include <EventManager.hpp>
+#include "Instance.hpp"
+#include "MediaListPlayer.hpp"
+#include "MediaDiscoverer.hpp"
+#include "MediaPlayer.hpp"
+#include "Media.hpp"
+#include "MediaLibrary.hpp"
+#include "MediaList.hpp"
+#include "EventManager.hpp"
 
 #endif
