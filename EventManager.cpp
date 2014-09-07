@@ -20,8 +20,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#include "libvlc_EventManager.hpp"
-#include "libvlc_Media.hpp"
+#include "EventManager.hpp"
+#include "Media.hpp"
 #include <vlc/libvlc_events.h>
 
 namespace VLC

@@ -23,7 +23,7 @@
 
 #include <vlc.hpp>
 
-#include "libvlc_EventManager.hpp"
+#include "EventManager.hpp"
 
 namespace VLC
 {

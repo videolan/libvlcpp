@@ -25,7 +25,7 @@
 
 #include <string>
 #include <vlc/vlc.h>
-#include "libvlc_Internal.hpp"
+#include "Internal.hpp"
 
 namespace VLC
 {

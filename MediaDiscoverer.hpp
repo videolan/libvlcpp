@@ -24,8 +24,8 @@
 #ifndef LIBVLC_CXX_MEDIADISCOVERER_H
 #define LIBVLC_CXX_MEDIADISCOVERER_H
 
-#include <libvlc_common.hpp>
-#include "libvlc_Internal.hpp"
+#include <common.hpp>
+#include "Internal.hpp"
 
 namespace VLC
 {

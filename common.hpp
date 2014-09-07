@@ -32,7 +32,7 @@
 #include <stdexcept>
 #include <vlc/vlc.h>
 
-#include <libvlc_structures.hpp>
+#include "structures.hpp"
 
 namespace VLC {
 
