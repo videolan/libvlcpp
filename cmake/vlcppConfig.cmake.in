@@ -1,0 +1,13 @@
+# - Config file for the libvlcpp package
+# It defines the following variables
+#  LIBVLCPP_INCLUDE_DIRS - include directories for libvlcpp
+#  LIBVLCPP_LIBRARIES    - libraries to link against
+
+# Compute paths
+get_filename_component(LIBVLCPP_CMAKE_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
+set(LIBVLCPP_INCLUDE_DIRS "@CONF_INCLUDE_DIRS@")
+FIND_LIBRARY(LIBVLCPP_LIBRARY vlcpp
+    PATHS @CMAKE_INSTALL_PREFIX@/lib/@PROJECT_NAME@
+    NO_DEFAULT_PATH
+)
+SET(LIBVLCPP_LIBRARIES ${LIBVLCPP_LIBRARY})
