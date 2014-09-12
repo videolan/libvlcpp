@@ -25,7 +25,6 @@
 #define LIBVLC_CXX_STRUCTURES_H
 
 #include "common.hpp"
-#include <vector>
 
 namespace VLC
 {

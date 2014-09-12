@@ -24,6 +24,8 @@
 #ifndef LIBVLC_CXX_MEDIALISTPLAYER_H
 #define LIBVLC_CXX_MEDIALISTPLAYER_H
 
+#include <string>
+
 #include "common.hpp"
 #include "Internal.hpp"
 
@@ -31,6 +33,8 @@ namespace VLC
 {
 
 class EventManager;
+class MediaPlayer;
+class MediaList;
 
 class VLCPP_API MediaListPlayer : public Internal<libvlc_media_list_player_t>
 {

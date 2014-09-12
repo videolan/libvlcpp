@@ -36,17 +36,4 @@
 # define VLCPP_API
 #endif
 
-namespace VLC
-{
-class Instance;
-class Video;
-class MediaListPlayer;
-class MediaDiscoverer;
-class MediaPlayer;
-class Media;
-class MediaLibrary;
-class MediaList;
-class Audio;
-}
-
 #endif
