@@ -46,7 +46,7 @@ public:
      * \param path local filesystem path
      * \return the newly created media or NULL on error
      */
-    static Media* fromPath(Instance& instance, const std::string& path);
+    static Media fromPath(Instance& instance, const std::string& path);
 
     /**
      * Create a media with a certain given media resource location,
@@ -63,7 +63,7 @@ public:
      * \param psz_mrl the media location
      * \return the newly created media or NULL on error
      */
-    static Media* fromLocation(Instance& instance, const std::string& location);
+    static Media fromLocation(Instance& instance, const std::string& location);
 
     /**
      * Create a media for an already open file descriptor.
@@ -85,7 +85,7 @@ public:
      * \param fd open file descriptor
      * \return the newly created media or NULL on error
      */
-    static Media* fromFileDescriptor(Instance& instance, int fd);
+    static Media fromFileDescriptor(Instance& instance, int fd);
 
     /**
      * Get media instance from this media list instance. This action will increase
@@ -95,7 +95,7 @@ public:
      * \param p_ml a media list instance
      * \return media instance
      */
-    static Media* fromList(MediaList& list );
+    static Media fromList(MediaList& list );
 
     /**
      * Create a media as an empty node with a given name.
@@ -104,7 +104,7 @@ public:
      * \param psz_name the name of the node
      * \return the new empty media or NULL on error
      */
-    static Media* asNode(Instance& instance, const std::string& nodeName);
+    static Media asNode(Instance& instance, const std::string& nodeName);
 
     /**
      * Copy libvlc_media_t from another to new Media object.

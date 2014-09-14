@@ -61,20 +61,16 @@ MediaPlayer::~MediaPlayer()
     release();
 }
 
-MediaPlayer*MediaPlayer::create( Instance& instance )
+MediaPlayer MediaPlayer::create( Instance& instance )
 {
     InternalPtr ptr = libvlc_media_player_new( instance );
-    if ( ptr == NULL )
-        return NULL;
-    return new MediaPlayer( ptr );
+    return MediaPlayer( ptr );
 }
 
-MediaPlayer*MediaPlayer::fromMedia( Media& md )
+MediaPlayer MediaPlayer::fromMedia( Media& md )
 {
     InternalPtr ptr = libvlc_media_player_new_from_media( md );
-    if ( ptr == NULL )
-        return NULL;
-    return new MediaPlayer( ptr );
+    return MediaPlayer( ptr );
 }
 
 void MediaPlayer::setMedia( Media& md )
@@ -82,10 +78,10 @@ void MediaPlayer::setMedia( Media& md )
     libvlc_media_player_set_media( m_obj, md );
 }
 
-Media* MediaPlayer::media()
+Media MediaPlayer::media()
 {
     libvlc_media_t* media = libvlc_media_player_get_media(m_obj);
-    return new Media(media);
+    return Media(media);
 }
 
 EventManager& MediaPlayer::eventManager()
@@ -672,7 +668,8 @@ std::vector<TrackDescription> MediaPlayer::getTracksDescription(libvlc_track_des
 }
 
 
-void MediaPlayer::release() {
+void MediaPlayer::release()
+{
     libvlc_media_player_release(m_obj);
 }
 

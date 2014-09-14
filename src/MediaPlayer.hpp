@@ -71,7 +71,7 @@ public:
      * \param p_libvlc_instance  the libvlc instance in which the Media
      * Player should be created.
      */
-    static MediaPlayer* create( Instance& instance );
+    static VLC::MediaPlayer create( Instance& instance );
 
     // libvlc_media_player_new_from_media
     /**
@@ -79,7 +79,7 @@ public:
      *
      * \param p_md  the media. Afterwards the p_md can be safely destroyed.
      */
-    static MediaPlayer* fromMedia( Media &md );
+    static VLC::MediaPlayer fromMedia( Media &md );
 
     /**
      * Set the media that will be used by the media_player. If any, previous
@@ -95,7 +95,7 @@ public:
      * \return the media associated with p_mi, or NULL if no media is
      * associated
      */
-    Media* media();
+    VLC::Media media();
 
     /**
      * Get the Event Manager from which the media player send event.

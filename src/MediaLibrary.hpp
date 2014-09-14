@@ -38,7 +38,7 @@ public:
      *
      * \param p_instance  the libvlc instance
      */
-    static MediaLibrary* create(Instance & p_instance);
+    static MediaLibrary create(Instance & p_instance);
     /**
      * Copy libvlc_media_library_t from another to new MediaLibrary object.
      * \param another existing MediaLibrary

@@ -26,12 +26,10 @@
 namespace VLC
 {
 
-MediaLibrary*MediaLibrary::create(Instance& instance)
+MediaLibrary MediaLibrary::create(Instance& instance)
 {
     InternalPtr ptr = libvlc_media_library_new( instance );
-    if ( ptr == NULL )
-        return NULL;
-    return new MediaLibrary(ptr);
+    return MediaLibrary(ptr);
 }
 
 MediaLibrary::MediaLibrary(const MediaLibrary& another)

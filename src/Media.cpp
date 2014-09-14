@@ -26,44 +26,34 @@
 namespace VLC
 {
 
-Media* Media::fromPath(Instance& instance, const std::string& path)
+Media Media::fromPath(Instance& instance, const std::string& path)
 {
     InternalPtr ptr = libvlc_media_new_path( instance, path.c_str() );
-    if ( ptr == NULL )
-        return NULL;
-    return new Media(ptr);
+    return Media(ptr);
 }
 
-Media*Media::fromLocation(Instance& instance, const std::string& location)
+Media Media::fromLocation(Instance& instance, const std::string& location)
 {
     InternalPtr ptr = libvlc_media_new_location( instance, location.c_str() );
-    if ( ptr == NULL )
-        return NULL;
-    return new Media(ptr);
+    return Media(ptr);
 }
 
-Media*Media::fromFileDescriptor(Instance& instance, int fd)
+Media Media::fromFileDescriptor(Instance& instance, int fd)
 {
     InternalPtr ptr = libvlc_media_new_fd( instance, fd );
-    if ( ptr == NULL )
-        return NULL;
-    return new Media( ptr );
+    return Media( ptr );
 }
 
-Media*Media::fromList(MediaList& list)
+Media Media::fromList(MediaList& list)
 {
     InternalPtr ptr = libvlc_media_list_media( list );
-    if ( ptr == NULL )
-        return NULL;
-    return new Media( ptr );
+    return Media( ptr );
 }
 
-Media*Media::asNode(Instance& instance, const std::string& nodeName)
+Media Media::asNode(Instance& instance, const std::string& nodeName)
 {
     InternalPtr ptr = libvlc_media_new_as_node( instance, nodeName.c_str() );
-    if ( ptr == NULL )
-        return NULL;
-    return new Media( ptr );
+    return Media( ptr );
 }
 
 Media::Media(const Media& another)

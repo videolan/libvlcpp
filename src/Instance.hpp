@@ -36,6 +36,7 @@ namespace VLC
 class VLCPP_API Instance : public Internal<libvlc_instance_t>
 {
 public:
+    Instance();
     /**
      * Copy libvlc_instance_t from another to new Instance object.
      * \param another existing Instance
@@ -80,7 +81,7 @@ public:
      *
      * \param argv  list of arguments (should be NULL)
      */
-    static Instance* create(int argc, const char *const * argv);
+    static Instance create(int argc, const char *const * argv);
 
     /**
      * Try to start a user interface for the libvlc instance.

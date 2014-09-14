@@ -62,36 +62,28 @@ MediaList::~MediaList()
     release();
 }
 
-MediaList*MediaList::fromMedia(Media& md)
+MediaList MediaList::fromMedia(Media& md)
 {
     InternalPtr ptr = libvlc_media_subitems( md );
-    if ( ptr == NULL )
-        return NULL;
-    return new MediaList( ptr );
+    return MediaList( ptr );
 }
 
-MediaList* MediaList::fromMediaDiscoverer( MediaDiscoverer& mdis )
+MediaList MediaList::fromMediaDiscoverer( MediaDiscoverer& mdis )
 {
     InternalPtr ptr = libvlc_media_discoverer_media_list( mdis );
-    if ( ptr == NULL )
-        return NULL;
-    return new MediaList( ptr );
+    return MediaList( ptr );
 }
 
-MediaList*MediaList::fromMediaLibrary(MediaLibrary& mlib)
+MediaList MediaList::fromMediaLibrary(MediaLibrary& mlib)
 {
     InternalPtr ptr = libvlc_media_library_media_list( mlib );
-    if ( ptr == NULL )
-        return NULL;
-    return new MediaList( ptr );
+    return MediaList( ptr );
 }
 
-MediaList*MediaList::create( Instance& instance )
+MediaList MediaList::create( Instance& instance )
 {
     InternalPtr ptr = libvlc_media_list_new( instance );
-    if ( ptr == NULL )
-        return NULL;
-    return new MediaList( ptr );
+    return MediaList( ptr );
 }
 
 void MediaList::setMedia( Media &md )
@@ -121,7 +113,8 @@ int MediaList::count()
 
 Media MediaList::itemAtIndex(int i_pos)
 {
-    return libvlc_media_list_item_at_index(m_obj, i_pos);
+    Media::InternalPtr ptr = libvlc_media_list_item_at_index(m_obj, i_pos);
+    return Media( ptr );
 }
 
 int MediaList::indexOfItem( Media &md )

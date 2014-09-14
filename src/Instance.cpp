@@ -26,6 +26,11 @@
 namespace VLC
 {
 
+Instance::Instance()
+    : Internal( NULL )
+{
+}
+
 Instance::Instance( const Instance& another )
     : Internal( another )
 {
@@ -54,12 +59,10 @@ Instance::~Instance()
     release();
 }
 
-Instance* Instance::create( int argc, const char *const * argv )
+Instance Instance::create( int argc, const char *const * argv )
 {
     InternalPtr ptr = libvlc_new( argc, argv );
-    if ( ptr == NULL )
-        return NULL;
-    return new Instance( ptr );
+    return Instance( ptr );
 }
 
 int Instance::addIntf( const std::string& name )
@@ -164,7 +167,8 @@ Instance::Instance(Internal::InternalPtr ptr)
 
 void Instance::release()
 {
-    libvlc_release(m_obj);
+    if ( m_obj )
+        libvlc_release(m_obj);
 }
 
 void Instance::retain()

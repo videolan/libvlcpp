@@ -41,8 +41,9 @@ class   Internal
             return m_obj;
         }
         operator T*() { return m_obj; }
+        bool isValid() const { return m_obj != NULL; }
     protected:
-        Internal(InternalPtr obj = NULL ) : m_obj( obj ) {}
+        Internal( InternalPtr obj = NULL ) : m_obj( obj ) {}
         Internal( const Internal& copied ) : m_obj( copied.m_obj ) {}
         ~Internal(){}
 

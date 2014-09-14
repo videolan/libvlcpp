@@ -67,7 +67,7 @@ public:
      *
      * \param p_instance  libvlc instance
      */
-    static MediaListPlayer* create(Instance & instance);
+    static MediaListPlayer create(Instance & instance);
 
     /**
      * Return the event manager of this media_list_player.

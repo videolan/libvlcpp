@@ -65,7 +65,7 @@ public:
      *
      * \param p_md  media descriptor object
      */
-    static MediaList* fromMedia(Media &md);
+    static VLC::MediaList fromMedia(Media &md);
 
     // libvlc_media_discoverer_media_list
     /**
@@ -73,7 +73,7 @@ public:
      *
      * \param p_mdis  media service discover object
      */
-    static MediaList* fromMediaDiscoverer(MediaDiscoverer & mdis);
+    static VLC::MediaList fromMediaDiscoverer(MediaDiscoverer & mdis);
 
     // libvlc_media_library_media_list
     /**
@@ -81,7 +81,7 @@ public:
      *
      * \param p_mlib  media library object
      */
-    static MediaList* fromMediaLibrary( MediaLibrary &mlib );
+    static VLC::MediaList fromMediaLibrary( MediaLibrary &mlib );
 
     // libvlc_media_list_new
     /**
@@ -89,7 +89,7 @@ public:
      *
      * \param p_instance  libvlc instance
      */
-    static MediaList* create(Instance &instance);
+    static VLC::MediaList create(Instance &instance);
 
     /**
      * Associate media instance with this media list instance. If another
