@@ -42,6 +42,7 @@ class Media;
 class VLCPP_API MediaPlayer : public Internal<libvlc_media_player_t>
 {
 public:
+    MediaPlayer();
     /**
      * Copy libvlc_media_player_t from another to new MediaPlayer object.
      * \param another existing MediaPlayer

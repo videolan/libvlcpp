@@ -31,7 +31,7 @@ namespace VLC
 {
 
 template < typename T >
-class   Internal
+class Internal
 {
     public:
         typedef     T*      InternalPtr;

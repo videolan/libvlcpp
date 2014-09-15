@@ -28,6 +28,11 @@
 namespace VLC
 {
 
+MediaPlayer::MediaPlayer()
+    : Internal( NULL )
+{
+}
+
 MediaPlayer::MediaPlayer(const MediaPlayer& another)
     : Internal( another )
 {
