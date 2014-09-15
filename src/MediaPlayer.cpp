@@ -58,6 +58,7 @@ bool MediaPlayer::operator==(const MediaPlayer& another) const
 
 MediaPlayer::~MediaPlayer()
 {
+    delete m_eventManager;
     release();
 }
 
