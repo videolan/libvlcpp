@@ -37,7 +37,7 @@ Instance::Instance( const Instance& another )
     retain();
 }
 
-const Instance& Instance::operator=( const Instance& another )
+Instance& Instance::operator=( const Instance& another )
 {
     if ( this == &another )
     {

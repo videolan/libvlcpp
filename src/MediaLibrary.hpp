@@ -50,7 +50,7 @@ public:
      * to this MediaLibrary
      * \param another existing MediaLibrary
      */
-    const MediaLibrary& operator=(const MediaLibrary& another);
+    MediaLibrary& operator=(const MediaLibrary& another);
 
     /**
      * Check if 2 MediaLibrary objects contain the same libvlc_media_library_t.

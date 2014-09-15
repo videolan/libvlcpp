@@ -53,7 +53,7 @@ public:
      * to this MediaPlayer
      * \param another existing MediaPlayer
      */
-    const MediaPlayer& operator=(const MediaPlayer& another);
+    MediaPlayer& operator=(const MediaPlayer& another);
 
     /**
      * Check if 2 MediaPlayer objects contain the same libvlc_media_player_t.

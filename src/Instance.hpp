@@ -48,7 +48,7 @@ public:
      * to this Instance
      * \param another existing Instance
      */
-    const Instance& operator=(const Instance& another);
+    Instance& operator=(const Instance& another);
 
     /**
      * Check if 2 Instance objects contain the same libvlc_instance_t.

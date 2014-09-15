@@ -38,7 +38,7 @@ MediaLibrary::MediaLibrary(const MediaLibrary& another)
     retain();
 }
 
-const MediaLibrary& MediaLibrary::operator=(const MediaLibrary& another)
+MediaLibrary& MediaLibrary::operator=(const MediaLibrary& another)
 {
     if (this == &another)
     {

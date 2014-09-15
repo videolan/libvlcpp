@@ -64,7 +64,7 @@ Media::Media(const Media& another)
         m_eventManager = new EventManager( *another.m_eventManager );
 }
 
-const Media& Media::operator=(const Media& another)
+Media& Media::operator=(const Media& another)
 {
     if (this == &another)
     {

@@ -79,7 +79,7 @@ private:
     void release();
 
     MediaDiscoverer(const MediaDiscoverer& another);
-    const MediaDiscoverer& operator=(const MediaDiscoverer& another);
+    MediaDiscoverer& operator=(const MediaDiscoverer& another);
 
 private:
     EventManager* m_eventManager;

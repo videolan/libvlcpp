@@ -36,7 +36,7 @@ MediaPlayer::MediaPlayer(const MediaPlayer& another)
     retain();
 }
 
-const MediaPlayer& MediaPlayer::operator=(const MediaPlayer& another)
+MediaPlayer& MediaPlayer::operator=(const MediaPlayer& another)
 {
     if (this == &another)
     {

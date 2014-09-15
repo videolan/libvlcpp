@@ -117,7 +117,7 @@ public:
      * to this Media
      * \param another existing Media
      */
-    const Media& operator=(const Media& another);
+    Media& operator=(const Media& another);
 
     /**
      * Check if 2 Media objects contain the same libvlc_media_t.

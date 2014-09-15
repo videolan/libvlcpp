@@ -50,7 +50,7 @@ public:
      * to this MediaListPlayer
      * \param another existing MediaListPlayer
      */
-    const MediaListPlayer& operator=(const MediaListPlayer& another);
+    MediaListPlayer& operator=(const MediaListPlayer& another);
 
     /**
      * Check if 2 MediaListPlayer objects contain the same libvlc_media_list_player_t.

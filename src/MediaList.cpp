@@ -36,7 +36,7 @@ MediaList::MediaList(const MediaList& another)
     retain();
 }
 
-const MediaList& MediaList::operator=(const MediaList& another)
+MediaList& MediaList::operator=(const MediaList& another)
 {
     if (this == &another)
     {
