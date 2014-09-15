@@ -521,7 +521,7 @@ public:
      *
      * \version LibVLC 2.0.0 or later
      */
-    void setCallbacks(libvlc_audio_play_cb play, libvlc_audio_pause_cb pause, libvlc_audio_resume_cb resume, libvlc_audio_flush_cb flush, libvlc_audio_drain_cb drain, void * opaque);
+    void setAudioCallbacks(libvlc_audio_play_cb play, libvlc_audio_pause_cb pause, libvlc_audio_resume_cb resume, libvlc_audio_flush_cb flush, libvlc_audio_drain_cb drain, void * opaque);
 
     /**
      * Set callbacks and private data for decoded audio. Use
@@ -545,7 +545,7 @@ public:
      *
      * \version LibVLC 2.0.0 or later
      */
-    void setFormatCallbacks(libvlc_audio_setup_cb setup, libvlc_audio_cleanup_cb cleanup);
+    void setAudioFormatCallbacks(libvlc_audio_setup_cb setup, libvlc_audio_cleanup_cb cleanup);
 
     /**
      * Set decoded audio format. This only works in combination with
@@ -561,7 +561,7 @@ public:
      *
      * \version LibVLC 2.0.0 or later
      */
-    void setFormat(const std::string& format, unsigned rate, unsigned channels);
+    void setAudioFormat(const std::string& format, unsigned rate, unsigned channels);
 
     /**
      * Selects an audio output module.
@@ -778,7 +778,7 @@ public:
      *
      * \version LibVLC 1.1.1 or later
      */
-    void setCallbacks(libvlc_video_lock_cb lock, libvlc_video_unlock_cb unlock, libvlc_video_display_cb display, void * opaque);
+    void setVideoCallbacks(libvlc_video_lock_cb lock, libvlc_video_unlock_cb unlock, libvlc_video_display_cb display, void * opaque);
 
     /**
      * Set decoded video chroma and dimensions. This only works in
@@ -796,7 +796,7 @@ public:
      *
      * \version LibVLC 1.1.1 or later
      */
-    void setFormat(const std::string& chroma, unsigned width, unsigned height, unsigned pitch);
+    void setVideoFormat(const std::string& chroma, unsigned width, unsigned height, unsigned pitch);
 
     /**
      * Set decoded video chroma and dimensions. This only works in
@@ -808,7 +808,7 @@ public:
      *
      * \version LibVLC 2.0.0 or later
      */
-    void setFormatCallbacks(libvlc_video_format_cb setup, libvlc_video_cleanup_cb cleanup);
+    void setVideoFormatCallbacks(libvlc_video_format_cb setup, libvlc_video_cleanup_cb cleanup);
 
     /**
      * Enable or disable key press events handling, according to the LibVLC

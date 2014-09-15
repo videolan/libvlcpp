@@ -320,7 +320,7 @@ int MediaPlayer::setEqualizer(libvlc_equalizer_t * p_equalizer)
     return libvlc_media_player_set_equalizer(m_obj, p_equalizer);
 }
 
-void MediaPlayer::setCallbacks(libvlc_audio_play_cb play, libvlc_audio_pause_cb pause, libvlc_audio_resume_cb resume, libvlc_audio_flush_cb flush, libvlc_audio_drain_cb drain, void * opaque)
+void MediaPlayer::setAudioCallbacks(libvlc_audio_play_cb play, libvlc_audio_pause_cb pause, libvlc_audio_resume_cb resume, libvlc_audio_flush_cb flush, libvlc_audio_drain_cb drain, void * opaque)
 {
     libvlc_audio_set_callbacks(m_obj, play, pause, resume, flush, drain, opaque);
 }
@@ -330,12 +330,12 @@ void MediaPlayer::setVolumeCallback(libvlc_audio_set_volume_cb set_volume)
     libvlc_audio_set_volume_callback(m_obj, set_volume);
 }
 
-void MediaPlayer::setFormatCallbacks(libvlc_audio_setup_cb setup, libvlc_audio_cleanup_cb cleanup)
+void MediaPlayer::setAudioFormatCallbacks(libvlc_audio_setup_cb setup, libvlc_audio_cleanup_cb cleanup)
 {
     libvlc_audio_set_format_callbacks(m_obj, setup, cleanup);
 }
 
-void MediaPlayer::setFormat(const std::string& format, unsigned rate, unsigned channels)
+void MediaPlayer::setAudioFormat(const std::string& format, unsigned rate, unsigned channels)
 {
     libvlc_audio_set_format(m_obj, format.c_str(), rate, channels);
 }
@@ -428,17 +428,17 @@ int MediaPlayer::setDelay(int64_t i_delay)
     return libvlc_audio_set_delay(m_obj, i_delay);
 }
 
-void MediaPlayer::setCallbacks(libvlc_video_lock_cb lock, libvlc_video_unlock_cb unlock, libvlc_video_display_cb display, void * opaque)
+void MediaPlayer::setVideoCallbacks(libvlc_video_lock_cb lock, libvlc_video_unlock_cb unlock, libvlc_video_display_cb display, void * opaque)
 {
     libvlc_video_set_callbacks(m_obj, lock, unlock, display, opaque);
 }
 
-void MediaPlayer::setFormat(const std::string& chroma, unsigned width, unsigned height, unsigned pitch)
+void MediaPlayer::setVideoFormat(const std::string& chroma, unsigned width, unsigned height, unsigned pitch)
 {
     libvlc_video_set_format(m_obj, chroma.c_str(), width, height, pitch);
 }
 
-void MediaPlayer::setFormatCallbacks(libvlc_video_format_cb setup, libvlc_video_cleanup_cb cleanup)
+void MediaPlayer::setVideoFormatCallbacks(libvlc_video_format_cb setup, libvlc_video_cleanup_cb cleanup)
 {
     libvlc_video_set_format_callbacks(m_obj, setup, cleanup);
 }
