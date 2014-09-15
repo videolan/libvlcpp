@@ -575,7 +575,7 @@ public:
      *
      * \return 0 if function succeded, -1 on error
      */
-    int outputSet(const std::string& psz_name);
+    int setAudioOutput(const std::string& psz_name);
 
     /**
      * Gets a list of potential audio output devices,

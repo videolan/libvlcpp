@@ -340,7 +340,7 @@ void MediaPlayer::setAudioFormat(const std::string& format, unsigned rate, unsig
     libvlc_audio_set_format(m_obj, format.c_str(), rate, channels);
 }
 
-int MediaPlayer::outputSet(const std::string& psz_name)
+int MediaPlayer::setAudioOutput(const std::string& psz_name)
 {
     return libvlc_audio_output_set(m_obj, psz_name.c_str());
 }
