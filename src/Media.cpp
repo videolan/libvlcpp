@@ -26,6 +26,11 @@
 namespace VLC
 {
 
+Media::Media()
+    : Internal( NULL )
+{
+}
+
 Media Media::fromPath(Instance& instance, const std::string& path)
 {
     InternalPtr ptr = libvlc_media_new_path( instance, path.c_str() );

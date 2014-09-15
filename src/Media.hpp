@@ -39,6 +39,7 @@ class EventManager;
 class VLCPP_API Media : public Internal<libvlc_media_t>
 {
 public:
+    Media();
     /**
      * Create a media for a certain file path.
      *
