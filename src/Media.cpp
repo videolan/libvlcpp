@@ -120,7 +120,8 @@ std::string Media::mrl()
 
 Media Media::duplicate()
 {
-    return libvlc_media_duplicate(m_obj);
+    InternalPtr obj = libvlc_media_duplicate(m_obj);
+    return Media( obj );
 }
 
 std::string Media::meta(libvlc_meta_t e_meta)

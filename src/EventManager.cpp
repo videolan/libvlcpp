@@ -128,13 +128,13 @@ void EventManager::handleMediaEvent(const libvlc_event_t* event, void* data)
             cb->parsedChanged( event->u.media_parsed_changed.new_status );
             break;
         case libvlc_MediaFreed:
-            cb->freed( event->u.media_freed.md );
+            cb->freed( Media( event->u.media_freed.md ) );
             break;
         case libvlc_MediaStateChanged:
             cb->stateChanged( event->u.media_state_changed.new_state );
             break;
         case libvlc_MediaSubItemTreeAdded:
-            cb->subItemTreeAdded( event->u.media_subitemtree_added.item );
+            cb->subItemTreeAdded( Media( event->u.media_subitemtree_added.item ) );
             break;
         default:
             assert(false);

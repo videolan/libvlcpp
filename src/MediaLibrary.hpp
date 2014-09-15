@@ -69,7 +69,7 @@ public:
     int load();
 
 private:
-    MediaLibrary(InternalPtr ptr);
+    explicit MediaLibrary(InternalPtr ptr);
     /**
      * Release media library object. This functions decrements the reference
      * count of the media library object. If it reaches 0, then the object

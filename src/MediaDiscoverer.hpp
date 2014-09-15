@@ -69,7 +69,7 @@ public:
     bool isRunning();
 
 private:
-    MediaDiscoverer(InternalPtr ptr);
+    explicit MediaDiscoverer(InternalPtr ptr);
     /**
      * Release media discover object. If the reference count reaches 0, then
      * the object will be released.

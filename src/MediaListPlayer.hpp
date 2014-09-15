@@ -159,7 +159,7 @@ public:
     void setPlaybackMode(libvlc_playback_mode_t e_mode);
 
 private:
-    MediaListPlayer(InternalPtr ptr);
+    explicit MediaListPlayer(InternalPtr ptr);
     /**
      * Release a media_list_player after use Decrement the reference count of
      * a media player object. If the reference count is 0, then

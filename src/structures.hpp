@@ -24,6 +24,8 @@
 #ifndef LIBVLC_CXX_STRUCTURES_H
 #define LIBVLC_CXX_STRUCTURES_H
 
+#include <string>
+
 #include "common.hpp"
 
 namespace VLC
@@ -41,7 +43,7 @@ public:
     const std::string& help() const;
 
 private:
-    ModuleDescription( libvlc_module_description_t* c );
+    explicit ModuleDescription( libvlc_module_description_t* c );
     std::string m_name;
     std::string m_shortname;
     std::string m_longname;
@@ -82,7 +84,7 @@ public:
     const std::string& encoding() const;
 
 private:
-    MediaTrack(libvlc_media_track_t* c);
+    explicit MediaTrack(libvlc_media_track_t* c);
 
     uint32_t m_codec;
     uint32_t m_originalFourcc;
@@ -130,7 +132,7 @@ class VLCPP_API AudioOutputDeviceDescription
         const std::string& description() const;
 
     private:
-        AudioOutputDeviceDescription( libvlc_audio_output_device_t* d );
+        explicit AudioOutputDeviceDescription( libvlc_audio_output_device_t* d );
 
         std::string m_device;
         std::string m_description;
@@ -146,7 +148,7 @@ public:
     const std::string& name() const;
 
 private:
-    TrackDescription( libvlc_track_description_t* c );
+    explicit TrackDescription( libvlc_track_description_t* c );
     int m_id;
     std::string m_name;
 

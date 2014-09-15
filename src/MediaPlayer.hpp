@@ -1210,7 +1210,7 @@ public:
     void setAdjustFloat(unsigned option, float value);
 
 private:
-    MediaPlayer( InternalPtr ptr );
+    explicit MediaPlayer( InternalPtr ptr );
     /**
      * Release a media_player after use Decrement the reference count of a
      * media player object. If the reference count is 0, then

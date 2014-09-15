@@ -192,7 +192,7 @@ public:
     VLC::EventManager& eventManager();
 
 private:
-    MediaList(InternalPtr ptr);
+    explicit MediaList(InternalPtr ptr);
     /**
      * Release media list created with MediaList::MediaList() .
      */
