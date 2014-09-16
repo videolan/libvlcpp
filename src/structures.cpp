@@ -108,7 +108,7 @@ uint32_t MediaTrack::fpsDen() const
     return m_fpsDen;
 }
 
-const std::string&MediaTrack::encoding() const
+const std::string& MediaTrack::encoding() const
 {
     return m_encoding;
 }
@@ -128,12 +128,12 @@ uint32_t MediaTrack::bitrate() const
     return m_bitrate;
 }
 
-const std::string&MediaTrack::language() const
+const std::string& MediaTrack::language() const
 {
     return m_language;
 }
 
-const std::string&MediaTrack::description() const
+const std::string& MediaTrack::description() const
 {
     return m_description;
 }

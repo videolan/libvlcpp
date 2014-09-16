@@ -479,7 +479,9 @@ void MediaPlayer::setScale(float f_factor)
 
 std::string MediaPlayer::aspectRatio()
 {
-    char * c_result = libvlc_video_get_aspect_ratio(m_obj);
+    char* c_result = libvlc_video_get_aspect_ratio(m_obj);
+    if ( c_result == NULL )
+        return std::string();
     std::string result = c_result;
     libvlc_free(c_result);
     return result;
@@ -540,7 +542,9 @@ std::vector<TrackDescription> MediaPlayer::chapterDescription(int i_title)
 
 std::string MediaPlayer::cropGeometry()
 {
-    char * c_result = libvlc_video_get_crop_geometry(m_obj);
+    char* c_result = libvlc_video_get_crop_geometry(m_obj);
+    if ( c_result == NULL )
+        return std::string();
     std::string result = c_result;
     libvlc_free(c_result);
     return result;
@@ -599,7 +603,9 @@ int MediaPlayer::marqueeInt(unsigned option)
 
 std::string MediaPlayer::marqueeString(unsigned option)
 {
-    char * c_result = libvlc_video_get_marquee_string(m_obj, option);
+    char* c_result = libvlc_video_get_marquee_string(m_obj, option);
+    if ( c_result == NULL )
+        return std::string();
     std::string result = c_result;
     libvlc_free(c_result);
     return result;

@@ -111,7 +111,9 @@ void Media::addOptionFlag(const std::string& psz_options, unsigned i_flags)
 
 std::string Media::mrl()
 {
-    char * c_result = libvlc_media_get_mrl(m_obj);
+    char* c_result = libvlc_media_get_mrl(m_obj);
+    if ( c_result == NULL )
+        return std::string();
     std::string result = c_result;
     libvlc_free(c_result);
     return result;
@@ -125,7 +127,9 @@ Media Media::duplicate()
 
 std::string Media::meta(libvlc_meta_t e_meta)
 {
-    char * c_result = libvlc_media_get_meta(m_obj, e_meta);
+    char* c_result = libvlc_media_get_meta(m_obj, e_meta);
+    if ( c_result == NULL )
+        return std::string();
     std::string result = c_result;
     libvlc_free(c_result);
     return result;
