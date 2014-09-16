@@ -34,6 +34,8 @@ EventManager::EventManager(const EventManager& em)
 
 bool EventManager::attach(libvlc_event_type_t type, IMediaEventCb* cb)
 {
+    if ( cb == NULL )
+        return false;
     if ( type < libvlc_MediaMetaChanged || type > libvlc_MediaSubItemTreeAdded )
         return false;
     libvlc_event_attach( *this, type, &handleMediaEvent, cb );
@@ -42,6 +44,8 @@ bool EventManager::attach(libvlc_event_type_t type, IMediaEventCb* cb)
 
 bool EventManager::attach(libvlc_event_type_t type, IMediaPlayerEventCb* cb)
 {
+    if ( cb == NULL )
+        return false;
     if ( type < libvlc_MediaPlayerMediaChanged || type > libvlc_MediaPlayerESSelected )
         return false;
     libvlc_event_attach( *this, type, &handleMediaPlayerEvent, cb );
@@ -50,6 +54,8 @@ bool EventManager::attach(libvlc_event_type_t type, IMediaPlayerEventCb* cb)
 
 bool EventManager::attach(libvlc_event_type_t type, IMediaListEventCb* cb)
 {
+    if ( cb == NULL )
+        return false;
     if ( type < libvlc_MediaListItemAdded || type > libvlc_MediaListWillDeleteItem )
         return false;
     libvlc_event_attach( *this, type, &handleMediaListEvent, cb );
@@ -58,6 +64,8 @@ bool EventManager::attach(libvlc_event_type_t type, IMediaListEventCb* cb)
 
 bool EventManager::attach(libvlc_event_type_t type, IMediaListPlayerEventCb* cb)
 {
+    if ( cb == NULL )
+        return false;
     if ( type < libvlc_MediaListPlayerPlayed || type > libvlc_MediaListPlayerStopped )
         return false;
     libvlc_event_attach( *this, type, &handleMediaListPlayerEvent, cb );
@@ -66,6 +74,8 @@ bool EventManager::attach(libvlc_event_type_t type, IMediaListPlayerEventCb* cb)
 
 bool EventManager::attach(libvlc_event_type_t type, IMediaDiscovererEventCb* cb)
 {
+    if ( cb == NULL )
+        return false;
     if ( type < libvlc_MediaDiscovererStarted || type > libvlc_MediaDiscovererEnded )
         return false;
     libvlc_event_attach( *this, type, &handleMediaDiscovererEvent, cb );
@@ -74,6 +84,8 @@ bool EventManager::attach(libvlc_event_type_t type, IMediaDiscovererEventCb* cb)
 
 bool EventManager::attach( libvlc_event_type_t type, IVLMEventCb* cb )
 {
+    if ( cb == NULL )
+        return false;
     if ( type < libvlc_VlmMediaAdded || type > libvlc_VlmMediaInstanceStatusError )
         return false;
     libvlc_event_attach( *this, type, &handleVLMEvent, cb );
