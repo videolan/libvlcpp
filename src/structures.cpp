@@ -123,6 +123,21 @@ int32_t MediaTrack::level() const
     return m_level;
 }
 
+uint32_t MediaTrack::bitrate() const
+{
+    return m_bitrate;
+}
+
+const std::string&MediaTrack::language() const
+{
+    return m_language;
+}
+
+const std::string&MediaTrack::description() const
+{
+    return m_description;
+}
+
 uint32_t MediaTrack::channels() const
 {
     return m_channels;
@@ -139,7 +154,12 @@ MediaTrack::MediaTrack( libvlc_media_track_t* c )
     , m_id( c->i_id )
     , m_profile( c->i_profile )
     , m_level( c->i_level )
+    , m_bitrate( c->i_bitrate )
 {
+    if ( c->psz_language != NULL )
+        m_language = c->psz_language;
+    if ( c->psz_description != NULL )
+        m_description = c->psz_description;
     switch ( c->i_type )
     {
         case libvlc_track_audio:

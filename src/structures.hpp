@@ -70,6 +70,9 @@ public:
     Type type() const;
     int32_t profile() const;
     int32_t level() const;
+    uint32_t bitrate() const;
+    const std::string& language() const;
+    const std::string& description() const;
     // Audio specific
     uint32_t channels() const;
     uint32_t rate() const;
@@ -92,6 +95,9 @@ private:
     Type m_type;
     int32_t m_profile;
     int32_t m_level;
+    uint32_t m_bitrate;
+    std::string m_language;
+    std::string m_description;
     // Audio
     uint32_t m_channels;
     uint32_t m_rate;
