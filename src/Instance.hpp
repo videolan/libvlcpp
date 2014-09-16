@@ -243,7 +243,7 @@ public:
     std::vector<AudioOutputDeviceDescription> audioOutputDeviceList(const std::string& aout);
 
 private:
-    explicit Instance(InternalPtr ptr);
+    explicit Instance( InternalPtr ptr, bool increaseRefCount );
     /**
      * Decrement the reference count of a libvlc instance, and destroy it if
      * it reaches zero.

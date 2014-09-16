@@ -62,7 +62,7 @@ Instance::~Instance()
 Instance Instance::create( int argc, const char *const * argv )
 {
     InternalPtr ptr = libvlc_new( argc, argv );
-    return Instance( ptr );
+    return Instance( ptr, false );
 }
 
 int Instance::addIntf( const std::string& name )
@@ -160,9 +160,11 @@ std::vector<AudioOutputDeviceDescription> Instance::audioOutputDeviceList(const 
     return res;
 }
 
-Instance::Instance(Internal::InternalPtr ptr)
+Instance::Instance( Internal::InternalPtr ptr, bool increaseRefCount )
     : Internal( ptr )
 {
+    if ( increaseRefCount )
+        retain();
 }
 
 void Instance::release()

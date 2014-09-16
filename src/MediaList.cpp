@@ -114,7 +114,7 @@ int MediaList::count()
 Media MediaList::itemAtIndex(int i_pos)
 {
     Media::InternalPtr ptr = libvlc_media_list_item_at_index(m_obj, i_pos);
-    return Media( ptr );
+    return Media( ptr, false );
 }
 
 int MediaList::indexOfItem( Media &md )

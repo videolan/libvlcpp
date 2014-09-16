@@ -70,13 +70,13 @@ MediaPlayer::~MediaPlayer()
 MediaPlayer MediaPlayer::create( Instance& instance )
 {
     InternalPtr ptr = libvlc_media_player_new( instance );
-    return MediaPlayer( ptr );
+    return MediaPlayer( ptr, false );
 }
 
 MediaPlayer MediaPlayer::fromMedia( Media& md )
 {
     InternalPtr ptr = libvlc_media_player_new_from_media( md );
-    return MediaPlayer( ptr );
+    return MediaPlayer( ptr, false );
 }
 
 void MediaPlayer::setMedia( Media& md )
@@ -87,7 +87,7 @@ void MediaPlayer::setMedia( Media& md )
 Media MediaPlayer::media()
 {
     libvlc_media_t* media = libvlc_media_player_get_media(m_obj);
-    return Media(media);
+    return Media( media, false );
 }
 
 EventManager& MediaPlayer::eventManager()
@@ -648,10 +648,12 @@ void MediaPlayer::setAdjustFloat(unsigned option, float value)
     libvlc_video_set_adjust_float(m_obj, option, value);
 }
 
-MediaPlayer::MediaPlayer( InternalPtr ptr )
+MediaPlayer::MediaPlayer( InternalPtr ptr, bool increaseRefCount )
     : Internal( ptr )
     , m_eventManager( NULL )
 {
+    if ( increaseRefCount )
+        retain();
 }
 
 void MediaPlayer::retain()

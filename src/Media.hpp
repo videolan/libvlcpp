@@ -330,7 +330,7 @@ public:
     std::vector<MediaTrack> tracks();
 
 private:
-    explicit Media(InternalPtr ptr);
+    explicit Media(InternalPtr ptr, bool increaseRefCount );
     /**
      * Retain a reference to a media descriptor object (libvlc_media_t). Use
      * Media::release() to decrement the reference count of a media

@@ -59,7 +59,7 @@ MediaListPlayer::~MediaListPlayer()
     release();
 }
 
-MediaListPlayer MediaListPlayer::create(Instance& instance)
+MediaListPlayer MediaListPlayer::create( Instance& instance )
 {
     InternalPtr ptr = libvlc_media_list_player_new( instance );
     return MediaListPlayer( ptr );
