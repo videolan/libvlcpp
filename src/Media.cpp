@@ -28,6 +28,7 @@ namespace VLC
 
 Media::Media()
     : Internal( NULL )
+    , m_eventManager( NULL )
 {
 }
 
@@ -63,6 +64,7 @@ Media Media::asNode(Instance& instance, const std::string& nodeName)
 
 Media::Media(const Media& another)
     : Internal(another)
+    , m_eventManager( NULL )
 {
     retain();
     if ( another.m_eventManager != NULL )
@@ -80,6 +82,8 @@ Media& Media::operator=(const Media& another)
     delete m_eventManager;
     if ( another.m_eventManager != NULL )
         m_eventManager = new EventManager( *another.m_eventManager );
+    else
+        m_eventManager = NULL;
     retain();
     return *this;
 }

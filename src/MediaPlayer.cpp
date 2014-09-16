@@ -30,11 +30,13 @@ namespace VLC
 
 MediaPlayer::MediaPlayer()
     : Internal( NULL )
+    , m_eventManager( NULL )
 {
 }
 
 MediaPlayer::MediaPlayer(const MediaPlayer& another)
     : Internal( another )
+    , m_eventManager( NULL )
 {
     if ( another.m_eventManager != NULL )
         m_eventManager = new EventManager( *another.m_eventManager );
@@ -52,6 +54,8 @@ MediaPlayer& MediaPlayer::operator=(const MediaPlayer& another)
     delete m_eventManager;
     if ( another.m_eventManager != NULL )
         m_eventManager = new EventManager( *another.m_eventManager );
+    else
+        m_eventManager = NULL;
     retain();
     return *this;
 }
