@@ -656,7 +656,8 @@ MediaPlayer::MediaPlayer( InternalPtr ptr )
 
 void MediaPlayer::retain()
 {
-    libvlc_media_player_retain( m_obj );
+    if ( isValid() )
+        libvlc_media_player_retain( m_obj );
 }
 
 std::vector<TrackDescription> MediaPlayer::getTracksDescription(libvlc_track_description_t* tracks) const
@@ -676,7 +677,8 @@ std::vector<TrackDescription> MediaPlayer::getTracksDescription(libvlc_track_des
 
 void MediaPlayer::release()
 {
-    libvlc_media_player_release(m_obj);
+    if ( isValid() )
+        libvlc_media_player_release( m_obj );
 }
 
 } // namespace VLC

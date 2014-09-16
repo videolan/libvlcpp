@@ -210,12 +210,14 @@ Media::Media(Internal::InternalPtr ptr)
 
 void Media::retain()
 {
-    libvlc_media_retain(m_obj);
+    if ( isValid() )
+        libvlc_media_retain(m_obj);
 }
 
 void Media::release()
 {
-    libvlc_media_release(m_obj);
+    if ( isValid() )
+        libvlc_media_release(m_obj);
 }
 
 } // namespace VLC

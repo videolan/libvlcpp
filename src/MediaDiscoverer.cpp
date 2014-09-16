@@ -65,15 +65,16 @@ bool MediaDiscoverer::isRunning()
     return libvlc_media_discoverer_is_running(m_obj);
 }
 
-MediaDiscoverer::MediaDiscoverer(Internal::InternalPtr ptr)
+MediaDiscoverer::MediaDiscoverer( Internal::InternalPtr ptr )
     : Internal( ptr )
     , m_eventManager( NULL )
 {
+    assert( ptr != NULL );
 }
 
 void MediaDiscoverer::release()
 {
-    libvlc_media_discoverer_release(m_obj);
+    libvlc_media_discoverer_release( m_obj );
 }
 
 } // namespace VLC

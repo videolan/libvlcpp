@@ -167,13 +167,14 @@ Instance::Instance(Internal::InternalPtr ptr)
 
 void Instance::release()
 {
-    if ( m_obj )
+    if ( isValid() )
         libvlc_release(m_obj);
 }
 
 void Instance::retain()
 {
-    libvlc_retain(m_obj);
+    if ( isValid() )
+        libvlc_retain(m_obj);
 }
 
 } // namespace VLC
