@@ -46,6 +46,11 @@ namespace libVLCX
         delete [] c_argv;
     }
 
+    void Instance::Trim()
+    {
+        m_dxManager->Trim();
+    }
+
     void Instance::InitializeHack(char** argv, unsigned int nbArgs)
     {
         m_dxManager.reset(new DirectXManger);

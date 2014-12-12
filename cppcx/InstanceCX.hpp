@@ -37,6 +37,7 @@ namespace libVLCX
     public:
         //<HACK HACK HACK>
         void UpdateSize(float x, float y);
+        void Trim();
         //</HACK HACK HACK>
 
         /**
