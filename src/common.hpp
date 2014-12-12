@@ -26,11 +26,15 @@
 
 #include <vlc/vlc.h>
 
-#ifdef WIN32
+#ifdef _WIN32
+#ifdef libvlcpp_BUILD_DLL
 #ifdef libvlcpp_EXPORTS
 #   define VLCPP_API __declspec(dllexport)
 #else
 #   define VLCPP_API __declspec(dllimport)
+#endif
+#else
+# define VLCPP_API
 #endif
 #else
 # define VLCPP_API
