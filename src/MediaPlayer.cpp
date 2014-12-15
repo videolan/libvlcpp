@@ -683,6 +683,7 @@ std::vector<TrackDescription> MediaPlayer::getTracksDescription(libvlc_track_des
         result.push_back( TrackDescription( p ) );
         p = p->p_next;
     }
+    libvlc_track_description_list_release(tracks);
     return result;
 }
 
