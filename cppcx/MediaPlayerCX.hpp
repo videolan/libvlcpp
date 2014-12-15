@@ -126,7 +126,7 @@ namespace libVLCX
         *
         * \param drawable  windows handle of the drawable
         */
-        void setHwnd(Platform::IntPtr drawable);
+        void setHwnd(uint64 drawable);
 
         /**
         * Get the Windows API window handle (HWND) previously set with
@@ -135,7 +135,7 @@ namespace libVLCX
         *
         * \return a window handle or NULL if there are none.
         */
-        Platform::IntPtr hwnd();
+        uint64 hwnd();
 
         /**
         * Get the current movie length (in ms).

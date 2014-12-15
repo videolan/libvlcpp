@@ -82,14 +82,14 @@ namespace libVLCX
         m_mp.stop();
     }
 
-    void MediaPlayer::setHwnd(Platform::IntPtr drawable)
+    void MediaPlayer::setHwnd(uint64 drawable)
     {
         m_mp.setHwnd((void*) drawable);
     }
 
-    Platform::IntPtr MediaPlayer::hwnd()
+    uint64 MediaPlayer::hwnd()
     {
-        return (Platform::IntPtr)m_mp.hwnd();
+        return (uint64)m_mp.hwnd();
     }
 
     libvlc_time_t MediaPlayer::length()
