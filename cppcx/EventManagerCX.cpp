@@ -129,17 +129,17 @@ namespace libVLCX
         m_em->OnScrambledChanged(val);
     }
 
-    void MediaPlayerEventCb::eSAdded(libvlc_track_type_t, int)
+    void MediaPlayerEventCb::eSAdded(libvlc_track_type_t type, int trackId)
     {
-
+        m_em->OnTrackAdded((TrackType) type, trackId);
     }
-    void MediaPlayerEventCb::eSDeleted(libvlc_track_type_t, int)
+    void MediaPlayerEventCb::eSDeleted(libvlc_track_type_t type, int trackId)
     {
-
+        m_em->OnTrackDeleted((TrackType) type, trackId);
     }
-    void MediaPlayerEventCb::eSSelected(libvlc_track_type_t, int)
+    void MediaPlayerEventCb::eSSelected(libvlc_track_type_t type, int trackId)
     {
-
+        m_em->OnTrackSelected((TrackType) type, trackId);
     }
 
     EventManager::EventManager(VLC::EventManager& em)

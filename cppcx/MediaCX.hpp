@@ -70,7 +70,6 @@ namespace libVLCX
         Actors
     };
 
-
     public ref class Media sealed
     {
     public:

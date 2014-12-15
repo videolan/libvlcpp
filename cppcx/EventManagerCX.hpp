@@ -22,6 +22,7 @@
 
 #include "EventManager.hpp"
 #include "Media.hpp"
+#include "StructuresCX.hpp"
 
 #include <memory>
 
@@ -49,9 +50,9 @@ namespace libVLCX
     public delegate void LengthChanged(libvlc_time_t);
     public delegate void Vout(int);
     public delegate void ScrambledChanged(int);
-    //public delegate void ESAdded(libvlc_track_type_t, int);
-    //public delegate void ESDeleted(libvlc_track_type_t, int);
-    //public delegate void ESSelected(libvlc_track_type_t, int);
+    public delegate void ESAdded(TrackType, int);
+    public delegate void ESDeleted(TrackType, int);
+    public delegate void ESSelected(TrackType, int);
 
     ref class EventManager;
 
@@ -109,6 +110,9 @@ namespace libVLCX
         event LengthChanged^ OnLengthChanged;
         event Vout^ OnVoutCountChanged;
         event ScrambledChanged^ OnScrambledChanged;
+        event ESAdded^ OnTrackAdded;
+        event ESDeleted^ OnTrackDeleted;
+        event ESSelected^ OnTrackSelected;
 
     internal:
         EventManager(VLC::EventManager& em);
