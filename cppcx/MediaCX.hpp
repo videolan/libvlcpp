@@ -247,22 +247,6 @@ namespace libVLCX
         bool isParsed();
 
         /**
-        * Sets media descriptor's user_data. user_data is specialized data
-        * accessed by the host application, VLC.framework uses it as a pointer
-        * to an native object that references a libvlc_media_t pointer
-        *
-        * \param p_new_user_data  pointer to user data
-        */
-        void setUserData(Platform::IntPtr p_new_user_data);
-
-        /**
-        * Get media descriptor's user_data. user_data is specialized data
-        * accessed by the host application, VLC.framework uses it as a pointer
-        * to an native object that references a libvlc_media_t pointer
-        */
-        Platform::IntPtr userData();
-
-        /**
         * Get media descriptor's elementary streams description
         *
         * Note, you need to call Media::parse() or play the media at least once

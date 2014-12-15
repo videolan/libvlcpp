@@ -102,16 +102,6 @@ namespace libVLCX
         return m_media.isParsed();
     }
 
-    void Media::setUserData(Platform::IntPtr p_new_user_data)
-    {
-        m_media.setUserData((void*) p_new_user_data);
-    }
-
-    Platform::IntPtr Media::userData()
-    {
-        return (Platform::IntPtr)m_media.userData();
-    }
-
     Windows::Foundation::Collections::IVector<MediaTrack^>^ Media::tracks()
     {
         return MarshallVector<MediaTrack, VLC::MediaTrack>(m_media.tracks());
