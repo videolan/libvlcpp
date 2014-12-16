@@ -38,9 +38,9 @@ ToPlatformString(const char *str) {
     size_t len = MultiByteToWideChar(CP_UTF8, 0, str, -1, NULL, 0);
     if (len == 0)
         return nullptr;
-    wchar_t* w_str = reinterpret_cast<wchar_t*>(alloca(len * sizeof(*w_str)));
-    MultiByteToWideChar(CP_UTF8, 0, str, -1, w_str, len);
-    return ref new Platform::String(w_str);
+    std::unique_ptr<wchar_t[]> w_str(new wchar_t[len]);
+    MultiByteToWideChar(CP_UTF8, 0, str, -1, w_str.get(), len);
+    return ref new Platform::String(w_str.get());
 }
 
 Platform::String^
