@@ -414,7 +414,7 @@ namespace libVLCX
 
     int MediaPlayer::setSpuDelay(int64_t i_delay)
     {
-        return setSpuDelay(i_delay);
+        return m_mp.setSpuDelay(i_delay);
     }
 
     Windows::Foundation::Collections::IVector<TrackDescription^>^ MediaPlayer::titleDescription()
