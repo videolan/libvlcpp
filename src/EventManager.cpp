@@ -137,7 +137,7 @@ void EventManager::handleMediaEvent(const libvlc_event_t* event, void* data)
             cb->durationChanged( event->u.media_duration_changed.new_duration );
             break;
         case libvlc_MediaParsedChanged:
-            cb->parsedChanged( event->u.media_parsed_changed.new_status );
+            cb->parsedChanged( event->u.media_parsed_changed.new_status != 0 );
             break;
         case libvlc_MediaFreed:
             cb->freed( Media( event->u.media_freed.md, true ) );
@@ -198,10 +198,10 @@ void EventManager::handleMediaPlayerEvent(const libvlc_event_t* event, void* dat
             cb->positionChanged( event->u.media_player_position_changed.new_position );
             break;
         case libvlc_MediaPlayerSeekableChanged:
-            cb->seekableChanged( event->u.media_player_seekable_changed.new_seekable );
+            cb->seekableChanged( event->u.media_player_seekable_changed.new_seekable != 0 );
             break;
         case libvlc_MediaPlayerPausableChanged:
-            cb->pausableChanged( event->u.media_player_seekable_changed.new_seekable );
+            cb->pausableChanged( event->u.media_player_seekable_changed.new_seekable != 0 );
             break;
         case libvlc_MediaPlayerTitleChanged:
             cb->titleChanged( event->u.media_player_title_changed.new_title );

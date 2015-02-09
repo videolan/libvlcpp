@@ -152,7 +152,7 @@ libvlc_state_t Media::state()
 
 bool Media::stats(libvlc_media_stats_t * p_stats)
 {
-    return libvlc_media_get_stats(m_obj, p_stats);
+    return libvlc_media_get_stats(m_obj, p_stats) != 0;
 }
 
 EventManager& Media::eventManager()
@@ -182,7 +182,7 @@ void Media::parseAsync()
 
 bool Media::isParsed()
 {
-    return libvlc_media_is_parsed(m_obj);
+    return libvlc_media_is_parsed(m_obj) != 0;
 }
 
 void Media::setUserData(void * p_new_user_data)

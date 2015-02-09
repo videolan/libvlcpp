@@ -211,7 +211,7 @@ int MediaPlayer::chapterCount()
 
 bool MediaPlayer::willPlay()
 {
-    return libvlc_media_player_will_play(m_obj);
+    return libvlc_media_player_will_play(m_obj) != 0;
 }
 
 int MediaPlayer::chapterCountForTitle(int i_title)
@@ -271,17 +271,17 @@ unsigned MediaPlayer::hasVout()
 
 bool MediaPlayer::isSeekable()
 {
-    return libvlc_media_player_is_seekable(m_obj);
+    return libvlc_media_player_is_seekable(m_obj) != 0;
 }
 
 bool MediaPlayer::canPause()
 {
-    return libvlc_media_player_can_pause(m_obj);
+    return libvlc_media_player_can_pause(m_obj) != 0;
 }
 
 bool MediaPlayer::programScrambled()
 {
-    return libvlc_media_player_program_scrambled(m_obj);
+    return libvlc_media_player_program_scrambled(m_obj) != 0;
 }
 
 void MediaPlayer::nextFrame()
