@@ -26,9 +26,9 @@
 namespace VLC
 {
 
-Instance::Instance()
-    : Internal( NULL )
+Instance::Instance(int argc, const char* const* argv)
 {
+    m_obj = libvlc_new( argc, argv );
 }
 
 Instance::Instance( const Instance& another )
@@ -57,12 +57,6 @@ bool Instance::operator==( const Instance& another ) const
 Instance::~Instance()
 {
     release();
-}
-
-Instance Instance::create( int argc, const char *const * argv )
-{
-    InternalPtr ptr = libvlc_new( argc, argv );
-    return Instance( ptr, false );
 }
 
 int Instance::addIntf( const std::string& name )
@@ -158,13 +152,6 @@ std::vector<AudioOutputDeviceDescription> Instance::audioOutputDeviceList(const 
         res.push_back( AudioOutputDeviceDescription( p ) );
     libvlc_audio_output_device_list_release( devices );
     return res;
-}
-
-Instance::Instance( Internal::InternalPtr ptr, bool increaseRefCount )
-    : Internal( ptr )
-{
-    if ( increaseRefCount )
-        retain();
 }
 
 void Instance::release()

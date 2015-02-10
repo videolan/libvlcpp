@@ -25,6 +25,8 @@
 
 #include "EventManager.hpp"
 
+#include <stdexcept>
+
 namespace VLC
 {
 
@@ -65,28 +67,36 @@ MediaList::~MediaList()
     release();
 }
 
-MediaList MediaList::fromMedia(Media& md)
+MediaList::MediaList(Media& md)
+    : m_eventManager( NULL )
 {
-    InternalPtr ptr = libvlc_media_subitems( md );
-    return MediaList( ptr );
+    m_obj = libvlc_media_subitems( md );
+    if ( m_obj == NULL )
+        throw std::runtime_error("Failed to construct a media list");
 }
 
-MediaList MediaList::fromMediaDiscoverer( MediaDiscoverer& mdis )
+MediaList::MediaList( MediaDiscoverer& mdis )
+    : m_eventManager( NULL )
 {
-    InternalPtr ptr = libvlc_media_discoverer_media_list( mdis );
-    return MediaList( ptr );
+    m_obj = libvlc_media_discoverer_media_list( mdis );
+    if ( m_obj == NULL )
+        throw std::runtime_error("Failed to construct a media list");
 }
 
-MediaList MediaList::fromMediaLibrary(MediaLibrary& mlib)
+MediaList::MediaList(MediaLibrary& mlib)
+    : m_eventManager( NULL )
 {
     InternalPtr ptr = libvlc_media_library_media_list( mlib );
-    return MediaList( ptr );
+    if ( m_obj == NULL )
+        throw std::runtime_error("Failed to construct a media list");
 }
 
-MediaList MediaList::create( Instance& instance )
+MediaList::MediaList( Instance& instance )
+    : m_eventManager( NULL )
 {
-    InternalPtr ptr = libvlc_media_list_new( instance );
-    return MediaList( ptr );
+    m_obj = libvlc_media_list_new( instance );
+    if ( m_obj == NULL )
+        throw std::runtime_error("Failed to construct a media list");
 }
 
 void MediaList::setMedia( Media &md )
@@ -148,12 +158,6 @@ EventManager& MediaList::eventManager()
         m_eventManager = new EventManager( obj );
     }
     return *m_eventManager;
-}
-
-MediaList::MediaList( Internal::InternalPtr ptr )
-    : Internal( ptr )
-    , m_eventManager( NULL )
-{
 }
 
 void MediaList::release()

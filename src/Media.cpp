@@ -22,44 +22,45 @@
  *****************************************************************************/
 
 #include "vlc.hpp"
+#include <stdexcept>
 
 namespace VLC
 {
 
-Media::Media()
+Media::Media(Instance &instance, const std::string &mrl, Media::FromType type)
     : Internal( NULL )
-    , m_eventManager( NULL )
 {
+    switch (type)
+    {
+    case FromLocation:
+        m_obj = libvlc_media_new_location( instance, mrl.c_str() );
+        break;
+    case FromPath:
+        m_obj = libvlc_media_new_path( instance, mrl.c_str() );
+        break;
+    case AsNode:
+        m_obj = libvlc_media_new_as_node( instance, mrl.c_str() );
+        break;
+    default:
+        break;
+    }
+    if ( m_obj == NULL )
+        throw std::runtime_error("Failed to construct a media");
 }
 
-Media Media::fromPath(Instance& instance, const std::string& path)
+
+Media::Media(Instance& instance, int fd)
 {
-    InternalPtr ptr = libvlc_media_new_path( instance, path.c_str() );
-    return Media( ptr, false );
+    m_obj = libvlc_media_new_fd( instance, fd );
+    if ( m_obj == NULL )
+        throw std::runtime_error("Failed to construct a media");
 }
 
-Media Media::fromLocation(Instance& instance, const std::string& location)
+Media::Media(MediaList& list)
 {
-    InternalPtr ptr = libvlc_media_new_location( instance, location.c_str() );
-    return Media( ptr, false );
-}
-
-Media Media::fromFileDescriptor(Instance& instance, int fd)
-{
-    InternalPtr ptr = libvlc_media_new_fd( instance, fd );
-    return Media( ptr, false );
-}
-
-Media Media::fromList(MediaList& list)
-{
-    InternalPtr ptr = libvlc_media_list_media( list );
-    return Media( ptr, false );
-}
-
-Media Media::asNode(Instance& instance, const std::string& nodeName)
-{
-    InternalPtr ptr = libvlc_media_new_as_node( instance, nodeName.c_str() );
-    return Media( ptr, false );
+    m_obj = libvlc_media_list_media( list );
+    if ( m_obj == NULL )
+        throw std::runtime_error("Failed to construct a media");
 }
 
 Media::Media(const Media& another)

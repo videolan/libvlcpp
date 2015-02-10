@@ -26,6 +26,7 @@
 
 #include "common.hpp"
 #include "Internal.hpp"
+#include <string>
 
 namespace VLC
 {
@@ -47,7 +48,7 @@ public:
      * \warning This is returned as a pointer, as this is not refcounter by VLC, and is
      *          fairly expensive to instantiate.
      */
-    static MediaDiscoverer* create(Instance & inst, const std::string& name);
+    MediaDiscoverer(Instance & inst, const std::string& name);
 
     /**
      * Get media service discover object its localized name.

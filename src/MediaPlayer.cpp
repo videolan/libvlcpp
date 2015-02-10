@@ -24,6 +24,7 @@
 #include "vlc.hpp"
 
 #include "EventManager.hpp"
+#include <stdexcept>
 
 namespace VLC
 {
@@ -71,16 +72,20 @@ MediaPlayer::~MediaPlayer()
     release();
 }
 
-MediaPlayer MediaPlayer::create( Instance& instance )
+MediaPlayer::MediaPlayer( Instance& instance )
+    : m_eventManager( NULL )
 {
-    InternalPtr ptr = libvlc_media_player_new( instance );
-    return MediaPlayer( ptr, false );
+    m_obj = libvlc_media_player_new( instance );
+    if ( m_obj == NULL )
+        throw std::runtime_error("Failed to construct a media player");
 }
 
-MediaPlayer MediaPlayer::fromMedia( Media& md )
+MediaPlayer::MediaPlayer( Media& md )
+    : m_eventManager( NULL )
 {
-    InternalPtr ptr = libvlc_media_player_new_from_media( md );
-    return MediaPlayer( ptr, false );
+    m_obj = libvlc_media_player_new_from_media( md );
+    if ( m_obj == NULL )
+        throw std::runtime_error("Failed to construct a media player");
 }
 
 void MediaPlayer::setMedia( Media& md )

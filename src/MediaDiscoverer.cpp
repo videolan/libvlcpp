@@ -24,6 +24,7 @@
 #include "vlc.hpp"
 
 #include "EventManager.hpp"
+#include <stdexcept>
 
 namespace VLC
 {
@@ -34,12 +35,11 @@ MediaDiscoverer::~MediaDiscoverer()
     release();
 }
 
-MediaDiscoverer* MediaDiscoverer::create( Instance &inst, const std::string& name )
+MediaDiscoverer::MediaDiscoverer( Instance &inst, const std::string& name )
 {
-    InternalPtr ptr = libvlc_media_discoverer_new_from_name(inst, name.c_str());
-    if ( ptr == NULL )
-        return NULL;
-    return new MediaDiscoverer( ptr );
+    m_obj = libvlc_media_discoverer_new_from_name(inst, name.c_str());
+    if ( m_obj == NULL )
+        throw std::runtime_error("Failed to construct a media discover");
 }
 
 std::string MediaDiscoverer::localizedName()

@@ -36,29 +36,6 @@ namespace VLC
 class VLCPP_API Instance : public Internal<libvlc_instance_t>
 {
 public:
-    Instance();
-    /**
-     * Copy libvlc_instance_t from another to new Instance object.
-     * \param another existing Instance
-     */
-    Instance(const Instance& another);
-
-    /**
-     * Copy libvlc_instance_t from another Instance
-     * to this Instance
-     * \param another existing Instance
-     */
-    Instance& operator=(const Instance& another);
-
-    /**
-     * Check if 2 Instance objects contain the same libvlc_instance_t.
-     * \param another another Instance
-     * \return true if they contain the same libvlc_instance_t
-     */
-    bool operator==(const Instance& another) const;
-
-    ~Instance();
-
     /**
      * Create and initialize a libvlc instance. This functions accept a list
      * of "command line" arguments similar to the main(). These arguments
@@ -81,7 +58,29 @@ public:
      *
      * \param argv  list of arguments (should be NULL)
      */
-    static Instance create(int argc, const char *const * argv);
+    Instance(int argc, const char *const * argv);
+
+    /**
+     * Copy libvlc_instance_t from another to new Instance object.
+     * \param another existing Instance
+     */
+    Instance(const Instance& another);
+
+    /**
+     * Copy libvlc_instance_t from another Instance
+     * to this Instance
+     * \param another existing Instance
+     */
+    Instance& operator=(const Instance& another);
+
+    /**
+     * Check if 2 Instance objects contain the same libvlc_instance_t.
+     * \param another another Instance
+     * \return true if they contain the same libvlc_instance_t
+     */
+    bool operator==(const Instance& another) const;
+
+    ~Instance();
 
     /**
      * Try to start a user interface for the libvlc instance.

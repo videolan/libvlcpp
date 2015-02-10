@@ -39,32 +39,36 @@ class EventManager;
 class VLCPP_API Media : public Internal<libvlc_media_t>
 {
 public:
-    Media();
-    /**
-     * Create a media for a certain file path.
-     *
-     * \param instance the instance
-     * \param path local filesystem path
-     * \return the newly created media or NULL on error
-     */
-    static Media fromPath(Instance& instance, const std::string& path);
+
+    enum FromType
+    {
+        /**
+         * Create a media for a certain file path.
+         */
+        FromPath,
+        /**
+         * Create a media with a certain given media resource location,
+         * for instance a valid URL.
+         *
+         * \note To refer to a local file with this function,
+         * the file://... URI syntax <b>must</b> be used (see IETF RFC3986).
+         * We recommend using FromPath instead when dealing with
+         * local files.
+         */
+        FromLocation,
+        /**
+         * Create a media as an empty node with a given name.
+         */
+        AsNode,
+    };
 
     /**
-     * Create a media with a certain given media resource location,
-     * for instance a valid URL.
-     *
-     * \note To refer to a local file with this function,
-     * the file://... URI syntax <b>must</b> be used (see IETF RFC3986).
-     * We recommend using libvlc_media_new_path() instead when dealing with
-     * local files.
-     *
-     * \see libvlc_media_release
-     *
-     * \param instance the instance
-     * \param psz_mrl the media location
-     * \return the newly created media or NULL on error
+     * @brief Media Constructs a libvlc Media instance
+     * @param instance  A libvlc instance
+     * @param mrl       A path, location, or node name, depending on the 3rd parameter
+     * @param type      The type of the 2nd argument. \sa{FromType}
      */
-    static Media fromLocation(Instance& instance, const std::string& location);
+    Media(Instance& instance, const std::string& mrl, FromType type);
 
     /**
      * Create a media for an already open file descriptor.
@@ -86,7 +90,7 @@ public:
      * \param fd open file descriptor
      * \return the newly created media or NULL on error
      */
-    static Media fromFileDescriptor(Instance& instance, int fd);
+    Media(Instance& instance, int fd);
 
     /**
      * Get media instance from this media list instance. This action will increase
@@ -96,16 +100,7 @@ public:
      * \param p_ml a media list instance
      * \return media instance
      */
-    static Media fromList(MediaList& list );
-
-    /**
-     * Create a media as an empty node with a given name.
-     *
-     * \param p_instance the instance
-     * \param psz_name the name of the node
-     * \return the new empty media or NULL on error
-     */
-    static Media asNode(Instance& instance, const std::string& nodeName);
+    Media(MediaList& list );
 
     /**
      * Copy libvlc_media_t from another to new Media object.

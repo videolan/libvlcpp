@@ -23,13 +23,16 @@
 
 #include "vlc.hpp"
 
+#include <stdexcept>
+
 namespace VLC
 {
 
-MediaLibrary MediaLibrary::create(Instance& instance)
+MediaLibrary::MediaLibrary(Instance& instance)
 {
-    InternalPtr ptr = libvlc_media_library_new( instance );
-    return MediaLibrary(ptr);
+    m_obj = libvlc_media_library_new( instance );
+    if (m_obj == NULL)
+        throw std::runtime_error("Failed to construct a media library");
 }
 
 MediaLibrary::MediaLibrary(const MediaLibrary& another)
