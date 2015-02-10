@@ -15,7 +15,9 @@ foreach(p LIB BIN INCLUDE CMAKE)
 endforeach()
 
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake ${CMAKE_MODULE_PATH})
+include(cpp11)
 add_definitions("-Wall -Wextra -pedantic")
+EnableCpp11()
 
 add_library (${PROJECT_NAME} SHARED
     src/Media.cpp
