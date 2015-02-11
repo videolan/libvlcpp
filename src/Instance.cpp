@@ -27,26 +27,8 @@ namespace VLC
 {
 
 Instance::Instance(int argc, const char* const* argv)
+    : Internal{ libvlc_new( argc, argv ), libvlc_release }
 {
-    m_obj = libvlc_new( argc, argv );
-}
-
-Instance::Instance( const Instance& another )
-    : Internal( another )
-{
-    retain();
-}
-
-Instance& Instance::operator=( const Instance& another )
-{
-    if ( this == &another )
-    {
-        return *this;
-    }
-    release();
-    m_obj = another.m_obj;
-    retain();
-    return *this;
 }
 
 bool Instance::operator==( const Instance& another ) const
@@ -54,49 +36,44 @@ bool Instance::operator==( const Instance& another ) const
     return m_obj == another.m_obj;
 }
 
-Instance::~Instance()
-{
-    release();
-}
-
 int Instance::addIntf( const std::string& name )
 {
-    return libvlc_add_intf( m_obj, name.c_str() );
+    return libvlc_add_intf( get(), name.c_str() );
 }
 
 void Instance::setExitHandler( void(*cb)(void *), void * opaque )
 {
-    libvlc_set_exit_handler( m_obj, cb, opaque );
+    libvlc_set_exit_handler( get(), cb, opaque );
 }
 
 void Instance::setUserAgent( const std::string& name, const std::string& http )
 {
-    libvlc_set_user_agent( m_obj, name.c_str(), http.c_str() );
+    libvlc_set_user_agent( get(), name.c_str(), http.c_str() );
 }
 
 void Instance::setAppId( const std::string& id, const std::string& version, const std::string& icon )
 {
-    libvlc_set_app_id( m_obj, id.c_str(), version.c_str(), icon.c_str() );
+    libvlc_set_app_id( get(), id.c_str(), version.c_str(), icon.c_str() );
 }
 
 void Instance::logUnset()
 {
-    libvlc_log_unset( m_obj );
+    libvlc_log_unset( get() );
 }
 
 void Instance::logSet( libvlc_log_cb cb, void * data )
 {
-    libvlc_log_set(m_obj, cb, data);
+    libvlc_log_set(get(), cb, data);
 }
 
 void Instance::logSetFile( FILE * stream )
 {
-    libvlc_log_set_file( m_obj, stream );
+    libvlc_log_set_file( get(), stream );
 }
 
 std::vector<ModuleDescription> Instance::audioFilterList()
 {
-    libvlc_module_description_t* result = libvlc_audio_filter_list_get(m_obj);
+    libvlc_module_description_t* result = libvlc_audio_filter_list_get(get());
     std::vector<ModuleDescription> res;
     if ( result == NULL )
         return res;
@@ -112,7 +89,7 @@ std::vector<ModuleDescription> Instance::audioFilterList()
 
 std::vector<ModuleDescription> Instance::videoFilterList()
 {
-    libvlc_module_description_t* result = libvlc_video_filter_list_get(m_obj);
+    libvlc_module_description_t* result = libvlc_video_filter_list_get(get());
     std::vector<ModuleDescription> res;
     if ( result == NULL )
         return res;
@@ -128,7 +105,7 @@ std::vector<ModuleDescription> Instance::videoFilterList()
 
 std::vector<AudioOutputDescription> Instance::audioOutputList()
 {
-    libvlc_audio_output_t* result = libvlc_audio_output_list_get(m_obj);
+    libvlc_audio_output_t* result = libvlc_audio_output_list_get(get());
     std::vector<AudioOutputDescription> res;
     if ( result == NULL )
         return res;
@@ -144,7 +121,7 @@ std::vector<AudioOutputDescription> Instance::audioOutputList()
 
 std::vector<AudioOutputDeviceDescription> Instance::audioOutputDeviceList(const std::string& aout)
 {
-    libvlc_audio_output_device_t* devices = libvlc_audio_output_device_list_get( m_obj, aout.c_str() );
+    libvlc_audio_output_device_t* devices = libvlc_audio_output_device_list_get( get(), aout.c_str() );
     std::vector<AudioOutputDeviceDescription> res;
     if ( devices == NULL )
         return res;
@@ -152,18 +129,6 @@ std::vector<AudioOutputDeviceDescription> Instance::audioOutputDeviceList(const 
         res.push_back( AudioOutputDeviceDescription( p ) );
     libvlc_audio_output_device_list_release( devices );
     return res;
-}
-
-void Instance::release()
-{
-    if ( isValid() )
-        libvlc_release(m_obj);
-}
-
-void Instance::retain()
-{
-    if ( isValid() )
-        libvlc_retain(m_obj);
 }
 
 } // namespace VLC

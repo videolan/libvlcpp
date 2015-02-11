@@ -37,19 +37,19 @@ class IMediaEventCb
     public:
         virtual ~IMediaEventCb() {}
         virtual void metaChanged( libvlc_meta_t ) {}
-        virtual void subItemAdded( const Media& ) {}
+        virtual void subItemAdded( MediaPtr ) {}
         virtual void durationChanged( int64_t ) {}
         virtual void parsedChanged( bool ) {}
-        virtual void freed( const Media& ) {}
+        virtual void freed( MediaPtr ) {}
         virtual void stateChanged( libvlc_state_t ) {}
-        virtual void subItemTreeAdded( const Media& ) {}
+        virtual void subItemTreeAdded( MediaPtr ) {}
 };
 
 class IMediaPlayerEventCb
 {
     public:
         virtual ~IMediaPlayerEventCb(){}
-        virtual void mediaChanged( const Media& ) {}
+        virtual void mediaChanged( MediaPtr ) {}
         virtual void nothingSpecial() {}
         virtual void opening() {}
         virtual void buffering( float ) {}
@@ -78,10 +78,10 @@ class IMediaListEventCb
 {
     public:
         virtual ~IMediaListEventCb() {}
-        virtual void itemAdded( const Media&, int ) {}
-        virtual void willAddItem( const Media&, int ) {}
-        virtual void itemDeleted( const Media&, int ) {}
-        virtual void willDeleteItem( const Media&, int ) {}
+        virtual void itemAdded( MediaPtr, int ) {}
+        virtual void willAddItem( MediaPtr, int ) {}
+        virtual void itemDeleted( MediaPtr, int ) {}
+        virtual void willDeleteItem( MediaPtr, int ) {}
 };
 
 // MediaListView events are not being sent by VLC, so we don't implement them here
@@ -91,7 +91,7 @@ class IMediaListPlayerEventCb
     public:
         virtual ~IMediaListPlayerEventCb() {}
         virtual void played() {}
-        virtual void nextItemSet( const Media& ) {}
+        virtual void nextItemSet( MediaPtr ) {}
         virtual void stopped() {}
 };
 
@@ -123,7 +123,8 @@ class IVLMEventCb
 class VLCPP_API EventManager : public Internal<libvlc_event_manager_t>
 {
     public:
-        EventManager( const EventManager& em );
+        EventManager(InternalPtr ptr);
+
         bool attach( libvlc_event_type_t type, IMediaEventCb* cb );
         bool attach( libvlc_event_type_t type, IMediaPlayerEventCb* cb );
         bool attach( libvlc_event_type_t type, IMediaListEventCb* cb );
@@ -147,13 +148,6 @@ class VLCPP_API EventManager : public Internal<libvlc_event_manager_t>
         static void handleVLMEvent( const libvlc_event_t* event, void* data );
 
         static void handleEvent( const libvlc_event_t* event, void* data );
-
-        EventManager(InternalPtr obj );
-        friend class Media;
-        friend class MediaDiscoverer;
-        friend class MediaList;
-        friend class MediaListPlayer;
-        friend class MediaPlayer;
 };
 
 }

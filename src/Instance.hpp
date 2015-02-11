@@ -61,26 +61,11 @@ public:
     Instance(int argc, const char *const * argv);
 
     /**
-     * Copy libvlc_instance_t from another to new Instance object.
-     * \param another existing Instance
-     */
-    Instance(const Instance& another);
-
-    /**
-     * Copy libvlc_instance_t from another Instance
-     * to this Instance
-     * \param another existing Instance
-     */
-    Instance& operator=(const Instance& another);
-
-    /**
      * Check if 2 Instance objects contain the same libvlc_instance_t.
      * \param another another Instance
      * \return true if they contain the same libvlc_instance_t
      */
     bool operator==(const Instance& another) const;
-
-    ~Instance();
 
     /**
      * Try to start a user interface for the libvlc instance.
@@ -240,20 +225,6 @@ public:
      * \version LibVLC 2.1.0 or later.
      */
     std::vector<AudioOutputDeviceDescription> audioOutputDeviceList(const std::string& aout);
-
-private:
-    explicit Instance( InternalPtr ptr, bool increaseRefCount );
-    /**
-     * Decrement the reference count of a libvlc instance, and destroy it if
-     * it reaches zero.
-     */
-    void release();
-
-    /**
-     * Increments the reference count of a libvlc instance. The initial
-     * reference count is 1 after Instance::Instance() returns.
-     */
-    void retain();
 };
 
 } // namespace VLC

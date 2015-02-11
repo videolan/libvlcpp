@@ -28,29 +28,9 @@
 namespace VLC
 {
 
-MediaLibrary::MediaLibrary(Instance& instance)
+MediaLibrary::MediaLibrary(InstancePtr instance)
+    : Internal{ libvlc_media_library_new( instance->get() ), libvlc_media_library_release }
 {
-    m_obj = libvlc_media_library_new( instance );
-    if (m_obj == NULL)
-        throw std::runtime_error("Failed to construct a media library");
-}
-
-MediaLibrary::MediaLibrary(const MediaLibrary& another)
-    : Internal( another )
-{
-    retain();
-}
-
-MediaLibrary& MediaLibrary::operator=(const MediaLibrary& another)
-{
-    if (this == &another)
-    {
-        return *this;
-    }
-    release();
-    m_obj = another.m_obj;
-    retain();
-    return *this;
 }
 
 bool MediaLibrary::operator==(const MediaLibrary& another) const
@@ -58,29 +38,9 @@ bool MediaLibrary::operator==(const MediaLibrary& another) const
     return m_obj == another.m_obj;
 }
 
-MediaLibrary::~MediaLibrary()
-{
-    release();
-}
-
 int MediaLibrary::load()
 {
-    return libvlc_media_library_load(m_obj);
-}
-
-MediaLibrary::MediaLibrary(Internal::InternalPtr ptr)
-    : Internal( ptr )
-{
-}
-
-void MediaLibrary::release()
-{
-    libvlc_media_library_release(m_obj);
-}
-
-void MediaLibrary::retain()
-{
-    libvlc_media_library_retain(m_obj);
+    return libvlc_media_library_load(get());
 }
 
 } // namespace VLC

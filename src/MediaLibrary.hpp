@@ -38,19 +38,7 @@ public:
      *
      * \param p_instance  the libvlc instance
      */
-    MediaLibrary(Instance & p_instance);
-    /**
-     * Copy libvlc_media_library_t from another to new MediaLibrary object.
-     * \param another existing MediaLibrary
-     */
-    MediaLibrary(const MediaLibrary& another);
-
-    /**
-     * Copy libvlc_media_library_t from another MediaLibrary
-     * to this MediaLibrary
-     * \param another existing MediaLibrary
-     */
-    MediaLibrary& operator=(const MediaLibrary& another);
+    MediaLibrary(InstancePtr p_instance);
 
     /**
      * Check if 2 MediaLibrary objects contain the same libvlc_media_library_t.
@@ -59,30 +47,12 @@ public:
      */
     bool operator==(const MediaLibrary& another) const;
 
-    ~MediaLibrary();
-
     /**
      * Load media library.
      *
      * \return 0 on success, -1 on error
      */
     int load();
-
-private:
-    explicit MediaLibrary(InternalPtr ptr);
-    /**
-     * Release media library object. This functions decrements the reference
-     * count of the media library object. If it reaches 0, then the object
-     * will be released.
-     */
-    void release();
-
-    /**
-     * Retain a reference to a media library object. This function will
-     * increment the reference counting for this object. Use
-     * MediaLibrary::release() to decrement the reference count.
-     */
-    void retain();
 };
 
 } // namespace VLC

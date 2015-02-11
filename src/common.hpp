@@ -40,4 +40,30 @@
 # define VLCPP_API
 #endif
 
+#include <memory>
+
+namespace VLC
+{
+    class EventManager;
+    using EventManagerPtr = std::shared_ptr<EventManager>;
+
+    class Media;
+    using MediaPtr = std::shared_ptr<Media>;
+
+    class Instance;
+    using InstancePtr = std::shared_ptr<Instance>;
+
+    class MediaDiscoverer;
+    using MediaDiscovererPtr = std::shared_ptr<MediaDiscoverer>;
+
+    class MediaPlayer;
+    using MediaPlayerPtr = std::shared_ptr<MediaPlayer>;
+
+    class MediaList;
+    using MediaListPtr = std::shared_ptr<MediaList>;
+
+    class MediaLibrary;
+    using MediaLibraryPtr = std::shared_ptr<MediaLibrary>;
+}
+
 #endif

@@ -27,8 +27,7 @@
 #include <string>
 #include <vector>
 
-#include "common.hpp"
-#include "Internal.hpp"
+#include "vlc.hpp"
 
 namespace VLC
 {
@@ -43,18 +42,6 @@ class VLCPP_API MediaPlayer : public Internal<libvlc_media_player_t>
 {
 public:
     MediaPlayer();
-    /**
-     * Copy libvlc_media_player_t from another to new MediaPlayer object.
-     * \param another existing MediaPlayer
-     */
-    MediaPlayer(const MediaPlayer& another);
-
-    /**
-     * Copy libvlc_media_player_t from another MediaPlayer
-     * to this MediaPlayer
-     * \param another existing MediaPlayer
-     */
-    MediaPlayer& operator=(const MediaPlayer& another);
 
     /**
      * Check if 2 MediaPlayer objects contain the same libvlc_media_player_t.
@@ -63,8 +50,6 @@ public:
      */
     bool operator==(const MediaPlayer& another) const;
 
-    ~MediaPlayer();
-
     // libvlc_media_player_new
     /**
      * Create an empty Media Player object
@@ -72,7 +57,7 @@ public:
      * \param p_libvlc_instance  the libvlc instance in which the Media
      * Player should be created.
      */
-    MediaPlayer( Instance& instance );
+    MediaPlayer(InstancePtr instance );
 
     // libvlc_media_player_new_from_media
     /**
@@ -80,7 +65,7 @@ public:
      *
      * \param p_md  the media. Afterwards the p_md can be safely destroyed.
      */
-    MediaPlayer( Media &md );
+    MediaPlayer(MediaPtr md );
 
     /**
      * Set the media that will be used by the media_player. If any, previous
@@ -88,7 +73,7 @@ public:
      *
      * \param p_md  the Media. Afterwards the p_md can be safely destroyed.
      */
-    void setMedia(Media & md);
+    void setMedia(MediaPtr md);
 
     /**
      * Get the media used by the media_player.
@@ -96,14 +81,14 @@ public:
      * \return the media associated with p_mi, or NULL if no media is
      * associated
      */
-    VLC::Media media();
+    MediaPtr media();
 
     /**
      * Get the Event Manager from which the media player send event.
      *
      * \return the event manager associated with p_mi
      */
-    VLC::EventManager& eventManager();
+    EventManagerPtr eventManager();
 
     /**
      * is_playing
@@ -1211,26 +1196,10 @@ public:
     void setAdjustFloat(unsigned option, float value);
 
 private:
-    explicit MediaPlayer( InternalPtr ptr, bool increaseRefCount );
-    /**
-     * Release a media_player after use Decrement the reference count of a
-     * media player object. If the reference count is 0, then
-     * MediaPlayer::release() will release the media player object. If the
-     * media player object has been released, then it should not be used
-     * again.
-     */
-    void release();
-
-    /**
-     * Retain a reference to a media player object. Use
-     * MediaPlayer::release() to decrement reference count.
-     */
-    void retain();
-
     std::vector<TrackDescription> getTracksDescription( libvlc_track_description_t* tracks ) const;
 
 private:
-    EventManager* m_eventManager;
+    EventManagerPtr m_eventManager;
 
 };
 

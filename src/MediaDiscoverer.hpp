@@ -24,8 +24,7 @@
 #ifndef LIBVLC_CXX_MEDIADISCOVERER_H
 #define LIBVLC_CXX_MEDIADISCOVERER_H
 
-#include "common.hpp"
-#include "Internal.hpp"
+#include "vlc.hpp"
 #include <string>
 
 namespace VLC
@@ -36,8 +35,6 @@ class EventManager;
 class VLCPP_API MediaDiscoverer : public Internal<libvlc_media_discoverer_t>
 {
 public:
-    ~MediaDiscoverer();
-
     // libvlc_media_discoverer_new_from_name
     /**
      * Discover media service by name.
@@ -48,7 +45,7 @@ public:
      * \warning This is returned as a pointer, as this is not refcounter by VLC, and is
      *          fairly expensive to instantiate.
      */
-    MediaDiscoverer(Instance & inst, const std::string& name);
+    MediaDiscoverer(InstancePtr inst, const std::string& name);
 
     /**
      * Get media service discover object its localized name.
@@ -62,7 +59,7 @@ public:
      *
      * \return event manager object.
      */
-    EventManager& eventManager();
+    EventManagerPtr eventManager();
 
     /**
      * Query if media service discover object is running.
@@ -72,18 +69,7 @@ public:
     bool isRunning();
 
 private:
-    explicit MediaDiscoverer(InternalPtr ptr);
-    /**
-     * Release media discover object. If the reference count reaches 0, then
-     * the object will be released.
-     */
-    void release();
-
-    MediaDiscoverer(const MediaDiscoverer& another);
-    MediaDiscoverer& operator=(const MediaDiscoverer& another);
-
-private:
-    EventManager* m_eventManager;
+    EventManagerPtr m_eventManager;
 };
 
 } // namespace VLC

@@ -25,9 +25,7 @@
 #define LIBVLC_CXX_MEDIA_H
 
 #include <vector>
-#include "common.hpp"
-#include "Internal.hpp"
-#include "structures.hpp"
+#include "vlc.hpp"
 
 namespace VLC
 {
@@ -68,7 +66,7 @@ public:
      * @param mrl       A path, location, or node name, depending on the 3rd parameter
      * @param type      The type of the 2nd argument. \sa{FromType}
      */
-    Media(Instance& instance, const std::string& mrl, FromType type);
+    Media(InstancePtr instance, const std::string& mrl, FromType type);
 
     /**
      * Create a media for an already open file descriptor.
@@ -90,7 +88,7 @@ public:
      * \param fd open file descriptor
      * \return the newly created media or NULL on error
      */
-    Media(Instance& instance, int fd);
+    Media(InstancePtr instance, int fd);
 
     /**
      * Get media instance from this media list instance. This action will increase
@@ -100,20 +98,9 @@ public:
      * \param p_ml a media list instance
      * \return media instance
      */
-    Media(MediaList& list );
+    Media(MediaListPtr list );
 
-    /**
-     * Copy libvlc_media_t from another to new Media object.
-     * \param another existing Media
-     */
-    Media(const Media& another);
-
-    /**
-     * Copy libvlc_media_t from another Media
-     * to this Media
-     * \param another existing Media
-     */
-    Media& operator=(const Media& another);
+    explicit Media(InternalPtr ptr, bool incrementRefCount);
 
     /**
      * Check if 2 Media objects contain the same libvlc_media_t.
@@ -121,8 +108,6 @@ public:
      * \return true if they contain the same libvlc_media_t
      */
     bool operator==(const Media& another) const;
-
-    ~Media();
 
     /**
      * Add an option to the media.
@@ -242,7 +227,7 @@ public:
      *
      * \return event manager object
      */
-    EventManager& eventManager();
+    EventManagerPtr eventManager();
 
     /**
      * Get duration (in ms) of media descriptor object item.
@@ -325,7 +310,7 @@ public:
     std::vector<MediaTrack> tracks();
 
 private:
-    explicit Media(InternalPtr ptr, bool increaseRefCount );
+
     /**
      * Retain a reference to a media descriptor object (libvlc_media_t). Use
      * Media::release() to decrement the reference count of a media
@@ -333,21 +318,9 @@ private:
      */
     void retain();
 
-    /**
-     * Decrement the reference count of a media descriptor object. If the
-     * reference count is 0, then Media::release() will release the media
-     * descriptor object. It will send out an libvlc_MediaFreed event to all
-     * listeners. If the media descriptor object has been released it should
-     * not be used again.
-     */
-    void release();
 
 private:
-    EventManager* m_eventManager;
-
-    friend class MediaList;
-    friend class MediaPlayer;
-    friend class EventManager;
+    EventManagerPtr m_eventManager;
 };
 
 } // namespace VLC

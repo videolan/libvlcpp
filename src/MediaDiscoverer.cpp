@@ -25,26 +25,20 @@
 
 #include "EventManager.hpp"
 #include <stdexcept>
+#include <memory>
 
 namespace VLC
 {
 
-MediaDiscoverer::~MediaDiscoverer()
+MediaDiscoverer::MediaDiscoverer(InstancePtr inst, const std::string& name )
+    : Internal{ libvlc_media_discoverer_new_from_name(inst->get(), name.c_str()),
+                libvlc_media_discoverer_release }
 {
-    delete m_eventManager;
-    release();
-}
-
-MediaDiscoverer::MediaDiscoverer( Instance &inst, const std::string& name )
-{
-    m_obj = libvlc_media_discoverer_new_from_name(inst, name.c_str());
-    if ( m_obj == NULL )
-        throw std::runtime_error("Failed to construct a media discover");
 }
 
 std::string MediaDiscoverer::localizedName()
 {
-    char* c_result = libvlc_media_discoverer_localized_name(m_obj);
+    char* c_result = libvlc_media_discoverer_localized_name(get());
     if ( c_result == NULL )
         return std::string();
     std::string result = c_result;
@@ -52,31 +46,19 @@ std::string MediaDiscoverer::localizedName()
     return result;
 }
 
-EventManager& MediaDiscoverer::eventManager()
+EventManagerPtr MediaDiscoverer::eventManager()
 {
-    if ( m_eventManager == NULL )
+    if ( m_eventManager )
     {
-        libvlc_event_manager_t* obj = libvlc_media_discoverer_event_manager( m_obj );
-        m_eventManager = new EventManager( obj );
+        libvlc_event_manager_t* obj = libvlc_media_discoverer_event_manager( get() );
+        m_eventManager = std::make_shared<EventManager>( obj );
     }
-    return *m_eventManager;
+    return m_eventManager;
 }
 
 bool MediaDiscoverer::isRunning()
 {
-    return libvlc_media_discoverer_is_running(m_obj);
-}
-
-MediaDiscoverer::MediaDiscoverer( Internal::InternalPtr ptr )
-    : Internal( ptr )
-    , m_eventManager( NULL )
-{
-    assert( ptr != NULL );
-}
-
-void MediaDiscoverer::release()
-{
-    libvlc_media_discoverer_release( m_obj );
+    return libvlc_media_discoverer_is_running(get());
 }
 
 } // namespace VLC

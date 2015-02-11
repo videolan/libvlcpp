@@ -24,8 +24,7 @@
 #ifndef LIBVLC_CXX_MEDIALIST_H
 #define LIBVLC_CXX_MEDIALIST_H
 
-#include "common.hpp"
-#include "Internal.hpp"
+#include "vlc.hpp"
 
 namespace VLC
 {
@@ -36,26 +35,11 @@ class VLCPP_API MediaList : public Internal<libvlc_media_list_t>
 {
 public:
     /**
-     * Copy libvlc_media_list_t from another to new MediaList object.
-     * \param another existing MediaList
-     */
-    MediaList(const MediaList& another);
-
-    /**
-     * Copy libvlc_media_list_t from another MediaList
-     * to this MediaList
-     * \param another existing MediaList
-     */
-    MediaList& operator=(const MediaList& another);
-
-    /**
      * Check if 2 MediaList objects contain the same libvlc_media_list_t.
      * \param another another MediaList
      * \return true if they contain the same libvlc_media_list_t
      */
     bool operator==(const MediaList& another) const;
-
-    ~MediaList();
 
     // libvlc_media_subitems
     /**
@@ -65,7 +49,7 @@ public:
      *
      * \param p_md  media descriptor object
      */
-    MediaList(Media &md);
+    MediaList(MediaPtr md);
 
     // libvlc_media_discoverer_media_list
     /**
@@ -73,7 +57,7 @@ public:
      *
      * \param p_mdis  media service discover object
      */
-    MediaList(MediaDiscoverer & mdis);
+    MediaList(MediaDiscovererPtr mdis);
 
     // libvlc_media_library_media_list
     /**
@@ -81,7 +65,7 @@ public:
      *
      * \param p_mlib  media library object
      */
-    MediaList( MediaLibrary &mlib );
+    MediaList(MediaLibraryPtr mlib );
 
     // libvlc_media_list_new
     /**
@@ -89,7 +73,7 @@ public:
      *
      * \param p_instance  libvlc instance
      */
-    MediaList(Instance &instance);
+    MediaList(InstancePtr instance);
 
     /**
      * Associate media instance with this media list instance. If another
@@ -98,7 +82,7 @@ public:
      *
      * \param p_md  media instance to add
      */
-    void setMedia(Media & p_md);
+    void setMedia(MediaPtr p_md);
 
     /**
      * Add media instance to media list The libvlc_media_list_lock should be
@@ -108,7 +92,7 @@ public:
      *
      * \return 0 on success, -1 if the media list is read-only
      */
-    int addMedia(Media & p_md);
+    int addMedia(MediaPtr p_md);
 
     /**
      * Insert media instance in media list on a position The
@@ -120,7 +104,7 @@ public:
      *
      * \return 0 on success, -1 if the media list is read-only
      */
-    int insertMedia(Media & md, int pos);
+    int insertMedia(MediaPtr md, int pos);
 
     /**
      * Remove media instance from media list on a position The
@@ -162,7 +146,7 @@ public:
      *
      * \return position of media instance or -1 if media not found
      */
-    int indexOfItem(Media & md);
+    int indexOfItem(MediaPtr md);
 
     /**
      * This indicates if this media list is read-only from a user point of
@@ -189,22 +173,10 @@ public:
      *
      * \return libvlc_event_manager
      */
-    VLC::EventManager& eventManager();
+    EventManagerPtr eventManager();
 
 private:
-    explicit MediaList(InternalPtr ptr);
-    /**
-     * Release media list created with MediaList::MediaList() .
-     */
-    void release();
-
-    /**
-     * Retain reference to a media list
-     */
-    void retain();
-
-private:
-    EventManager* m_eventManager;
+    EventManagerPtr m_eventManager;
 };
 
 } // namespace VLC

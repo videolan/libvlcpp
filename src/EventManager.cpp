@@ -27,18 +27,13 @@
 namespace VLC
 {
 
-EventManager::EventManager(const EventManager& em)
-    : Internal( em )
-{
-}
-
 bool EventManager::attach(libvlc_event_type_t type, IMediaEventCb* cb)
 {
     if ( cb == NULL )
         return false;
     if ( type < libvlc_MediaMetaChanged || type > libvlc_MediaSubItemTreeAdded )
         return false;
-    libvlc_event_attach( *this, type, &handleMediaEvent, cb );
+    libvlc_event_attach( get(), type, &handleMediaEvent, cb );
     return true;
 }
 
@@ -48,7 +43,7 @@ bool EventManager::attach(libvlc_event_type_t type, IMediaPlayerEventCb* cb)
         return false;
     if ( type < libvlc_MediaPlayerMediaChanged || type > libvlc_MediaPlayerESSelected )
         return false;
-    libvlc_event_attach( *this, type, &handleMediaPlayerEvent, cb );
+    libvlc_event_attach( get(), type, &handleMediaPlayerEvent, cb );
     return true;
 }
 
@@ -58,7 +53,7 @@ bool EventManager::attach(libvlc_event_type_t type, IMediaListEventCb* cb)
         return false;
     if ( type < libvlc_MediaListItemAdded || type > libvlc_MediaListWillDeleteItem )
         return false;
-    libvlc_event_attach( *this, type, &handleMediaListEvent, cb );
+    libvlc_event_attach( get(), type, &handleMediaListEvent, cb );
     return true;
 }
 
@@ -68,7 +63,7 @@ bool EventManager::attach(libvlc_event_type_t type, IMediaListPlayerEventCb* cb)
         return false;
     if ( type < libvlc_MediaListPlayerPlayed || type > libvlc_MediaListPlayerStopped )
         return false;
-    libvlc_event_attach( *this, type, &handleMediaListPlayerEvent, cb );
+    libvlc_event_attach( get(), type, &handleMediaListPlayerEvent, cb );
     return true;
 }
 
@@ -78,7 +73,7 @@ bool EventManager::attach(libvlc_event_type_t type, IMediaDiscovererEventCb* cb)
         return false;
     if ( type < libvlc_MediaDiscovererStarted || type > libvlc_MediaDiscovererEnded )
         return false;
-    libvlc_event_attach( *this, type, &handleMediaDiscovererEvent, cb );
+    libvlc_event_attach( get(), type, &handleMediaDiscovererEvent, cb );
     return true;
 }
 
@@ -88,38 +83,38 @@ bool EventManager::attach( libvlc_event_type_t type, IVLMEventCb* cb )
         return false;
     if ( type < libvlc_VlmMediaAdded || type > libvlc_VlmMediaInstanceStatusError )
         return false;
-    libvlc_event_attach( *this, type, &handleVLMEvent, cb );
+    libvlc_event_attach( get(), type, &handleVLMEvent, cb );
     return true;
 }
 
 void EventManager::detach(libvlc_event_type_t type, IMediaEventCb* cb)
 {
-    libvlc_event_detach( *this, type, &handleMediaEvent, cb );
+    libvlc_event_detach( get(), type, &handleMediaEvent, cb );
 }
 
 void EventManager::detach(libvlc_event_type_t type, IMediaPlayerEventCb* cb)
 {
-    libvlc_event_detach( *this, type, &handleMediaPlayerEvent, cb );
+    libvlc_event_detach( get(), type, &handleMediaPlayerEvent, cb );
 }
 
 void EventManager::detach(libvlc_event_type_t type, IMediaListEventCb* cb)
 {
-    libvlc_event_detach( *this, type, &handleMediaListEvent, cb );
+    libvlc_event_detach( get(), type, &handleMediaListEvent, cb );
 }
 
 void EventManager::detach(libvlc_event_type_t type, IMediaListPlayerEventCb* cb)
 {
-    libvlc_event_detach( *this, type, &handleMediaListPlayerEvent, cb );
+    libvlc_event_detach( get(), type, &handleMediaListPlayerEvent, cb );
 }
 
 void EventManager::detach(libvlc_event_type_t type, IMediaDiscovererEventCb* cb)
 {
-    libvlc_event_detach( *this, type, &handleMediaDiscovererEvent, cb );
+    libvlc_event_detach( get(), type, &handleMediaDiscovererEvent, cb );
 }
 
 void EventManager::detach(libvlc_event_type_t type, IVLMEventCb* cb)
 {
-    libvlc_event_detach( *this, type, &handleVLMEvent, cb );
+    libvlc_event_detach( get(), type, &handleVLMEvent, cb );
 }
 
 void EventManager::handleMediaEvent(const libvlc_event_t* event, void* data)
@@ -131,7 +126,7 @@ void EventManager::handleMediaEvent(const libvlc_event_t* event, void* data)
             cb->metaChanged( event->u.media_meta_changed.meta_type );
             break;
         case libvlc_MediaSubItemAdded:
-            cb->subItemAdded( Media( event->u.media_subitem_added.new_child, true ) );
+            cb->subItemAdded( std::make_shared<Media>( event->u.media_subitem_added.new_child, true ) );
             break;
         case libvlc_MediaDurationChanged:
             cb->durationChanged( event->u.media_duration_changed.new_duration );
@@ -140,13 +135,13 @@ void EventManager::handleMediaEvent(const libvlc_event_t* event, void* data)
             cb->parsedChanged( event->u.media_parsed_changed.new_status != 0 );
             break;
         case libvlc_MediaFreed:
-            cb->freed( Media( event->u.media_freed.md, true ) );
+            cb->freed( std::make_shared<Media>( event->u.media_freed.md, true ) );
             break;
         case libvlc_MediaStateChanged:
             cb->stateChanged( event->u.media_state_changed.new_state );
             break;
         case libvlc_MediaSubItemTreeAdded:
-            cb->subItemTreeAdded( Media( event->u.media_subitemtree_added.item, true ) );
+            cb->subItemTreeAdded( std::make_shared<Media>( event->u.media_subitemtree_added.item, true ) );
             break;
         default:
             assert(false);
@@ -159,7 +154,7 @@ void EventManager::handleMediaPlayerEvent(const libvlc_event_t* event, void* dat
     switch ( event->type )
     {
         case libvlc_MediaPlayerMediaChanged:
-            cb->mediaChanged( Media( event->u.media_player_media_changed.new_media, true ) );
+            cb->mediaChanged( std::make_shared<Media>( event->u.media_player_media_changed.new_media, true ) );
             break;
         case libvlc_MediaPlayerNothingSpecial:
             cb->nothingSpecial();
@@ -238,16 +233,16 @@ void EventManager::handleMediaListEvent(const libvlc_event_t* event, void* data)
     switch ( event->type )
     {
         case libvlc_MediaListItemAdded:
-            cb->itemAdded( Media( event->u.media_list_item_added.item, true ), event->u.media_list_item_added.index );
+            cb->itemAdded( std::make_shared<Media>( event->u.media_list_item_added.item, true ), event->u.media_list_item_added.index );
             break;
         case libvlc_MediaListWillAddItem:
-            cb->willAddItem( Media( event->u.media_list_will_add_item.item, true ), event->u.media_list_will_add_item.index );
+            cb->willAddItem( std::make_shared<Media>( event->u.media_list_will_add_item.item, true ), event->u.media_list_will_add_item.index );
             break;
         case libvlc_MediaListItemDeleted:
-            cb->itemDeleted( Media( event->u.media_list_item_deleted.item, true ), event->u.media_list_item_deleted.index );
+            cb->itemDeleted( std::make_shared<Media>( event->u.media_list_item_deleted.item, true ), event->u.media_list_item_deleted.index );
             break;
         case libvlc_MediaListWillDeleteItem:
-            cb->willDeleteItem( Media( event->u.media_list_will_delete_item.item, true ), event->u.media_list_will_delete_item.index );
+            cb->willDeleteItem( std::make_shared<Media>( event->u.media_list_will_delete_item.item, true ), event->u.media_list_will_delete_item.index );
             break;
         default:
             assert(false);
@@ -263,7 +258,7 @@ void EventManager::handleMediaListPlayerEvent(const libvlc_event_t* event, void*
             cb->played();
             break;
         case libvlc_MediaListPlayerNextItemSet:
-            cb->nextItemSet( Media( event->u.media_list_player_next_item_set.item, true ) );
+            cb->nextItemSet( std::make_shared<Media>( event->u.media_list_player_next_item_set.item, true ) );
             break;
         case libvlc_MediaListPlayerStopped:
             cb->stopped();
@@ -334,8 +329,8 @@ void EventManager::handleVLMEvent(const libvlc_event_t* event, void* data)
     }
 }
 
-EventManager::EventManager( InternalPtr obj)
-    : Internal( obj )
+EventManager::EventManager(Internal::InternalPtr ptr)
+    : Internal{ ptr, [](InternalPtr){ /* No-op; EventManager's are handled by their respective objects */ } }
 {
 }
 

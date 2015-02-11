@@ -26,31 +26,36 @@
 #include <cassert>
 #include <stdlib.h>
 #include <vlc/libvlc.h>
+#include <memory>
+#include <stdexcept>
 
 namespace VLC
 {
 
-template < typename T >
+template <typename T, typename Releaser = void(*)(T*)>
 class Internal
 {
     public:
-        typedef     T*      InternalPtr;
-        InternalPtr         getInternalPtr()
-        {
-            assert( m_obj != NULL );
-            return m_obj;
-        }
-        operator T*() { return m_obj; }
-        bool isValid() const { return m_obj != NULL; }
+        using InternalType  = T;
+        using InternalPtr   = T*;
+        using Pointer       = std::unique_ptr<T, Releaser>;
+
+        InternalPtr get() { return m_obj.get(); }
+        bool isValid() const { return (bool)m_obj; }
     protected:
-        Internal( InternalPtr obj = NULL ) : m_obj( obj ) {}
-        Internal( const Internal& copied ) : m_obj( copied.m_obj ) {}
-        ~Internal(){}
+        Internal( InternalPtr obj, Releaser releaser )
+            : m_obj{ obj, releaser }
+        {
+            if ( obj == nullptr )
+                throw std::runtime_error("Wrapping a NULL instance");
+        }
+        Internal(Releaser releaser)
+            : m_obj{ nullptr, releaser }
+        {
+        }
 
-        InternalPtr         m_obj;
-
-    private:
-        Internal& operator=(const Internal&);
+    protected:
+        Pointer     m_obj;
 };
 
 }

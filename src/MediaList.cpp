@@ -23,151 +23,96 @@
 
 #include "vlc.hpp"
 
-#include "EventManager.hpp"
-
 #include <stdexcept>
+#include <memory>
 
 namespace VLC
 {
-
-MediaList::MediaList(const MediaList& another)
-    : Internal( another )
-    , m_eventManager( NULL )
-{
-    if ( another.m_eventManager )
-        m_eventManager = new EventManager( *another.m_eventManager );
-    retain();
-}
-
-MediaList& MediaList::operator=(const MediaList& another)
-{
-    if (this == &another)
-    {
-        return *this;
-    }
-    release();
-    m_obj = another.m_obj;
-    delete m_eventManager;
-    if ( another.m_eventManager != NULL )
-        m_eventManager = new EventManager( *another.m_eventManager );
-    else
-        m_eventManager = NULL;
-    retain();
-    return *this;
-}
 
 bool MediaList::operator==(const MediaList& another) const
 {
     return m_obj == another.m_obj;
 }
 
-MediaList::~MediaList()
+MediaList::MediaList(MediaPtr md)
+    : Internal{ libvlc_media_subitems( md->get() ), libvlc_media_list_release }
 {
-    delete m_eventManager;
-    release();
 }
 
-MediaList::MediaList(Media& md)
-    : m_eventManager( NULL )
+MediaList::MediaList(MediaDiscovererPtr mdis )
+    : Internal{ libvlc_media_discoverer_media_list( mdis->get() ), libvlc_media_list_release }
 {
-    m_obj = libvlc_media_subitems( md );
-    if ( m_obj == NULL )
-        throw std::runtime_error("Failed to construct a media list");
 }
 
-MediaList::MediaList( MediaDiscoverer& mdis )
-    : m_eventManager( NULL )
+MediaList::MediaList(MediaLibraryPtr mlib)
+    : Internal{ libvlc_media_library_media_list( mlib->get() ), libvlc_media_list_release }
 {
-    m_obj = libvlc_media_discoverer_media_list( mdis );
-    if ( m_obj == NULL )
-        throw std::runtime_error("Failed to construct a media list");
 }
 
-MediaList::MediaList(MediaLibrary& mlib)
-    : m_eventManager( NULL )
+MediaList::MediaList( InstancePtr instance )
+    : Internal{ libvlc_media_list_new( instance->get() ), libvlc_media_list_release }
 {
-    InternalPtr ptr = libvlc_media_library_media_list( mlib );
-    if ( m_obj == NULL )
-        throw std::runtime_error("Failed to construct a media list");
 }
 
-MediaList::MediaList( Instance& instance )
-    : m_eventManager( NULL )
+void MediaList::setMedia( MediaPtr md )
 {
-    m_obj = libvlc_media_list_new( instance );
-    if ( m_obj == NULL )
-        throw std::runtime_error("Failed to construct a media list");
+    libvlc_media_list_set_media( get(), md->get() );
 }
 
-void MediaList::setMedia( Media &md )
+int MediaList::addMedia(MediaPtr p_md)
 {
-    libvlc_media_list_set_media( m_obj, md );
+    return libvlc_media_list_add_media( get(), p_md->get() );
 }
 
-int MediaList::addMedia(Media& p_md)
+int MediaList::insertMedia( MediaPtr md, int pos )
 {
-    return libvlc_media_list_add_media( m_obj, p_md );
-}
-
-int MediaList::insertMedia( Media& md, int pos )
-{
-    return libvlc_media_list_insert_media( m_obj, md, pos );
+    return libvlc_media_list_insert_media( get(), md->get(), pos );
 }
 
 int MediaList::removeIndex(int i_pos)
 {
-    return libvlc_media_list_remove_index(m_obj, i_pos);
+    return libvlc_media_list_remove_index(get(), i_pos);
 }
 
 int MediaList::count()
 {
-    return libvlc_media_list_count(m_obj);
+    return libvlc_media_list_count(get());
 }
 
 Media MediaList::itemAtIndex(int i_pos)
 {
-    Media::InternalPtr ptr = libvlc_media_list_item_at_index(m_obj, i_pos);
+    Media::InternalPtr ptr = libvlc_media_list_item_at_index(get(), i_pos);
     return Media( ptr, false );
 }
 
-int MediaList::indexOfItem( Media &md )
+int MediaList::indexOfItem( MediaPtr md )
 {
-    return libvlc_media_list_index_of_item( m_obj, md );
+    return libvlc_media_list_index_of_item( get(), md->get() );
 }
 
 bool MediaList::isReadonly()
 {
-    return libvlc_media_list_is_readonly(m_obj);
+    return libvlc_media_list_is_readonly(get());
 }
 
 void MediaList::lock()
 {
-    libvlc_media_list_lock(m_obj);
+    libvlc_media_list_lock(get());
 }
 
 void MediaList::unlock()
 {
-    libvlc_media_list_unlock(m_obj);
+    libvlc_media_list_unlock(get());
 }
 
-EventManager& MediaList::eventManager()
+EventManagerPtr MediaList::eventManager()
 {
-    if ( m_eventManager == NULL )
+    if ( m_eventManager )
     {
-        libvlc_event_manager_t* obj = libvlc_media_list_event_manager( *this );
-        m_eventManager = new EventManager( obj );
+        libvlc_event_manager_t* obj = libvlc_media_list_event_manager( get() );
+        m_eventManager = std::make_shared<EventManager>( obj );
     }
-    return *m_eventManager;
-}
-
-void MediaList::release()
-{
-    libvlc_media_list_release(m_obj);
-}
-
-void MediaList::retain()
-{
-    libvlc_media_list_retain(m_obj);
+    return m_eventManager;
 }
 
 } // namespace VLC

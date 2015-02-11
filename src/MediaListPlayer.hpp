@@ -27,7 +27,6 @@
 #include <string>
 
 #include "common.hpp"
-#include "Internal.hpp"
 
 namespace VLC
 {
@@ -40,19 +39,6 @@ class VLCPP_API MediaListPlayer : public Internal<libvlc_media_list_player_t>
 {
 public:
     /**
-     * Copy libvlc_media_list_player_t from another to new MediaListPlayer object.
-     * \param another existing MediaListPlayer
-     */
-    MediaListPlayer(const MediaListPlayer& another);
-
-    /**
-     * Copy libvlc_media_list_player_t from another MediaListPlayer
-     * to this MediaListPlayer
-     * \param another existing MediaListPlayer
-     */
-    MediaListPlayer& operator=(const MediaListPlayer& another);
-
-    /**
      * Check if 2 MediaListPlayer objects contain the same libvlc_media_list_player_t.
      * \param another another MediaListPlayer
      * \return true if they contain the same libvlc_media_list_player_t
@@ -61,34 +47,33 @@ public:
 
     ~MediaListPlayer();
 
-    // libvlc_media_list_player_new
     /**
      * Create new media_list_player.
      *
      * \param p_instance  libvlc instance
      */
-    MediaListPlayer(Instance & instance);
+    MediaListPlayer(InstancePtr instance);
 
     /**
      * Return the event manager of this media_list_player.
      *
      * \return the event manager
      */
-    EventManager& eventManager();
+    EventManagerPtr eventManager();
 
     /**
      * Replace media player in media_list_player with this instance.
      *
      * \param p_mi  media player instance
      */
-    void setMediaPlayer(MediaPlayer & p_mi);
+    void setMediaPlayer(MediaPlayerPtr p_mi);
 
     /**
      * Set the media list associated with the player
      *
      * \param p_mlist  list of media
      */
-    void setMediaList(MediaList & mlist);
+    void setMediaList(MediaListPtr mlist);
 
     /**
      * Play media list
@@ -130,7 +115,7 @@ public:
      *
      * \return 0 upon success, -1 if the media is not part of the media list
      */
-    int playItem(Media & p_md);
+    int playItem(MediaPtr p_md);
 
     /**
      * Stop playing media list
@@ -160,23 +145,9 @@ public:
 
 private:
     explicit MediaListPlayer(InternalPtr ptr);
-    /**
-     * Release a media_list_player after use Decrement the reference count of
-     * a media player object. If the reference count is 0, then
-     * MediaListPlayer::release() will release the media player object. If
-     * the media player object has been released, then it should not be used
-     * again.
-     */
-    void release();
-
-    /**
-     * Retain a reference to a media player list object. Use
-     * MediaListPlayer::release() to decrement reference count.
-     */
-    void retain();
 
 private:
-    EventManager* m_eventManager;
+    EventManagerPtr m_eventManager;
 
 };
 
