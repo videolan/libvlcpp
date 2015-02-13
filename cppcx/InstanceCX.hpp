@@ -170,8 +170,8 @@ namespace libVLCX
         VLC::Instance m_instance;
         // <HACK HACK HACK!>
         std::unique_ptr<DirectXManger> m_dxManager;
-        float m_width;
-        float m_height;
+        unsigned int m_width;
+        unsigned int m_height;
         SwapChainPanel^ m_chainPanel;
         // </HACK HACK HACK>
     };

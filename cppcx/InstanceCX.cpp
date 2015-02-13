@@ -104,8 +104,8 @@ namespace libVLCX
         const float scaleFactor = (float) DisplayProperties::ResolutionScale / 100.f;
 #endif
 
-        m_width = x * scaleFactor;
-        m_height = y * scaleFactor;
+        m_width = (uint32_t)(x * scaleFactor);
+        m_height = (uint32_t)(y * scaleFactor);
     }
 
     int Instance::addIntf(Platform::String^ name)
