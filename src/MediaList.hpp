@@ -24,7 +24,7 @@
 #ifndef LIBVLC_CXX_MEDIALIST_H
 #define LIBVLC_CXX_MEDIALIST_H
 
-#include "vlc.hpp"
+#include "common.hpp"
 
 namespace VLC
 {
@@ -39,7 +39,10 @@ public:
      * \param another another MediaList
      * \return true if they contain the same libvlc_media_list_t
      */
-    bool operator==(const MediaList& another) const;
+    bool operator==(const MediaList& another) const
+    {
+        return m_obj == another.m_obj;
+    }
 
     // libvlc_media_subitems
     /**
@@ -49,7 +52,10 @@ public:
      *
      * \param p_md  media descriptor object
      */
-    MediaList(MediaPtr md);
+    MediaList(MediaPtr md)
+        : Internal{ libvlc_media_subitems( md->get() ), libvlc_media_list_release }
+    {
+    }
 
     // libvlc_media_discoverer_media_list
     /**
@@ -57,7 +63,10 @@ public:
      *
      * \param p_mdis  media service discover object
      */
-    MediaList(MediaDiscovererPtr mdis);
+    MediaList(MediaDiscovererPtr mdis)
+        : Internal{ libvlc_media_discoverer_media_list( mdis->get() ), libvlc_media_list_release }
+    {
+    }
 
     // libvlc_media_library_media_list
     /**
@@ -65,7 +74,11 @@ public:
      *
      * \param p_mlib  media library object
      */
-    MediaList(MediaLibraryPtr mlib );
+    MediaList(MediaLibraryPtr mlib )
+        : Internal{ libvlc_media_library_media_list( mlib->get() ), libvlc_media_list_release }
+    {
+    }
+
 
     // libvlc_media_list_new
     /**
@@ -73,7 +86,10 @@ public:
      *
      * \param p_instance  libvlc instance
      */
-    MediaList(InstancePtr instance);
+    MediaList(InstancePtr instance)
+        : Internal{ libvlc_media_list_new( instance->get() ), libvlc_media_list_release }
+    {
+    }
 
     /**
      * Associate media instance with this media list instance. If another
@@ -82,7 +98,10 @@ public:
      *
      * \param p_md  media instance to add
      */
-    void setMedia(MediaPtr p_md);
+    void setMedia(MediaPtr md)
+    {
+        libvlc_media_list_set_media( get(), md->get() );
+    }
 
     /**
      * Add media instance to media list The libvlc_media_list_lock should be
@@ -92,7 +111,10 @@ public:
      *
      * \return 0 on success, -1 if the media list is read-only
      */
-    int addMedia(MediaPtr p_md);
+    int addMedia(MediaPtr p_md)
+    {
+        return libvlc_media_list_add_media( get(), p_md->get() );
+    }
 
     /**
      * Insert media instance in media list on a position The
@@ -104,7 +126,10 @@ public:
      *
      * \return 0 on success, -1 if the media list is read-only
      */
-    int insertMedia(MediaPtr md, int pos);
+    int insertMedia(MediaPtr md, int pos)
+    {
+        return libvlc_media_list_insert_media( get(), md->get(), pos );
+    }
 
     /**
      * Remove media instance from media list on a position The
@@ -115,7 +140,10 @@ public:
      * \return 0 on success, -1 if the list is read-only or the item was not
      * found
      */
-    int removeIndex(int i_pos);
+    int removeIndex(int i_pos)
+    {
+        return libvlc_media_list_remove_index(get(), i_pos);
+    }
 
     /**
      * Get count on media list items The libvlc_media_list_lock should be
@@ -123,7 +151,10 @@ public:
      *
      * \return number of items in media list
      */
-    int count();
+    int count()
+    {
+        return libvlc_media_list_count(get());
+    }
 
     /**
      * List media instance in media list at a position The
@@ -135,7 +166,11 @@ public:
      * case of success, Media::retain() is called to increase the refcount on
      * the media.
      */
-    Media itemAtIndex(int i_pos);
+    Media itemAtIndex(int i_pos)
+    {
+        Media::InternalPtr ptr = libvlc_media_list_item_at_index(get(), i_pos);
+        return Media( ptr, false );
+    }
 
     /**
      * Find index position of List media instance in media list. Warning: the
@@ -146,7 +181,10 @@ public:
      *
      * \return position of media instance or -1 if media not found
      */
-    int indexOfItem(MediaPtr md);
+    int indexOfItem(MediaPtr md)
+    {
+        return libvlc_media_list_index_of_item( get(), md->get() );
+    }
 
     /**
      * This indicates if this media list is read-only from a user point of
@@ -154,18 +192,27 @@ public:
      *
      * \return 1 on readonly, 0 on readwrite
      */
-    bool isReadonly();
+    bool isReadonly()
+    {
+        return libvlc_media_list_is_readonly(get());
+    }
 
     /**
      * Get lock on media list items
      */
-    void lock();
+    void lock()
+    {
+        libvlc_media_list_lock(get());
+    }
 
     /**
      * Release lock on media list items The libvlc_media_list_lock should be
      * held upon entering this function.
      */
-    void unlock();
+    void unlock()
+    {
+        libvlc_media_list_unlock(get());
+    }
 
     /**
      * Get libvlc_event_manager from this media list instance. The
@@ -173,7 +220,15 @@ public:
      *
      * \return libvlc_event_manager
      */
-    EventManagerPtr eventManager();
+    EventManagerPtr eventManager()
+    {
+        if ( m_eventManager )
+        {
+            libvlc_event_manager_t* obj = libvlc_media_list_event_manager( get() );
+            m_eventManager = std::make_shared<EventManager>( obj );
+        }
+        return m_eventManager;
+    }
 
 private:
     EventManagerPtr m_eventManager;

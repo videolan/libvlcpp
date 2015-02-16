@@ -24,7 +24,8 @@
 #ifndef LIBVLC_CXX_MEDIADISCOVERER_H
 #define LIBVLC_CXX_MEDIADISCOVERER_H
 
-#include "vlc.hpp"
+#include "common.hpp"
+
 #include <string>
 
 namespace VLC
@@ -45,28 +46,51 @@ public:
      * \warning This is returned as a pointer, as this is not refcounter by VLC, and is
      *          fairly expensive to instantiate.
      */
-    MediaDiscoverer(InstancePtr inst, const std::string& name);
+    MediaDiscoverer(InstancePtr inst, const std::string& name)
+        : Internal{ libvlc_media_discoverer_new_from_name(inst->get(), name.c_str()),
+                    libvlc_media_discoverer_release }
+    {
+    }
 
     /**
      * Get media service discover object its localized name.
      *
      * \return localized name
      */
-    std::string localizedName();
+    std::string localizedName()
+    {
+        char* c_result = libvlc_media_discoverer_localized_name(get());
+        if ( c_result == NULL )
+            return std::string();
+        std::string result = c_result;
+        libvlc_free(c_result);
+        return result;
+    }
 
     /**
      * Get event manager from media service discover object.
      *
      * \return event manager object.
      */
-    EventManagerPtr eventManager();
+    EventManagerPtr eventManager()
+    {
+        if ( m_eventManager )
+        {
+            libvlc_event_manager_t* obj = libvlc_media_discoverer_event_manager( get() );
+            m_eventManager = std::make_shared<EventManager>( obj );
+        }
+        return m_eventManager;
+    }
 
     /**
      * Query if media service discover object is running.
      *
      * \return true if running, false if not
      */
-    bool isRunning();
+    bool isRunning()
+    {
+        return libvlc_media_discoverer_is_running(get());
+    }
 
 private:
     EventManagerPtr m_eventManager;

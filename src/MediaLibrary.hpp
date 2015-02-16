@@ -38,21 +38,30 @@ public:
      *
      * \param p_instance  the libvlc instance
      */
-    MediaLibrary(InstancePtr p_instance);
+    MediaLibrary(InstancePtr instance)
+        : Internal{ libvlc_media_library_new( instance->get() ), libvlc_media_library_release }
+    {
+    }
 
     /**
      * Check if 2 MediaLibrary objects contain the same libvlc_media_library_t.
      * \param another another MediaLibrary
      * \return true if they contain the same libvlc_media_library_t
      */
-    bool operator==(const MediaLibrary& another) const;
+    bool operator==(const MediaLibrary& another) const
+    {
+        return m_obj == another.m_obj;
+    }
 
     /**
      * Load media library.
      *
      * \return 0 on success, -1 on error
      */
-    int load();
+    int load()
+    {
+        return libvlc_media_library_load(get());
+    }
 };
 
 } // namespace VLC

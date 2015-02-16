@@ -43,61 +43,95 @@ public:
      * \param another another MediaListPlayer
      * \return true if they contain the same libvlc_media_list_player_t
      */
-    bool operator==(const MediaListPlayer& another) const;
-
-    ~MediaListPlayer();
+    bool operator==(const MediaListPlayer& another) const
+    {
+        return m_obj == another.m_obj;
+    }
 
     /**
      * Create new media_list_player.
      *
      * \param p_instance  libvlc instance
      */
-    MediaListPlayer(InstancePtr instance);
+    MediaListPlayer(InstancePtr instance)
+        : Internal{ libvlc_media_list_player_new( instance->get() ), libvlc_media_list_player_release }
+    {
+    }
+
 
     /**
      * Return the event manager of this media_list_player.
      *
      * \return the event manager
      */
-    EventManagerPtr eventManager();
+    EventManagerPtr eventManager()
+    {
+        if ( m_eventManager )
+        {
+            libvlc_event_manager_t* obj = libvlc_media_list_player_event_manager(get());
+            m_eventManager = std::make_shared<EventManager>( obj );
+        }
+        return m_eventManager;
+    }
+
 
     /**
      * Replace media player in media_list_player with this instance.
      *
      * \param p_mi  media player instance
      */
-    void setMediaPlayer(MediaPlayerPtr p_mi);
+    void setMediaPlayer(MediaPlayerPtr mi)
+    {
+        libvlc_media_list_player_set_media_player( get(),
+                        getInternalPtr<libvlc_media_player_t>( mi ) );
+    }
 
     /**
      * Set the media list associated with the player
      *
      * \param p_mlist  list of media
      */
-    void setMediaList(MediaListPtr mlist);
+    void setMediaList(MediaListPtr mlist)
+    {
+        libvlc_media_list_player_set_media_list( get(),
+                            getInternalPtr<libvlc_media_list_t>( mlist ) );
+    }
 
     /**
      * Play media list
      */
-    void play();
+    void play()
+    {
+        libvlc_media_list_player_play(get());
+    }
 
     /**
      * Toggle pause (or resume) media list
      */
-    void pause();
+    void pause()
+    {
+        libvlc_media_list_player_pause(get());
+    }
 
     /**
      * Is media list playing?
      *
      * \return true for playing and false for not playing
      */
-    bool isPlaying();
+    bool isPlaying()
+    {
+        return libvlc_media_list_player_is_playing(get()) != 0;
+    }
 
     /**
      * Get current libvlc_state of media list player
      *
      * \return libvlc_state_t for media list player
      */
-    libvlc_state_t state();
+    libvlc_state_t state()
+    {
+        return libvlc_media_list_player_get_state( get() );
+    }
 
     /**
      * Play media list item at position index
@@ -106,7 +140,10 @@ public:
      *
      * \return 0 upon success -1 if the item wasn't found
      */
-    int playItemAtIndex(int i_index);
+    int playItemAtIndex(int i_index)
+    {
+        return libvlc_media_list_player_play_item_at_index(get(), i_index);
+    }
 
     /**
      * Play the given media item
@@ -115,36 +152,49 @@ public:
      *
      * \return 0 upon success, -1 if the media is not part of the media list
      */
-    int playItem(MediaPtr p_md);
+    int playItem(MediaPtr md)
+    {
+        return libvlc_media_list_player_play_item( get(),
+                        getInternalPtr<libvlc_media_t>( md ) );
+    }
 
     /**
      * Stop playing media list
      */
-    void stop();
+    void stop()
+    {
+        libvlc_media_list_player_stop(get());
+    }
 
     /**
      * Play next item from media list
      *
      * \return 0 upon success -1 if there is no next item
      */
-    int next();
+    int next()
+    {
+        return libvlc_media_list_player_next(get());
+    }
 
     /**
      * Play previous item from media list
      *
      * \return 0 upon success -1 if there is no previous item
      */
-    int previous();
+    int previous()
+    {
+        return libvlc_media_list_player_previous(get());
+    }
 
     /**
      * Sets the playback mode for the playlist
      *
      * \param e_mode  playback mode specification
      */
-    void setPlaybackMode(libvlc_playback_mode_t e_mode);
-
-private:
-    explicit MediaListPlayer(InternalPtr ptr);
+    void setPlaybackMode(libvlc_playback_mode_t e_mode)
+    {
+        libvlc_media_list_player_set_playback_mode(get(), e_mode);
+    }
 
 private:
     EventManagerPtr m_eventManager;

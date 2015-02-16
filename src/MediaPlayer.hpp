@@ -27,7 +27,7 @@
 #include <string>
 #include <vector>
 
-#include "vlc.hpp"
+#include "common.hpp"
 
 namespace VLC
 {
@@ -41,14 +41,15 @@ class Media;
 class VLCPP_API MediaPlayer : public Internal<libvlc_media_player_t>
 {
 public:
-    MediaPlayer();
-
     /**
      * Check if 2 MediaPlayer objects contain the same libvlc_media_player_t.
      * \param another another MediaPlayer
      * \return true if they contain the same libvlc_media_player_t
      */
-    bool operator==(const MediaPlayer& another) const;
+    bool operator==(const MediaPlayer& another) const
+    {
+        return m_obj == another.m_obj;
+    }
 
     // libvlc_media_player_new
     /**
@@ -57,7 +58,10 @@ public:
      * \param p_libvlc_instance  the libvlc instance in which the Media
      * Player should be created.
      */
-    MediaPlayer(InstancePtr instance );
+    MediaPlayer(InstancePtr instance )
+        : Internal{ libvlc_media_player_new( instance->get() ), libvlc_media_player_release }
+    {
+    }
 
     // libvlc_media_player_new_from_media
     /**
@@ -65,7 +69,13 @@ public:
      *
      * \param p_md  the media. Afterwards the p_md can be safely destroyed.
      */
-    MediaPlayer(MediaPtr md );
+    MediaPlayer( MediaPtr md )
+        : Internal{ libvlc_media_player_new_from_media(
+                        getInternalPtr<libvlc_media_t>( md ) ),
+                    libvlc_media_player_release }
+    {
+    }
+
 
     /**
      * Set the media that will be used by the media_player. If any, previous
@@ -73,7 +83,10 @@ public:
      *
      * \param p_md  the Media. Afterwards the p_md can be safely destroyed.
      */
-    void setMedia(MediaPtr md);
+    void setMedia(MediaPtr md)
+    {
+        libvlc_media_player_set_media( get(), getInternalPtr<libvlc_media_t>( md ) );
+    }
 
     /**
      * Get the media used by the media_player.
@@ -81,21 +94,36 @@ public:
      * \return the media associated with p_mi, or NULL if no media is
      * associated
      */
-    MediaPtr media();
+    MediaPtr media()
+    {
+        libvlc_media_t* media = libvlc_media_player_get_media(get());
+        return std::make_shared<Media>( media, true );
+    }
 
     /**
      * Get the Event Manager from which the media player send event.
      *
      * \return the event manager associated with p_mi
      */
-    EventManagerPtr eventManager();
+    EventManagerPtr eventManager()
+    {
+        if ( m_eventManager == NULL )
+        {
+            libvlc_event_manager_t* obj = libvlc_media_player_event_manager( get() );
+            m_eventManager = std::make_shared<EventManager>( obj );
+        }
+        return m_eventManager;
+    }
 
     /**
      * is_playing
      *
      * \return 1 if the media player is playing, 0 otherwise
      */
-    bool isPlaying();
+    bool isPlaying()
+    {
+        return libvlc_media_player_is_playing(get()) != 0;
+    }
 
     /**
      * Play
@@ -103,7 +131,10 @@ public:
      * \return 0 if playback started (and was already started), or -1 on
      * error.
      */
-    int play();
+    int play()
+    {
+        return libvlc_media_player_play(get());
+    }
 
     /**
      * Pause or resume (no effect if there is no media)
@@ -112,17 +143,26 @@ public:
      *
      * \version LibVLC 1.1.1 or later
      */
-    void setPause(int do_pause);
+    void setPause(int do_pause)
+    {
+        libvlc_media_player_set_pause(get(), do_pause);
+    }
 
     /**
      * Toggle pause (no effect if there is no media)
      */
-    void pause();
+    void pause()
+    {
+        libvlc_media_player_pause(get());
+    }
 
     /**
      * Stop (no effect if there is no media)
      */
-    void stop();
+    void stop()
+    {
+        libvlc_media_player_stop(get());
+    }
 
     /**
      * Set the NSView handler where the media player should render its video
@@ -148,7 +188,10 @@ public:
      * \param drawable  the drawable that is either an NSView or an object
      * following the VLCOpenGLVideoViewEmbedding protocol.
      */
-    void setNsobject(void * drawable);
+    void setNsobject(void * drawable)
+    {
+        libvlc_media_player_set_nsobject(get(), drawable);
+    }
 
     /**
      * Get the NSView handler previously set with MediaPlayer::setNsobject()
@@ -156,7 +199,10 @@ public:
      *
      * \return the NSView handler or 0 if none where set
      */
-    void * nsobject();
+    void * nsobject()
+    {
+        return libvlc_media_player_get_nsobject(get());
+    }
 
     /**
      * Set the agl handler where the media player should render its video
@@ -164,14 +210,20 @@ public:
      *
      * \param drawable  the agl handler
      */
-    void setAgl(uint32_t drawable);
+    void setAgl(uint32_t drawable)
+    {
+        libvlc_media_player_set_agl(get(), drawable);
+    }
 
     /**
      * Get the agl handler previously set with MediaPlayer::setAgl() .
      *
      * \return the agl handler or 0 if none where set
      */
-    uint32_t agl();
+    uint32_t agl()
+    {
+        return libvlc_media_player_get_agl(get());
+    }
 
     /**
      * Set an X Window System drawable where the media player should render
@@ -187,7 +239,10 @@ public:
      *
      * \param drawable  the ID of the X window
      */
-    void setXwindow(uint32_t drawable);
+    void setXwindow(uint32_t drawable)
+    {
+        libvlc_media_player_set_xwindow(get(), drawable);
+    }
 
     /**
      * Get the X Window System window identifier previously set with
@@ -197,7 +252,10 @@ public:
      *
      * \return an X window ID, or 0 if none where set.
      */
-    uint32_t xwindow();
+    uint32_t xwindow()
+    {
+        return libvlc_media_player_get_xwindow(get());
+    }
 
     /**
      * Set a Win32/Win64 API window handle (HWND) where the media player
@@ -206,7 +264,10 @@ public:
      *
      * \param drawable  windows handle of the drawable
      */
-    void setHwnd(void * drawable);
+    void setHwnd(void * drawable)
+    {
+        libvlc_media_player_set_hwnd(get(), drawable);
+    }
 
     /**
      * Get the Windows API window handle (HWND) previously set with
@@ -215,21 +276,30 @@ public:
      *
      * \return a window handle or NULL if there are none.
      */
-    void * hwnd();
+    void * hwnd()
+    {
+        return libvlc_media_player_get_hwnd(get());
+    }
 
     /**
      * Get the current movie length (in ms).
      *
      * \return the movie length (in ms), or -1 if there is no media.
      */
-    libvlc_time_t length();
+    libvlc_time_t length()
+    {
+        return libvlc_media_player_get_length(get());
+    }
 
     /**
      * Get the current movie time (in ms).
      *
      * \return the movie time (in ms), or -1 if there is no media.
      */
-    libvlc_time_t time();
+    libvlc_time_t time()
+    {
+        return  libvlc_media_player_get_time(get());
+    }
 
     /**
      * Set the movie time (in ms). This has no effect if no media is being
@@ -237,14 +307,20 @@ public:
      *
      * \param i_time  the movie time (in ms).
      */
-    void setTime(libvlc_time_t i_time);
+    void setTime(libvlc_time_t i_time)
+    {
+        libvlc_media_player_set_time(get(), i_time);
+    }
 
     /**
      * Get movie position as percentage between 0.0 and 1.0.
      *
      * \return movie position, or -1. in case of error
      */
-    float position();
+    float position()
+    {
+        return libvlc_media_player_get_position(get());
+    }
 
     /**
      * Set movie position as percentage between 0.0 and 1.0. This has no
@@ -253,35 +329,50 @@ public:
      *
      * \param f_pos  the position
      */
-    void setPosition(float f_pos);
+    void setPosition(float f_pos)
+    {
+        libvlc_media_player_set_position(get(), f_pos);
+    }
 
     /**
      * Set movie chapter (if applicable).
      *
      * \param i_chapter  chapter number to play
      */
-    void setChapter(int i_chapter);
+    void setChapter(int i_chapter)
+    {
+        libvlc_media_player_set_chapter(get(), i_chapter);
+    }
 
     /**
      * Get movie chapter.
      *
      * \return chapter number currently playing, or -1 if there is no media.
      */
-    int chapter();
+    int chapter()
+    {
+        return libvlc_media_player_get_chapter(get());
+    }
 
     /**
      * Get movie chapter count
      *
      * \return number of chapters in movie, or -1.
      */
-    int chapterCount();
+    int chapterCount()
+    {
+        return libvlc_media_player_get_chapter_count(get());
+    }
 
     /**
      * Is the player able to play
      *
      * \return boolean
      */
-    bool willPlay();
+    bool willPlay()
+    {
+        return libvlc_media_player_will_play(get());
+    }
 
     /**
      * Get title chapter count
@@ -290,38 +381,56 @@ public:
      *
      * \return number of chapters in title, or -1
      */
-    int chapterCountForTitle(int i_title);
+    int chapterCountForTitle(int i_title)
+    {
+        return libvlc_media_player_get_chapter_count_for_title(get(), i_title);
+    }
 
     /**
      * Set movie title
      *
      * \param i_title  title number to play
      */
-    void setTitle(int i_title);
+    void setTitle(int i_title)
+    {
+        libvlc_media_player_set_title(get(), i_title);
+    }
 
     /**
      * Get movie title
      *
      * \return title number currently playing, or -1
      */
-    int title();
+    int title()
+    {
+        return libvlc_media_player_get_title(get());
+    }
 
     /**
      * Get movie title count
      *
      * \return title number count, or -1
      */
-    int titleCount();
+    int titleCount()
+    {
+        return libvlc_media_player_get_title_count(get());
+    }
 
     /**
      * Set previous chapter (if applicable)
      */
-    void previousChapter();
+    void previousChapter()
+    {
+        libvlc_media_player_previous_chapter(get());
+    }
 
     /**
      * Set next chapter (if applicable)
      */
-    void nextChapter();
+    void nextChapter()
+    {
+        libvlc_media_player_next_chapter(get());
+    }
 
     /**
      * Get the requested movie play rate.
@@ -331,7 +440,10 @@ public:
      *
      * \return movie play rate
      */
-    float rate();
+    float rate()
+    {
+        return libvlc_media_player_get_rate(get());
+    }
 
     /**
      * Set movie play rate
@@ -341,7 +453,10 @@ public:
      * \return -1 if an error was detected, 0 otherwise (but even then, it
      * might not actually work depending on the underlying media protocol)
      */
-    int setRate(float rate);
+    int setRate(float rate)
+    {
+        return libvlc_media_player_set_rate(get(), rate);
+    }
 
     /**
      * Get current movie state
@@ -350,7 +465,10 @@ public:
      *
      * \see libvlc_state_t
      */
-    libvlc_state_t state();
+    libvlc_state_t state()
+    {
+        return libvlc_media_player_get_state(get());
+    }
 
     /**
      * Get movie fps rate
@@ -358,28 +476,40 @@ public:
      * \return frames per second (fps) for this playing movie, or 0 if
      * unspecified
      */
-    float fps();
+    float fps()
+    {
+        return libvlc_media_player_get_fps(get());
+    }
 
     /**
      * end bug How many video outputs does this media player have?
      *
      * \return the number of video outputs
      */
-    unsigned hasVout();
+    unsigned hasVout()
+    {
+        return libvlc_media_player_has_vout(get());
+    }
 
     /**
      * Is this media player seekable?
      *
      * \return true if the media player can seek
      */
-    bool isSeekable();
+    bool isSeekable()
+    {
+        return libvlc_media_player_is_seekable(get());
+    }
 
     /**
      * Can this media player be paused?
      *
      * \return true if the media player can pause
      */
-    bool canPause();
+    bool canPause()
+    {
+        return libvlc_media_player_can_pause(get());
+    }
 
     /**
      * Check if the current program is scrambled
@@ -388,12 +518,18 @@ public:
      *
      * \version LibVLC 2.2.0 or later
      */
-    bool programScrambled();
+    bool programScrambled()
+    {
+        return libvlc_media_player_program_scrambled(get());
+    }
 
     /**
      * Display the next frame (if supported)
      */
-    void nextFrame();
+    void nextFrame()
+    {
+        libvlc_media_player_next_frame(get());
+    }
 
     /**
      * Navigate through DVD Menu
@@ -402,7 +538,10 @@ public:
      *
      * \version libVLC 2.0.0 or later
      */
-    void navigate(unsigned navigate);
+    void navigate(unsigned navigate)
+    {
+        libvlc_media_player_navigate(get(), navigate);
+    }
 
     /**
      * Set if, and how, the video title will be shown when media is played.
@@ -415,7 +554,10 @@ public:
      *
      * \version libVLC 2.1.0 or later
      */
-    void setVideoTitleDisplay(libvlc_position_t position, unsigned int timeout);
+    void setVideoTitleDisplay(libvlc_position_t position, unsigned int timeout)
+    {
+        libvlc_media_player_set_video_title_display(get(), position, timeout);
+    }
 
     /**
      * Toggle fullscreen status on non-embedded video outputs.
@@ -423,7 +565,10 @@ public:
      * \warning The same limitations applies to this function as to
      * MediaPlayer::setFullscreen() .
      */
-    void toggleFullscreen();
+    void toggleFullscreen()
+    {
+        libvlc_toggle_fullscreen(get());
+    }
 
     /**
      * Enable or disable fullscreen.
@@ -437,19 +582,28 @@ public:
      *
      * \param b_fullscreen  boolean for fullscreen status
      */
-    void setFullscreen(int b_fullscreen);
+    void setFullscreen(int b_fullscreen)
+    {
+        libvlc_set_fullscreen(get(), b_fullscreen);
+    }
 
     /**
      * Get current fullscreen status.
      *
      * \return the fullscreen status (boolean)
      */
-    bool fullscreen();
+    bool fullscreen()
+    {
+        return libvlc_get_fullscreen(get()) != 0;
+    }
 
     /**
      * Toggle teletext transparent status on video output.
      */
-    void toggleTeletext();
+    void toggleTeletext()
+    {
+        libvlc_toggle_teletext(get());
+    }
 
     /**
      * Apply new equalizer settings to a media player.
@@ -484,7 +638,10 @@ public:
      *
      * \version LibVLC 2.2.0 or later
      */
-    int setEqualizer(libvlc_equalizer_t * p_equalizer);
+    int setEqualizer(libvlc_equalizer_t * p_equalizer)
+    {
+        return libvlc_media_player_set_equalizer(get(), p_equalizer);
+    }
 
     /**
      * Set callbacks and private data for decoded audio. Use
@@ -506,7 +663,10 @@ public:
      *
      * \version LibVLC 2.0.0 or later
      */
-    void setAudioCallbacks(libvlc_audio_play_cb play, libvlc_audio_pause_cb pause, libvlc_audio_resume_cb resume, libvlc_audio_flush_cb flush, libvlc_audio_drain_cb drain, void * opaque);
+    void setAudioCallbacks(libvlc_audio_play_cb play, libvlc_audio_pause_cb pause, libvlc_audio_resume_cb resume, libvlc_audio_flush_cb flush, libvlc_audio_drain_cb drain, void * opaque)
+    {
+        libvlc_audio_set_callbacks(get(), play, pause, resume, flush, drain, opaque);
+    }
 
     /**
      * Set callbacks and private data for decoded audio. Use
@@ -518,7 +678,10 @@ public:
      *
      * \version LibVLC 2.0.0 or later
      */
-    void setVolumeCallback(libvlc_audio_set_volume_cb set_volume);
+    void setVolumeCallback(libvlc_audio_set_volume_cb set_volume)
+    {
+        libvlc_audio_set_volume_callback(get(), set_volume);
+    }
 
     /**
      * Set decoded audio format. This only works in combination with
@@ -530,7 +693,10 @@ public:
      *
      * \version LibVLC 2.0.0 or later
      */
-    void setAudioFormatCallbacks(libvlc_audio_setup_cb setup, libvlc_audio_cleanup_cb cleanup);
+    void setAudioFormatCallbacks(libvlc_audio_setup_cb setup, libvlc_audio_cleanup_cb cleanup)
+    {
+        libvlc_audio_set_format_callbacks(get(), setup, cleanup);
+    }
 
     /**
      * Set decoded audio format. This only works in combination with
@@ -546,7 +712,10 @@ public:
      *
      * \version LibVLC 2.0.0 or later
      */
-    void setAudioFormat(const std::string& format, unsigned rate, unsigned channels);
+    void setAudioFormat(const std::string& format, unsigned rate, unsigned channels)
+    {
+        libvlc_audio_set_format(get(), format.c_str(), rate, channels);
+    }
 
     /**
      * Selects an audio output module.
@@ -560,7 +729,10 @@ public:
      *
      * \return 0 if function succeded, -1 on error
      */
-    int setAudioOutput(const std::string& psz_name);
+    int setAudioOutput(const std::string& psz_name)
+    {
+        return libvlc_audio_output_set(get(), psz_name.c_str());
+    }
 
     /**
      * Gets a list of potential audio output devices,
@@ -582,7 +754,17 @@ public:
      *
      * \version LibVLC 2.2.0 or later.
      */
-    std::vector<AudioOutputDeviceDescription> outputDeviceEnum();
+    std::vector<AudioOutputDeviceDescription> outputDeviceEnum()
+    {
+        libvlc_audio_output_device_t* devices = libvlc_audio_output_device_enum(get());
+        std::vector<AudioOutputDeviceDescription> res;
+        if ( devices == NULL )
+            return res;
+        for ( libvlc_audio_output_device_t* p = devices; p != NULL; p = p->p_next )
+            res.push_back( AudioOutputDeviceDescription( p ) );
+        libvlc_audio_output_device_list_release( devices );
+        return res;
+    }
 
     /**
      * Configures an explicit audio output device.
@@ -622,7 +804,10 @@ public:
      *
      * \return Nothing. Errors are ignored (this is a design bug).
      */
-    void outputDeviceSet(const std::string& module, const std::string& device_id);
+    void outputDeviceSet(const std::string& module, const std::string& device_id)
+    {
+        libvlc_audio_output_device_set(get(), module.c_str(), device_id.c_str());
+    }
 
     /**
      * Toggle mute status.
@@ -632,7 +817,10 @@ public:
      * asynchronously. Thus, there is a small race condition where toggling
      * will not work. See also the limitations of MediaPlayer::setMute() .
      */
-    void toggleMute();
+    void toggleMute()
+    {
+        libvlc_audio_toggle_mute(get());
+    }
 
     /**
      * Get current mute status.
@@ -640,7 +828,10 @@ public:
      * \return the mute status (boolean) if defined, -1 if
      * undefined/unapplicable
      */
-    int mute();
+    int mute()
+    {
+        return libvlc_audio_get_mute(get());
+    }
 
     /**
      * Set mute status.
@@ -656,7 +847,10 @@ public:
      * \note To force silent playback, disable all audio tracks. This is more
      * efficient and reliable than mute.
      */
-    void setMute(int status);
+    void setMute(int status)
+    {
+        libvlc_audio_set_mute(get(), status);
+    }
 
     /**
      * Get current software audio volume.
@@ -664,7 +858,10 @@ public:
      * \return the software volume in percents (0 = mute, 100 = nominal /
      * 0dB)
      */
-    int volume();
+    int volume()
+    {
+        return libvlc_audio_get_volume(get());
+    }
 
     /**
      * Set current software audio volume.
@@ -673,7 +870,10 @@ public:
      *
      * \return 0 if the volume was set, -1 if it was out of range
      */
-    int setVolume(int i_volume);
+    int setVolume(int i_volume)
+    {
+        return libvlc_audio_set_volume(get(), i_volume);
+    }
 
     /**
      * Get number of available audio tracks.
@@ -681,21 +881,31 @@ public:
      * \return the number of available audio tracks (int), or -1 if
      * unavailable
      */
-    int audioTrackCount();
+    int audioTrackCount()
+    {
+        return libvlc_audio_get_track_count(get());
+    }
 
     /**
      * Get the description of available audio tracks.
      *
      * \return list with description of available audio tracks, or NULL
      */
-    std::vector<TrackDescription> audioTrackDescription();
+    std::vector<TrackDescription> audioTrackDescription()
+    {
+        libvlc_track_description_t* result = libvlc_audio_get_track_description( get() );
+        return getTracksDescription( result );
+    }
 
     /**
      * Get current audio track.
      *
      * \return the audio track ID or -1 if no active input.
      */
-    int audioTrack();
+    int audioTrack()
+    {
+        return libvlc_audio_get_track(get());
+    }
 
     /**
      * Set current audio track.
@@ -704,7 +914,10 @@ public:
      *
      * \return 0 on success, -1 on error
      */
-    int setAudioTrack(int i_track);
+    int setAudioTrack(int i_track)
+    {
+        return libvlc_audio_set_track(get(), i_track);
+    }
 
     /**
      * Get current audio channel.
@@ -713,7 +926,10 @@ public:
      *
      * \see libvlc_audio_output_channel_t
      */
-    int channel();
+    int channel()
+    {
+        return libvlc_audio_get_channel(get());
+    }
 
     /**
      * Set current audio channel.
@@ -724,7 +940,10 @@ public:
      *
      * \return 0 on success, -1 on error
      */
-    int setChannel(int channel);
+    int setChannel(int channel)
+    {
+        return libvlc_audio_set_channel(get(), channel);
+    }
 
     /**
      * Get current audio delay.
@@ -733,7 +952,10 @@ public:
      *
      * \version LibVLC 1.1.1 or later
      */
-    int64_t delay();
+    int64_t delay()
+    {
+        return libvlc_audio_get_delay(get());
+    }
 
     /**
      * Set current audio delay. The audio delay will be reset to zero each
@@ -745,7 +967,10 @@ public:
      *
      * \version LibVLC 1.1.1 or later
      */
-    int setDelay(int64_t i_delay);
+    int setDelay(int64_t i_delay)
+    {
+        return libvlc_audio_set_delay(get(), i_delay);
+    }
 
     /**
      * Set callbacks and private data to render decoded video to a custom
@@ -763,7 +988,10 @@ public:
      *
      * \version LibVLC 1.1.1 or later
      */
-    void setVideoCallbacks(libvlc_video_lock_cb lock, libvlc_video_unlock_cb unlock, libvlc_video_display_cb display, void * opaque);
+    void setVideoCallbacks(libvlc_video_lock_cb lock, libvlc_video_unlock_cb unlock, libvlc_video_display_cb display, void * opaque)
+    {
+        libvlc_video_set_callbacks(get(), lock, unlock, display, opaque);
+    }
 
     /**
      * Set decoded video chroma and dimensions. This only works in
@@ -781,7 +1009,10 @@ public:
      *
      * \version LibVLC 1.1.1 or later
      */
-    void setVideoFormat(const std::string& chroma, unsigned width, unsigned height, unsigned pitch);
+    void setVideoFormat(const std::string& chroma, unsigned width, unsigned height, unsigned pitch)
+    {
+        libvlc_video_set_format(get(), chroma.c_str(), width, height, pitch);
+    }
 
     /**
      * Set decoded video chroma and dimensions. This only works in
@@ -793,7 +1024,10 @@ public:
      *
      * \version LibVLC 2.0.0 or later
      */
-    void setVideoFormatCallbacks(libvlc_video_format_cb setup, libvlc_video_cleanup_cb cleanup);
+    void setVideoFormatCallbacks(libvlc_video_format_cb setup, libvlc_video_cleanup_cb cleanup)
+    {
+        libvlc_video_set_format_callbacks(get(), setup, cleanup);
+    }
 
     /**
      * Enable or disable key press events handling, according to the LibVLC
@@ -810,7 +1044,10 @@ public:
      *
      * \param on  true to handle key press events, false to ignore them.
      */
-    void setKeyInput(unsigned on);
+    void setKeyInput(unsigned on)
+    {
+        libvlc_video_set_key_input(get(), on);
+    }
 
     /**
      * Enable or disable mouse click events handling. By default, those
@@ -824,7 +1061,10 @@ public:
      *
      * \param on  true to handle mouse click events, false to ignore them.
      */
-    void setMouseInput(unsigned on);
+    void setMouseInput(unsigned on)
+    {
+        libvlc_video_set_mouse_input(get(), on);
+    }
 
     /**
      * Get the pixel dimensions of a video.
@@ -837,7 +1077,10 @@ public:
      *
      * \return 0 on success, -1 if the specified video does not exist
      */
-    int size(unsigned num, unsigned * px, unsigned * py);
+    int size(unsigned num, unsigned * px, unsigned * py)
+    {
+        return libvlc_video_get_size(get(), num, px, py);
+    }
 
     /**
      * Get the mouse pointer coordinates over a video. Coordinates are
@@ -865,7 +1108,10 @@ public:
      *
      * \return 0 on success, -1 if the specified video does not exist
      */
-    int cursor(unsigned num, int * px, int * py);
+    int cursor(unsigned num, int * px, int * py)
+    {
+        return libvlc_video_get_cursor(get(), num, px, py);
+    }
 
     /**
      * Get the current video scaling factor. See also MediaPlayer::setScale() .
@@ -873,7 +1119,10 @@ public:
      * \return the currently configured zoom factor, or 0. if the video is
      * set to fit to the output window/drawable automatically.
      */
-    float scale();
+    float scale()
+    {
+        return libvlc_video_get_scale(get());
+    }
 
     /**
      * Set the video scaling factor. That is the ratio of the number of
@@ -885,7 +1134,10 @@ public:
      *
      * \param f_factor  the scaling factor, or zero
      */
-    void setScale(float f_factor);
+    void setScale(float f_factor)
+    {
+        libvlc_video_set_scale(get(), f_factor);
+    }
 
     /**
      * Get current video aspect ratio.
@@ -893,7 +1145,15 @@ public:
      * \return the video aspect ratio or NULL if unspecified (the result must
      * be released with free() or libvlc_free() ).
      */
-    std::string aspectRatio();
+    std::string aspectRatio()
+    {
+        char* c_result = libvlc_video_get_aspect_ratio(get());
+        if ( c_result == NULL )
+            return std::string();
+        std::string result = c_result;
+        libvlc_free(c_result);
+        return result;
+    }
 
     /**
      * Set new video aspect ratio.
@@ -902,28 +1162,41 @@ public:
      *
      * \note Invalid aspect ratios are ignored.
      */
-    void setAspectRatio(const std::string& psz_aspect);
+    void setAspectRatio(const std::string& psz_aspect)
+    {
+        libvlc_video_set_aspect_ratio(get(), psz_aspect.c_str());
+    }
 
     /**
      * Get current video subtitle.
      *
      * \return the video subtitle selected, or -1 if none
      */
-    int spu();
+    int spu()
+    {
+        return libvlc_video_get_spu(get());
+    }
 
     /**
      * Get the number of available video subtitles.
      *
      * \return the number of available video subtitles
      */
-    int spuCount();
+    int spuCount()
+    {
+        return libvlc_video_get_spu_count(get());
+    }
 
     /**
      * Get the description of available video subtitles.
      *
      * \return list containing description of available video subtitles
      */
-    std::vector<TrackDescription> spuDescription();
+    std::vector<TrackDescription> spuDescription()
+    {
+        libvlc_track_description_t* result = libvlc_video_get_spu_description( get() );
+        return getTracksDescription( result );
+    }
 
     /**
      * Set new video subtitle.
@@ -933,7 +1206,10 @@ public:
      *
      * \return 0 on success, -1 if out of range
      */
-    int setSpu(int i_spu);
+    int setSpu(int i_spu)
+    {
+        return libvlc_video_set_spu(get(), i_spu);
+    }
 
     /**
      * Set new video subtitle file.
@@ -942,7 +1218,10 @@ public:
      *
      * \return the success status (boolean)
      */
-    int setSubtitleFile(const std::string& psz_subtitle);
+    int setSubtitleFile(const std::string& psz_subtitle)
+    {
+        return libvlc_video_set_subtitle_file(get(), psz_subtitle.c_str());
+    }
 
     /**
      * Get the current subtitle delay. Positive values means subtitles are
@@ -953,7 +1232,10 @@ public:
      *
      * \version LibVLC 2.0.0 or later
      */
-    int64_t spuDelay();
+    int64_t spuDelay()
+    {
+        return libvlc_video_get_spu_delay(get());
+    }
 
     /**
      * Set the subtitle delay. This affects the timing of when the subtitle
@@ -970,14 +1252,21 @@ public:
      *
      * \version LibVLC 2.0.0 or later
      */
-    int setSpuDelay(int64_t i_delay);
+    int setSpuDelay(int64_t i_delay)
+    {
+        return libvlc_video_set_spu_delay(get(), i_delay);
+    }
 
     /**
      * Get the description of available titles.
      *
      * \return list containing description of available titles
      */
-    std::vector<TrackDescription> titleDescription();
+    std::vector<TrackDescription> titleDescription()
+    {
+        libvlc_track_description_t* result = libvlc_video_get_title_description( get() );
+        return getTracksDescription( result );
+    }
 
     /**
      * Get the description of available chapters for specific title.
@@ -987,42 +1276,66 @@ public:
      * \return list containing description of available chapter for title
      * i_title
      */
-    std::vector<TrackDescription> chapterDescription(int i_title);
+    std::vector<TrackDescription> chapterDescription(int i_title)
+    {
+        libvlc_track_description_t* result = libvlc_video_get_chapter_description( get(), i_title );
+        return getTracksDescription( result );
+    }
 
     /**
      * Get current crop filter geometry.
      *
      * \return the crop filter geometry or NULL if unset
      */
-    std::string cropGeometry();
+    std::string cropGeometry()
+    {
+        char* c_result = libvlc_video_get_crop_geometry(get());
+        if ( c_result == NULL )
+            return std::string();
+        std::string result = c_result;
+        libvlc_free(c_result);
+        return result;
+    }
 
     /**
      * Set new crop filter geometry.
      *
      * \param psz_geometry  new crop filter geometry (NULL to unset)
      */
-    void setCropGeometry(const std::string& psz_geometry);
+    void setCropGeometry(const std::string& psz_geometry)
+    {
+        libvlc_video_set_crop_geometry(get(), psz_geometry.c_str());
+    }
 
     /**
      * Get current teletext page requested.
      *
      * \return the current teletext page requested.
      */
-    int teletext();
+    int teletext()
+    {
+        return libvlc_video_get_teletext(get());
+    }
 
     /**
      * Set new teletext page to retrieve.
      *
      * \param i_page  teletex page number requested
      */
-    void setTeletext(int i_page);
+    void setTeletext(int i_page)
+    {
+        libvlc_video_set_teletext(get(), i_page);
+    }
 
     /**
      * Get number of available video tracks.
      *
      * \return the number of available video tracks (int)
      */
-    int videoTrackCount();
+    int videoTrackCount()
+    {
+        return libvlc_video_get_track_count(get());
+    }
 
     /**
      * Get the description of available video tracks.
@@ -1030,14 +1343,21 @@ public:
      * \return list with description of available video tracks, or NULL on
      * error
      */
-    std::vector<TrackDescription> videoTrackDescription();
+    std::vector<TrackDescription> videoTrackDescription()
+    {
+        libvlc_track_description_t* result = libvlc_video_get_track_description( get() );
+        return getTracksDescription( result );
+    }
 
     /**
      * Get current video track.
      *
      * \return the video track ID (int) or -1 if no active input
      */
-    int videoTrack();
+    int videoTrack()
+    {
+        return libvlc_video_get_track(get());
+    }
 
     /**
      * Set video track.
@@ -1046,7 +1366,10 @@ public:
      *
      * \return 0 on success, -1 if out of range
      */
-    int setVideoTrack(int i_track);
+    int setVideoTrack(int i_track)
+    {
+        return libvlc_video_set_track(get(), i_track);
+    }
 
     /**
      * Take a snapshot of the current video window.
@@ -1065,14 +1388,20 @@ public:
      *
      * \return 0 on success, -1 if the video was not found
      */
-    int takeSnapshot(unsigned num, const std::string& psz_filepath, unsigned int i_width, unsigned int i_height);
+    int takeSnapshot(unsigned num, const std::string& psz_filepath, unsigned int i_width, unsigned int i_height)
+    {
+        return libvlc_video_take_snapshot(get(), num, psz_filepath.c_str(), i_width, i_height);
+    }
 
     /**
      * Enable or disable deinterlace filter
      *
      * \param psz_mode  type of deinterlace filter, NULL to disable
      */
-    void setDeinterlace(const std::string& psz_mode);
+    void setDeinterlace(const std::string& psz_mode)
+    {
+        libvlc_video_set_deinterlace(get(), psz_mode.c_str());
+    }
 
     /**
      * Get an integer marquee option value
@@ -1081,7 +1410,10 @@ public:
      *
      * \see libvlc_video_marquee_int_option_t
      */
-    int marqueeInt(unsigned option);
+    int marqueeInt(unsigned option)
+    {
+        return libvlc_video_get_marquee_int(get(), option);
+    }
 
     /**
      * Get a string marquee option value
@@ -1090,7 +1422,15 @@ public:
      *
      * \see libvlc_video_marquee_string_option_t
      */
-    std::string marqueeString(unsigned option);
+    std::string marqueeString(unsigned option)
+    {
+        char* c_result = libvlc_video_get_marquee_string(get(), option);
+        if ( c_result == NULL )
+            return std::string();
+        std::string result = c_result;
+        libvlc_free(c_result);
+        return result;
+    }
 
     /**
      * Enable, disable or set an integer marquee option
@@ -1104,7 +1444,10 @@ public:
      *
      * \param i_val  marq option value
      */
-    void setMarqueeInt(unsigned option, int i_val);
+    void setMarqueeInt(unsigned option, int i_val)
+    {
+        libvlc_video_set_marquee_int(get(), option, i_val);
+    }
 
     /**
      * Set a marquee string option
@@ -1115,7 +1458,10 @@ public:
      *
      * \param psz_text  marq option value
      */
-    void setMarqueeString(unsigned option, const std::string& psz_text);
+    void setMarqueeString(unsigned option, const std::string& psz_text)
+    {
+        libvlc_video_set_marquee_string(get(), option, psz_text.c_str());
+    }
 
     /**
      * Get integer logo option.
@@ -1123,7 +1469,10 @@ public:
      * \param option  logo option to get, values of
      * libvlc_video_logo_option_t
      */
-    int logoInt(unsigned option);
+    int logoInt(unsigned option)
+    {
+        return libvlc_video_get_logo_int(get(), option);
+    }
 
     /**
      * Set logo option as integer. Options that take a different type value
@@ -1135,7 +1484,10 @@ public:
      *
      * \param value  logo option value
      */
-    void setLogoInt(unsigned option, int value);
+    void setLogoInt(unsigned option, int value)
+    {
+        libvlc_video_set_logo_int(get(), option, value);
+    }
 
     /**
      * Set logo option as string. Options that take a different type value
@@ -1146,7 +1498,10 @@ public:
      *
      * \param psz_value  logo option value
      */
-    void setLogoString(unsigned option, const std::string& psz_value);
+    void setLogoString(unsigned option, const std::string& psz_value)
+    {
+        libvlc_video_set_logo_string(get(), option, psz_value.c_str());
+    }
 
     /**
      * Get integer adjust option.
@@ -1156,7 +1511,10 @@ public:
      *
      * \version LibVLC 1.1.1 and later.
      */
-    int adjustInt(unsigned option);
+    int adjustInt(unsigned option)
+    {
+        return libvlc_video_get_adjust_int(get(), option);
+    }
 
     /**
      * Set adjust option as integer. Options that take a different type value
@@ -1170,7 +1528,10 @@ public:
      *
      * \version LibVLC 1.1.1 and later.
      */
-    void setAdjustInt(unsigned option, int value);
+    void setAdjustInt(unsigned option, int value)
+    {
+        libvlc_video_set_adjust_int(get(), option, value);
+    }
 
     /**
      * Get float adjust option.
@@ -1180,7 +1541,12 @@ public:
      *
      * \version LibVLC 1.1.1 and later.
      */
-    float adjustFloat(unsigned option);
+    float adjustFloat(unsigned option)
+    {
+        float c_result = libvlc_video_get_adjust_float(get(), option);
+        float result = c_result;
+        return result;
+    }
 
     /**
      * Set adjust option as float. Options that take a different type value
@@ -1193,10 +1559,26 @@ public:
      *
      * \version LibVLC 1.1.1 and later.
      */
-    void setAdjustFloat(unsigned option, float value);
+    void setAdjustFloat(unsigned option, float value)
+    {
+        libvlc_video_set_adjust_float(get(), option, value);
+    }
 
 private:
-    std::vector<TrackDescription> getTracksDescription( libvlc_track_description_t* tracks ) const;
+    std::vector<TrackDescription> getTracksDescription( libvlc_track_description_t* tracks ) const
+    {
+        std::vector<TrackDescription> result;
+        if ( tracks == NULL )
+            return result;
+        libvlc_track_description_t* p = tracks;
+        while ( p != NULL )
+        {
+            result.push_back( TrackDescription( p ) );
+            p = p->p_next;
+        }
+        libvlc_track_description_list_release(tracks);
+        return result;
+    }
 
 private:
     EventManagerPtr m_eventManager;

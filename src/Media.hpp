@@ -24,13 +24,14 @@
 #ifndef LIBVLC_CXX_MEDIA_H
 #define LIBVLC_CXX_MEDIA_H
 
+#include "common.hpp"
+
 #include <vector>
-#include "vlc.hpp"
+#include <stdexcept>
 
 namespace VLC
 {
 
-class MediaList;
 class MediaPlayer;
 class EventManager;
 
@@ -66,7 +67,28 @@ public:
      * @param mrl       A path, location, or node name, depending on the 3rd parameter
      * @param type      The type of the 2nd argument. \sa{FromType}
      */
-    Media(InstancePtr instance, const std::string& mrl, FromType type);
+    Media(InstancePtr instance, const std::string& mrl, FromType type)
+        : Internal{ libvlc_media_release }
+    {
+        InternalPtr ptr = nullptr;
+        switch (type)
+        {
+        case FromLocation:
+            ptr = libvlc_media_new_location( instance->get(), mrl.c_str() );
+            break;
+        case FromPath:
+            ptr = libvlc_media_new_path( instance->get(), mrl.c_str() );
+            break;
+        case AsNode:
+            ptr = libvlc_media_new_as_node( instance->get(), mrl.c_str() );
+            break;
+        default:
+            break;
+        }
+        if ( ptr == nullptr )
+            throw std::runtime_error("Failed to construct a media");
+        m_obj.reset( ptr );
+    }
 
     /**
      * Create a media for an already open file descriptor.
@@ -88,7 +110,10 @@ public:
      * \param fd open file descriptor
      * \return the newly created media or NULL on error
      */
-    Media(InstancePtr instance, int fd);
+    Media(InstancePtr instance, int fd)
+        : Internal { libvlc_media_new_fd( instance->get(), fd ), libvlc_media_release }
+    {
+    }
 
     /**
      * Get media instance from this media list instance. This action will increase
@@ -98,16 +123,28 @@ public:
      * \param p_ml a media list instance
      * \return media instance
      */
-    Media(MediaListPtr list );
+    Media(MediaListPtr list)
+        : Internal{ libvlc_media_list_media( getInternalPtr<libvlc_media_list_t>( list ) ),
+                    libvlc_media_release }
+    {
+    }
 
-    explicit Media(InternalPtr ptr, bool incrementRefCount);
+    explicit Media(Internal::InternalPtr ptr, bool incrementRefCount)
+        : Internal{ ptr, libvlc_media_release }
+    {
+        if (incrementRefCount)
+            retain();
+    }
 
     /**
      * Check if 2 Media objects contain the same libvlc_media_t.
      * \param another another Media
      * \return true if they contain the same libvlc_media_t
      */
-    bool operator==(const Media& another) const;
+    bool operator==(const Media& another) const
+    {
+        return m_obj == another.m_obj;
+    }
 
     /**
      * Add an option to the media.
@@ -127,7 +164,10 @@ public:
      *
      * \param psz_options  the options (as a string)
      */
-    void addOption(const std::string& psz_options);
+    void addOption(const std::string& psz_options)
+    {
+        libvlc_media_add_option(get(), psz_options.c_str());
+    }
 
     /**
      * Add an option to the media with configurable flags.
@@ -146,33 +186,48 @@ public:
      *
      * \param i_flags  the flags for this option
      */
-    void addOptionFlag(const std::string& psz_options, unsigned i_flags);
+    void addOptionFlag(const std::string& psz_options, unsigned i_flags)
+    {
+        libvlc_media_add_option_flag(get(), psz_options.c_str(), i_flags);
+    }
 
     /**
      * Get the media resource locator (mrl) from a media descriptor object
      *
      * \return string with mrl of media descriptor object
      */
-    std::string mrl();
+    std::string mrl()
+    {
+        char* c_result = libvlc_media_get_mrl(get());
+        if ( c_result == NULL )
+            return std::string();
+        std::string result = c_result;
+        libvlc_free(c_result);
+        return result;
+    }
 
     /**
      * Duplicate a media descriptor object.
      */
-    Media duplicate();
+    MediaPtr duplicate()
+    {
+        InternalPtr obj = libvlc_media_duplicate(get());
+        return std::make_shared<Media>( obj, false );
+    }
 
     /**
      * Read the meta of the media.
      *
      * If the media has not yet been parsed this will return NULL.
      *
-     * This methods automatically calls Media::parseAsync() , so after
+     * This methods automatically calls parseAsync() , so after
      * calling it you may receive a libvlc_MediaMetaChanged event. If you
-     * prefer a synchronous version ensure that you call Media::parse()
+     * prefer a synchronous version ensure that you call parse()
      * before get_meta().
      *
-     * \see Media::parse()
+     * \see parse()
      *
-     * \see Media::parseAsync()
+     * \see parseAsync()
      *
      * \see libvlc_MediaMetaChanged
      *
@@ -180,7 +235,15 @@ public:
      *
      * \return the media's meta
      */
-    std::string meta(libvlc_meta_t e_meta);
+    std::string meta(libvlc_meta_t e_meta)
+    {
+        char* c_result = libvlc_media_get_meta(get(), e_meta);
+        if ( c_result == NULL )
+            return std::string();
+        std::string result = c_result;
+        libvlc_free(c_result);
+        return result;
+    }
 
     /**
      * Set the meta of the media (this function will not save the meta, call
@@ -190,14 +253,21 @@ public:
      *
      * \param psz_value  the media's meta
      */
-    void setMeta(libvlc_meta_t e_meta, const std::string& psz_value);
+    void setMeta(libvlc_meta_t e_meta, const std::string& psz_value)
+    {
+        libvlc_media_set_meta(get(), e_meta, psz_value.c_str());
+    }
+
 
     /**
      * Save the meta previously set
      *
      * \return true if the write operation was successful
      */
-    int saveMeta();
+    int saveMeta()
+    {
+        return libvlc_media_save_meta(get());
+    }
 
     /**
      * Get current state of media descriptor object. Possible media states
@@ -209,7 +279,10 @@ public:
      *
      * \return state of media descriptor object
      */
-    libvlc_state_t state();
+    libvlc_state_t state()
+    {
+        return libvlc_media_get_state(get());
+    }
 
     /**
      * Get the current statistics about the media
@@ -219,7 +292,10 @@ public:
      *
      * \return true if the statistics are available, false otherwise
      */
-    bool stats(libvlc_media_stats_t * p_stats);
+    bool stats(libvlc_media_stats_t * p_stats)
+    {
+        return libvlc_media_get_stats(get(), p_stats);
+    }
 
     /**
      * Get event manager from media descriptor object. NOTE: this function
@@ -227,14 +303,25 @@ public:
      *
      * \return event manager object
      */
-    EventManagerPtr eventManager();
+    EventManagerPtr eventManager()
+    {
+        if ( m_eventManager == NULL )
+        {
+            libvlc_event_manager_t* obj = libvlc_media_event_manager(get());
+            m_eventManager = std::make_shared<EventManager>( obj );
+        }
+        return m_eventManager;
+    }
 
     /**
      * Get duration (in ms) of media descriptor object item.
      *
      * \return duration of media item or -1 on error
      */
-    libvlc_time_t duration();
+    libvlc_time_t duration()
+    {
+        return libvlc_media_get_duration(get());
+    }
 
     /**
      * Parse a media.
@@ -242,33 +329,39 @@ public:
      * This fetches (local) meta data and tracks information. The method is
      * synchronous.
      *
-     * \see Media::parseAsync()
+     * \see parseAsync()
      *
-     * \see Media::meta()
+     * \see meta()
      *
-     * \see Media::tracksInfo()
+     * \see tracksInfo()
      */
-    void parse();
+    void parse()
+    {
+        libvlc_media_parse(get());
+    }
 
     /**
      * Parse a media.
      *
      * This fetches (local) meta data and tracks information. The method is
-     * the asynchronous of Media::parse() .
+     * the asynchronous of parse() .
      *
      * To track when this is over you can listen to libvlc_MediaParsedChanged
      * event. However if the media was already parsed you will not receive
      * this event.
      *
-     * \see Media::parse()
+     * \see parse()
      *
      * \see libvlc_MediaParsedChanged
      *
-     * \see Media::meta()
+     * \see meta()
      *
-     * \see Media::tracks()
+     * \see tracks()
      */
-    void parseAsync();
+    void parseAsync()
+    {
+        libvlc_media_parse_async(get());
+    }
 
     /**
      * Get Parsed status for media descriptor object.
@@ -278,7 +371,10 @@ public:
      * \return true if media object has been parsed otherwise it returns
      * false
      */
-    bool isParsed();
+    bool isParsed()
+    {
+        return libvlc_media_is_parsed(get());
+    }
 
     /**
      * Sets media descriptor's user_data. user_data is specialized data
@@ -287,19 +383,25 @@ public:
      *
      * \param p_new_user_data  pointer to user data
      */
-    void setUserData(void * p_new_user_data);
+    void setUserData(void * p_new_user_data)
+    {
+        libvlc_media_set_user_data(get(), p_new_user_data);
+    }
 
     /**
      * Get media descriptor's user_data. user_data is specialized data
      * accessed by the host application, VLC.framework uses it as a pointer
      * to an native object that references a libvlc_media_t pointer
      */
-    void * userData();
+    void* userData()
+    {
+        return libvlc_media_get_user_data(get());
+    }
 
     /**
      * Get media descriptor's elementary streams description
      *
-     * Note, you need to call Media::parse() or play the media at least once
+     * Note, you need to call parse() or play the media at least once
      * before calling this function. Not doing this will result in an empty
      * array.
      *
@@ -307,16 +409,33 @@ public:
      *
      * \return a vector containing all tracks
      */
-    std::vector<MediaTrack> tracks();
+    std::vector<MediaTrack> tracks()
+    {
+        libvlc_media_track_t**  tracks;
+        uint32_t                nbTracks = libvlc_media_tracks_get(get(), &tracks);
+        std::vector<MediaTrack> res;
+
+        if ( nbTracks == 0 )
+            return res;
+
+        for ( uint32_t i = 0; i < nbTracks; ++i )
+            res.push_back( MediaTrack(tracks[i]));
+        libvlc_media_tracks_release( tracks, nbTracks );
+        return res;
+    }
 
 private:
 
     /**
      * Retain a reference to a media descriptor object (libvlc_media_t). Use
-     * Media::release() to decrement the reference count of a media
+     * release() to decrement the reference count of a media
      * descriptor object.
      */
-    void retain();
+    void retain()
+    {
+        if ( isValid() )
+            libvlc_media_retain(get());
+    }
 
 
 private:

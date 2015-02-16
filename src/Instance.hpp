@@ -24,11 +24,12 @@
 #ifndef LIBVLC_CXX_INSTANCE_H
 #define LIBVLC_CXX_INSTANCE_H
 
-#include <string>
-#include <vector>
 #include "common.hpp"
 #include "Internal.hpp"
 #include "structures.hpp"
+
+#include <string>
+#include <vector>
 
 namespace VLC
 {
@@ -58,14 +59,21 @@ public:
      *
      * \param argv  list of arguments (should be NULL)
      */
-    Instance(int argc, const char *const * argv);
+    Instance(int argc, const char *const * argv)
+        : Internal{ libvlc_new( argc, argv ), libvlc_release }
+    {
+    }
 
     /**
      * Check if 2 Instance objects contain the same libvlc_instance_t.
      * \param another another Instance
      * \return true if they contain the same libvlc_instance_t
      */
-    bool operator==(const Instance& another) const;
+    bool operator==(const Instance& another) const
+    {
+        return m_obj == another.m_obj;
+    }
+
 
     /**
      * Try to start a user interface for the libvlc instance.
@@ -74,7 +82,10 @@ public:
      *
      * \return 0 on success, -1 on error.
      */
-    int addIntf(const std::string& name);
+    int addIntf(const std::string& name)
+    {
+        return libvlc_add_intf( get(), name.c_str() );
+    }
 
     /**
      * Registers a callback for the LibVLC exit event. This is mostly useful
@@ -95,7 +106,10 @@ public:
      * \warning This function and Instance::wait() cannot be used at the same
      * time.
      */
-    void setExitHandler(void(*cb)(void *), void * opaque);
+    void setExitHandler(void(*cb)(void *), void * opaque)
+    {
+        libvlc_set_exit_handler( get(), cb, opaque );
+    }
 
     /**
      * Sets the application name. LibVLC passes this as the user agent string
@@ -108,7 +122,10 @@ public:
      *
      * \version LibVLC 1.1.1 or later
      */
-    void setUserAgent(const std::string& name, const std::string& http);
+    void setUserAgent(const std::string& name, const std::string& http)
+    {
+        libvlc_set_user_agent( get(), name.c_str(), http.c_str() );
+    }
 
     /**
      * Sets some meta-information about the application. See also
@@ -122,7 +139,10 @@ public:
      *
      * \version LibVLC 2.1.0 or later.
      */
-    void setAppId(const std::string& id, const std::string& version, const std::string& icon);
+    void setAppId(const std::string& id, const std::string& version, const std::string& icon)
+    {
+        libvlc_set_app_id( get(), id.c_str(), version.c_str(), icon.c_str() );
+    }
 
     /**
      * Unsets the logging callback for a LibVLC instance. This is rarely
@@ -133,7 +153,10 @@ public:
      *
      * \version LibVLC 2.1.0 or later
      */
-    void logUnset();
+    void logUnset()
+    {
+        libvlc_log_unset( get() );
+    }
 
     /**
      * Sets the logging callback for a LibVLC instance. This function is
@@ -153,7 +176,10 @@ public:
      *
      * \version LibVLC 2.1.0 or later
      */
-    void logSet(libvlc_log_cb cb, void * data);
+    void logSet(libvlc_log_cb cb, void * data)
+    {
+        libvlc_log_set(get(), cb, data);
+    }
 
     /**
      * Sets up logging to a file.
@@ -163,7 +189,10 @@ public:
      *
      * \version LibVLC 2.1.0 or later
      */
-    void logSetFile(FILE * stream);
+    void logSetFile(FILE * stream)
+    {
+        libvlc_log_set_file( get(), stream );
+    }
 
     /**
      * Returns a list of audio filters that are available.
@@ -176,7 +205,22 @@ public:
      *
      * \see ModuleDescription::moduleDescriptionListRelease()
      */
-    std::vector<ModuleDescription> audioFilterList();
+    std::vector<ModuleDescription> audioFilterList()
+    {
+        libvlc_module_description_t* result = libvlc_audio_filter_list_get(get());
+        std::vector<ModuleDescription> res;
+        if ( result == NULL )
+            return res;
+        libvlc_module_description_t* p = result;
+        while ( p != NULL )
+        {
+            res.push_back( ModuleDescription( p ) );
+            p = p->p_next;
+        }
+        libvlc_module_description_list_release( result );
+        return res;
+    }
+
 
     /**
      * Returns a list of video filters that are available.
@@ -189,7 +233,21 @@ public:
      *
      * \see ModuleDescription::moduleDescriptionListRelease()
      */
-    std::vector<ModuleDescription> videoFilterList();
+    std::vector<ModuleDescription> videoFilterList()
+    {
+        libvlc_module_description_t* result = libvlc_video_filter_list_get(get());
+        std::vector<ModuleDescription> res;
+        if ( result == NULL )
+            return res;
+        libvlc_module_description_t* p = result;
+        while ( p != NULL )
+        {
+            res.push_back( ModuleDescription( p ) );
+            p = p->p_next;
+        }
+        libvlc_module_description_list_release( result );
+        return res;
+    }
 
     /**
      * Gets the list of available audio output modules.
@@ -200,7 +258,21 @@ public:
      *
      * \see AudioOutputDescription . In case of error, NULL is returned.
      */
-    std::vector<AudioOutputDescription> audioOutputList();
+    std::vector<AudioOutputDescription> audioOutputList()
+    {
+        libvlc_audio_output_t* result = libvlc_audio_output_list_get(get());
+        std::vector<AudioOutputDescription> res;
+        if ( result == NULL )
+            return res;
+        libvlc_audio_output_t* p = result;
+        while ( p != NULL )
+        {
+            res.push_back( AudioOutputDescription( p ) );
+            p = p->p_next;
+        }
+        libvlc_audio_output_list_release(result);
+        return res;
+    }
 
     /**
      * Gets a list of audio output devices for a given audio output module,
@@ -224,7 +296,18 @@ public:
      *
      * \version LibVLC 2.1.0 or later.
      */
-    std::vector<AudioOutputDeviceDescription> audioOutputDeviceList(const std::string& aout);
+    std::vector<AudioOutputDeviceDescription> audioOutputDeviceList(const std::string& aout)
+    {
+        libvlc_audio_output_device_t* devices = libvlc_audio_output_device_list_get( get(), aout.c_str() );
+        std::vector<AudioOutputDeviceDescription> res;
+        if ( devices == NULL )
+            return res;
+        for ( libvlc_audio_output_device_t* p = devices; p != NULL; p = p->p_next )
+            res.push_back( AudioOutputDeviceDescription( p ) );
+        libvlc_audio_output_device_list_release( devices );
+        return res;
+    }
+
 };
 
 } // namespace VLC
