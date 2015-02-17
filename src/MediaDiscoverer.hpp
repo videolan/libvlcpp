@@ -34,7 +34,7 @@ namespace VLC
 class EventManager;
 class Instance;
 
-class VLCPP_API MediaDiscoverer : public Internal<libvlc_media_discoverer_t>
+class MediaDiscoverer : public Internal<libvlc_media_discoverer_t>
 {
 public:
     // libvlc_media_discoverer_new_from_name

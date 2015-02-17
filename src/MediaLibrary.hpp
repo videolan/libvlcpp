@@ -30,7 +30,7 @@
 namespace VLC
 {
 
-class VLCPP_API MediaLibrary : public Internal<libvlc_media_library_t>
+class MediaLibrary : public Internal<libvlc_media_library_t>
 {
 public:
     /**

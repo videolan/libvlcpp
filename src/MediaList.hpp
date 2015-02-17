@@ -34,7 +34,7 @@ class EventManager;
 class MediaDiscoverer;
 class MediaLibrary;
 
-class VLCPP_API MediaList : public Internal<libvlc_media_list_t>
+class MediaList : public Internal<libvlc_media_list_t>
 {
 public:
     /**

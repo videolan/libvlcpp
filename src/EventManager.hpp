@@ -121,7 +121,7 @@ class IVLMEventCb
         virtual void mediaInstanceStatusError( const std::string&, const std::string& ) {}
 };
 
-class VLCPP_API EventManager : public Internal<libvlc_event_manager_t>
+class EventManager : public Internal<libvlc_event_manager_t>
 {
     public:
         EventManager(InternalPtr ptr)

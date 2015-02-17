@@ -38,7 +38,7 @@ class TrackDescription;
 class Instance;
 class Media;
 
-class VLCPP_API MediaPlayer : public Internal<libvlc_media_player_t>
+class MediaPlayer : public Internal<libvlc_media_player_t>
 {
 public:
     /**

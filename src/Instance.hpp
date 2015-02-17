@@ -34,7 +34,7 @@
 namespace VLC
 {
 
-class VLCPP_API Instance : public Internal<libvlc_instance_t>
+class Instance : public Internal<libvlc_instance_t>
 {
 public:
     /**

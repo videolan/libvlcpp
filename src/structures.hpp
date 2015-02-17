@@ -34,7 +34,7 @@ namespace VLC
 class Instance;
 class Media;
 
-class VLCPP_API ModuleDescription
+class ModuleDescription
 {
 public:
     const std::string& name() const
@@ -79,7 +79,7 @@ private:
 };
 
 
-class VLCPP_API MediaTrack
+class MediaTrack
 {
 public:
     enum Type
@@ -250,7 +250,7 @@ private:
 };
 
 
-class VLCPP_API AudioOutputDescription
+class AudioOutputDescription
 {
 public:
     const std::string& name() const
@@ -278,7 +278,7 @@ private:
     friend class Instance;
 };
 
-class VLCPP_API AudioOutputDeviceDescription
+class AudioOutputDeviceDescription
 {
     public:
         /**< Device identifier string */
@@ -309,7 +309,7 @@ class VLCPP_API AudioOutputDeviceDescription
         friend class MediaPlayer;
 };
 
-class VLCPP_API TrackDescription
+class TrackDescription
 {
 public:
     int id() const;
