@@ -32,6 +32,7 @@ namespace VLC
 {
 
 class EventManager;
+class Instance;
 
 class VLCPP_API MediaDiscoverer : public Internal<libvlc_media_discoverer_t>
 {
@@ -46,8 +47,8 @@ public:
      * \warning This is returned as a pointer, as this is not refcounter by VLC, and is
      *          fairly expensive to instantiate.
      */
-    MediaDiscoverer(InstancePtr inst, const std::string& name)
-        : Internal{ libvlc_media_discoverer_new_from_name(inst->get(), name.c_str()),
+    MediaDiscoverer(Instance& inst, const std::string& name)
+        : Internal{ libvlc_media_discoverer_new_from_name(getInternalPtr<libvlc_instance_t>( inst ), name.c_str()),
                     libvlc_media_discoverer_release }
     {
     }
@@ -59,7 +60,7 @@ public:
      */
     std::string localizedName()
     {
-        char* c_result = libvlc_media_discoverer_localized_name(get());
+        char* c_result = libvlc_media_discoverer_localized_name(*this);
         if ( c_result == NULL )
             return std::string();
         std::string result = c_result;
@@ -76,7 +77,7 @@ public:
     {
         if ( m_eventManager )
         {
-            libvlc_event_manager_t* obj = libvlc_media_discoverer_event_manager( get() );
+            libvlc_event_manager_t* obj = libvlc_media_discoverer_event_manager( *this );
             m_eventManager = std::make_shared<EventManager>( obj );
         }
         return m_eventManager;
@@ -89,7 +90,7 @@ public:
      */
     bool isRunning()
     {
-        return libvlc_media_discoverer_is_running(get());
+        return libvlc_media_discoverer_is_running(*this);
     }
 
 private:

@@ -84,7 +84,7 @@ public:
      */
     int addIntf(const std::string& name)
     {
-        return libvlc_add_intf( get(), name.c_str() );
+        return libvlc_add_intf( *this, name.c_str() );
     }
 
     /**
@@ -108,7 +108,7 @@ public:
      */
     void setExitHandler(void(*cb)(void *), void * opaque)
     {
-        libvlc_set_exit_handler( get(), cb, opaque );
+        libvlc_set_exit_handler( *this, cb, opaque );
     }
 
     /**
@@ -124,7 +124,7 @@ public:
      */
     void setUserAgent(const std::string& name, const std::string& http)
     {
-        libvlc_set_user_agent( get(), name.c_str(), http.c_str() );
+        libvlc_set_user_agent( *this, name.c_str(), http.c_str() );
     }
 
     /**
@@ -141,7 +141,7 @@ public:
      */
     void setAppId(const std::string& id, const std::string& version, const std::string& icon)
     {
-        libvlc_set_app_id( get(), id.c_str(), version.c_str(), icon.c_str() );
+        libvlc_set_app_id( *this, id.c_str(), version.c_str(), icon.c_str() );
     }
 
     /**
@@ -155,7 +155,7 @@ public:
      */
     void logUnset()
     {
-        libvlc_log_unset( get() );
+        libvlc_log_unset( *this );
     }
 
     /**
@@ -178,7 +178,7 @@ public:
      */
     void logSet(libvlc_log_cb cb, void * data)
     {
-        libvlc_log_set(get(), cb, data);
+        libvlc_log_set(*this, cb, data);
     }
 
     /**
@@ -191,7 +191,7 @@ public:
      */
     void logSetFile(FILE * stream)
     {
-        libvlc_log_set_file( get(), stream );
+        libvlc_log_set_file( *this, stream );
     }
 
     /**
@@ -207,7 +207,7 @@ public:
      */
     std::vector<ModuleDescription> audioFilterList()
     {
-        libvlc_module_description_t* result = libvlc_audio_filter_list_get(get());
+        libvlc_module_description_t* result = libvlc_audio_filter_list_get(*this);
         std::vector<ModuleDescription> res;
         if ( result == NULL )
             return res;
@@ -235,7 +235,7 @@ public:
      */
     std::vector<ModuleDescription> videoFilterList()
     {
-        libvlc_module_description_t* result = libvlc_video_filter_list_get(get());
+        libvlc_module_description_t* result = libvlc_video_filter_list_get(*this);
         std::vector<ModuleDescription> res;
         if ( result == NULL )
             return res;
@@ -260,7 +260,7 @@ public:
      */
     std::vector<AudioOutputDescription> audioOutputList()
     {
-        libvlc_audio_output_t* result = libvlc_audio_output_list_get(get());
+        libvlc_audio_output_t* result = libvlc_audio_output_list_get(*this);
         std::vector<AudioOutputDescription> res;
         if ( result == NULL )
             return res;
@@ -298,7 +298,7 @@ public:
      */
     std::vector<AudioOutputDeviceDescription> audioOutputDeviceList(const std::string& aout)
     {
-        libvlc_audio_output_device_t* devices = libvlc_audio_output_device_list_get( get(), aout.c_str() );
+        libvlc_audio_output_device_t* devices = libvlc_audio_output_device_list_get( *this, aout.c_str() );
         std::vector<AudioOutputDeviceDescription> res;
         if ( devices == NULL )
             return res;

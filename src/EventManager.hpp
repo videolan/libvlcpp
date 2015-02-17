@@ -135,7 +135,7 @@ class VLCPP_API EventManager : public Internal<libvlc_event_manager_t>
                 return false;
             if ( type < libvlc_MediaMetaChanged || type > libvlc_MediaSubItemTreeAdded )
                 return false;
-            libvlc_event_attach( get(), type, &handleMediaEvent, cb );
+            libvlc_event_attach( *this,type, &handleMediaEvent, cb );
             return true;
         }
 
@@ -145,7 +145,7 @@ class VLCPP_API EventManager : public Internal<libvlc_event_manager_t>
                 return false;
             if ( type < libvlc_MediaPlayerMediaChanged || type > libvlc_MediaPlayerESSelected )
                 return false;
-            libvlc_event_attach( get(), type, &handleMediaPlayerEvent, cb );
+            libvlc_event_attach( *this,type, &handleMediaPlayerEvent, cb );
             return true;
         }
 
@@ -155,7 +155,7 @@ class VLCPP_API EventManager : public Internal<libvlc_event_manager_t>
                 return false;
             if ( type < libvlc_MediaListItemAdded || type > libvlc_MediaListWillDeleteItem )
                 return false;
-            libvlc_event_attach( get(), type, &handleMediaListEvent, cb );
+            libvlc_event_attach( *this,type, &handleMediaListEvent, cb );
             return true;
         }
 
@@ -165,7 +165,7 @@ class VLCPP_API EventManager : public Internal<libvlc_event_manager_t>
                 return false;
             if ( type < libvlc_MediaListPlayerPlayed || type > libvlc_MediaListPlayerStopped )
                 return false;
-            libvlc_event_attach( get(), type, &handleMediaListPlayerEvent, cb );
+            libvlc_event_attach( *this,type, &handleMediaListPlayerEvent, cb );
             return true;
         }
 
@@ -175,7 +175,7 @@ class VLCPP_API EventManager : public Internal<libvlc_event_manager_t>
                 return false;
             if ( type < libvlc_MediaDiscovererStarted || type > libvlc_MediaDiscovererEnded )
                 return false;
-            libvlc_event_attach( get(), type, &handleMediaDiscovererEvent, cb );
+            libvlc_event_attach( *this,type, &handleMediaDiscovererEvent, cb );
             return true;
         }
 
@@ -185,38 +185,38 @@ class VLCPP_API EventManager : public Internal<libvlc_event_manager_t>
                 return false;
             if ( type < libvlc_VlmMediaAdded || type > libvlc_VlmMediaInstanceStatusError )
                 return false;
-            libvlc_event_attach( get(), type, &handleVLMEvent, cb );
+            libvlc_event_attach( *this,type, &handleVLMEvent, cb );
             return true;
         }
 
         void detach( libvlc_event_type_t type, IMediaEventCb* cb )
         {
-            libvlc_event_detach( get(), type, &handleMediaEvent, cb );
+            libvlc_event_detach( *this,type, &handleMediaEvent, cb );
         }
 
         void detach( libvlc_event_type_t type, IMediaPlayerEventCb* cb )
         {
-            libvlc_event_detach( get(), type, &handleMediaPlayerEvent, cb );
+            libvlc_event_detach( *this,type, &handleMediaPlayerEvent, cb );
         }
 
         void detach( libvlc_event_type_t type, IMediaListEventCb* cb )
         {
-            libvlc_event_detach( get(), type, &handleMediaListEvent, cb );
+            libvlc_event_detach( *this,type, &handleMediaListEvent, cb );
         }
 
         void detach( libvlc_event_type_t type, IMediaListPlayerEventCb* cb )
         {
-            libvlc_event_detach( get(), type, &handleMediaListPlayerEvent, cb );
+            libvlc_event_detach( *this,type, &handleMediaListPlayerEvent, cb );
         }
 
         void detach( libvlc_event_type_t type, IMediaDiscovererEventCb* cb )
         {
-            libvlc_event_detach( get(), type, &handleMediaDiscovererEvent, cb );
+            libvlc_event_detach( *this,type, &handleMediaDiscovererEvent, cb );
         }
 
         void detach( libvlc_event_type_t type, IVLMEventCb* cb )
         {
-            libvlc_event_detach( get(), type, &handleVLMEvent, cb );
+            libvlc_event_detach( *this,type, &handleVLMEvent, cb );
         }
 
     private:

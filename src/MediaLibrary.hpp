@@ -38,8 +38,9 @@ public:
      *
      * \param p_instance  the libvlc instance
      */
-    MediaLibrary(InstancePtr instance)
-        : Internal{ libvlc_media_library_new( instance->get() ), libvlc_media_library_release }
+    MediaLibrary(Instance& instance)
+        : Internal{ libvlc_media_library_new( getInternalPtr<libvlc_instance_t>( instance ) ),
+                    libvlc_media_library_release }
     {
     }
 
@@ -60,7 +61,7 @@ public:
      */
     int load()
     {
-        return libvlc_media_library_load(get());
+        return libvlc_media_library_load(*this);
     }
 };
 

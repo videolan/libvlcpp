@@ -29,7 +29,10 @@
 namespace VLC
 {
 
+class Media;
 class EventManager;
+class MediaDiscoverer;
+class MediaLibrary;
 
 class VLCPP_API MediaList : public Internal<libvlc_media_list_t>
 {
@@ -52,8 +55,8 @@ public:
      *
      * \param p_md  media descriptor object
      */
-    MediaList(MediaPtr md)
-        : Internal{ libvlc_media_subitems( md->get() ), libvlc_media_list_release }
+    MediaList(Media& md)
+        : Internal{ libvlc_media_subitems( getInternalPtr<libvlc_media_t>( md ) ), libvlc_media_list_release }
     {
     }
 
@@ -63,8 +66,9 @@ public:
      *
      * \param p_mdis  media service discover object
      */
-    MediaList(MediaDiscovererPtr mdis)
-        : Internal{ libvlc_media_discoverer_media_list( mdis->get() ), libvlc_media_list_release }
+    MediaList(MediaDiscoverer& mdis)
+        : Internal{ libvlc_media_discoverer_media_list( getInternalPtr<libvlc_media_discoverer_t>( mdis ) ),
+                    libvlc_media_list_release }
     {
     }
 
@@ -74,8 +78,8 @@ public:
      *
      * \param p_mlib  media library object
      */
-    MediaList(MediaLibraryPtr mlib )
-        : Internal{ libvlc_media_library_media_list( mlib->get() ), libvlc_media_list_release }
+    MediaList(MediaLibrary& mlib )
+        : Internal{ libvlc_media_library_media_list( getInternalPtr<libvlc_media_library_t>( mlib ) ), libvlc_media_list_release }
     {
     }
 
@@ -86,8 +90,9 @@ public:
      *
      * \param p_instance  libvlc instance
      */
-    MediaList(InstancePtr instance)
-        : Internal{ libvlc_media_list_new( instance->get() ), libvlc_media_list_release }
+    MediaList(Instance& instance)
+        : Internal{ libvlc_media_list_new( getInternalPtr<libvlc_instance_t>( instance ) ),
+                                           libvlc_media_list_release }
     {
     }
 
@@ -98,9 +103,9 @@ public:
      *
      * \param p_md  media instance to add
      */
-    void setMedia(MediaPtr md)
+    void setMedia(Media& md)
     {
-        libvlc_media_list_set_media( get(), md->get() );
+        libvlc_media_list_set_media( *this, getInternalPtr<libvlc_media_t>( md ) );
     }
 
     /**
@@ -111,9 +116,9 @@ public:
      *
      * \return 0 on success, -1 if the media list is read-only
      */
-    int addMedia(MediaPtr p_md)
+    int addMedia(Media& md)
     {
-        return libvlc_media_list_add_media( get(), p_md->get() );
+        return libvlc_media_list_add_media( *this, getInternalPtr<libvlc_media_t>( md ) );
     }
 
     /**
@@ -126,9 +131,9 @@ public:
      *
      * \return 0 on success, -1 if the media list is read-only
      */
-    int insertMedia(MediaPtr md, int pos)
+    int insertMedia(Media& md, int pos)
     {
-        return libvlc_media_list_insert_media( get(), md->get(), pos );
+        return libvlc_media_list_insert_media( *this, getInternalPtr<libvlc_media_t>( md ), pos );
     }
 
     /**
@@ -142,7 +147,7 @@ public:
      */
     int removeIndex(int i_pos)
     {
-        return libvlc_media_list_remove_index(get(), i_pos);
+        return libvlc_media_list_remove_index(*this,i_pos);
     }
 
     /**
@@ -153,7 +158,7 @@ public:
      */
     int count()
     {
-        return libvlc_media_list_count(get());
+        return libvlc_media_list_count(*this);
     }
 
     /**
@@ -166,10 +171,10 @@ public:
      * case of success, Media::retain() is called to increase the refcount on
      * the media.
      */
-    Media itemAtIndex(int i_pos)
+    MediaPtr itemAtIndex(int i_pos)
     {
-        Media::InternalPtr ptr = libvlc_media_list_item_at_index(get(), i_pos);
-        return Media( ptr, false );
+        auto ptr = libvlc_media_list_item_at_index(*this,i_pos);
+        return std::make_shared<Media>( ptr, false );
     }
 
     /**
@@ -181,9 +186,9 @@ public:
      *
      * \return position of media instance or -1 if media not found
      */
-    int indexOfItem(MediaPtr md)
+    int indexOfItem(Media& md)
     {
-        return libvlc_media_list_index_of_item( get(), md->get() );
+        return libvlc_media_list_index_of_item( *this, getInternalPtr<libvlc_media_t>( md ) );
     }
 
     /**
@@ -194,7 +199,7 @@ public:
      */
     bool isReadonly()
     {
-        return libvlc_media_list_is_readonly(get());
+        return libvlc_media_list_is_readonly(*this);
     }
 
     /**
@@ -202,7 +207,7 @@ public:
      */
     void lock()
     {
-        libvlc_media_list_lock(get());
+        libvlc_media_list_lock(*this);
     }
 
     /**
@@ -211,7 +216,7 @@ public:
      */
     void unlock()
     {
-        libvlc_media_list_unlock(get());
+        libvlc_media_list_unlock(*this);
     }
 
     /**
@@ -224,7 +229,7 @@ public:
     {
         if ( m_eventManager )
         {
-            libvlc_event_manager_t* obj = libvlc_media_list_event_manager( get() );
+            libvlc_event_manager_t* obj = libvlc_media_list_event_manager( *this );
             m_eventManager = std::make_shared<EventManager>( obj );
         }
         return m_eventManager;

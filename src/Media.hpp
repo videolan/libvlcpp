@@ -34,6 +34,8 @@ namespace VLC
 
 class MediaPlayer;
 class EventManager;
+class Instance;
+class MediaList;
 
 class VLCPP_API Media : public Internal<libvlc_media_t>
 {
@@ -67,27 +69,27 @@ public:
      * @param mrl       A path, location, or node name, depending on the 3rd parameter
      * @param type      The type of the 2nd argument. \sa{FromType}
      */
-    Media(InstancePtr instance, const std::string& mrl, FromType type)
+    Media(Instance& instance, const std::string& mrl, FromType type)
         : Internal{ libvlc_media_release }
     {
         InternalPtr ptr = nullptr;
         switch (type)
         {
         case FromLocation:
-            ptr = libvlc_media_new_location( instance->get(), mrl.c_str() );
+            ptr = libvlc_media_new_location( getInternalPtr<libvlc_instance_t>( instance ), mrl.c_str() );
             break;
         case FromPath:
-            ptr = libvlc_media_new_path( instance->get(), mrl.c_str() );
+            ptr = libvlc_media_new_path( getInternalPtr<libvlc_instance_t>( instance ), mrl.c_str() );
             break;
         case AsNode:
-            ptr = libvlc_media_new_as_node( instance->get(), mrl.c_str() );
+            ptr = libvlc_media_new_as_node( getInternalPtr<libvlc_instance_t>( instance ), mrl.c_str() );
             break;
         default:
             break;
         }
         if ( ptr == nullptr )
             throw std::runtime_error("Failed to construct a media");
-        m_obj.reset( ptr );
+        m_obj.reset( ptr, libvlc_media_release );
     }
 
     /**
@@ -110,8 +112,9 @@ public:
      * \param fd open file descriptor
      * \return the newly created media or NULL on error
      */
-    Media(InstancePtr instance, int fd)
-        : Internal { libvlc_media_new_fd( instance->get(), fd ), libvlc_media_release }
+    Media(Instance& instance, int fd)
+        : Internal { libvlc_media_new_fd( getInternalPtr<libvlc_instance_t>( instance ), fd ),
+                     libvlc_media_release }
     {
     }
 
@@ -123,13 +126,13 @@ public:
      * \param p_ml a media list instance
      * \return media instance
      */
-    Media(MediaListPtr list)
+    Media(MediaList& list)
         : Internal{ libvlc_media_list_media( getInternalPtr<libvlc_media_list_t>( list ) ),
                     libvlc_media_release }
     {
     }
 
-    explicit Media(Internal::InternalPtr ptr, bool incrementRefCount)
+    explicit Media( Internal::InternalPtr ptr, bool incrementRefCount)
         : Internal{ ptr, libvlc_media_release }
     {
         if (incrementRefCount)
@@ -166,7 +169,7 @@ public:
      */
     void addOption(const std::string& psz_options)
     {
-        libvlc_media_add_option(get(), psz_options.c_str());
+        libvlc_media_add_option(*this,psz_options.c_str());
     }
 
     /**
@@ -188,7 +191,7 @@ public:
      */
     void addOptionFlag(const std::string& psz_options, unsigned i_flags)
     {
-        libvlc_media_add_option_flag(get(), psz_options.c_str(), i_flags);
+        libvlc_media_add_option_flag(*this,psz_options.c_str(), i_flags);
     }
 
     /**
@@ -198,7 +201,7 @@ public:
      */
     std::string mrl()
     {
-        char* c_result = libvlc_media_get_mrl(get());
+        char* c_result = libvlc_media_get_mrl(*this);
         if ( c_result == NULL )
             return std::string();
         std::string result = c_result;
@@ -211,7 +214,7 @@ public:
      */
     MediaPtr duplicate()
     {
-        InternalPtr obj = libvlc_media_duplicate(get());
+        auto obj = libvlc_media_duplicate(*this);
         return std::make_shared<Media>( obj, false );
     }
 
@@ -237,7 +240,7 @@ public:
      */
     std::string meta(libvlc_meta_t e_meta)
     {
-        char* c_result = libvlc_media_get_meta(get(), e_meta);
+        char* c_result = libvlc_media_get_meta(*this, e_meta);
         if ( c_result == NULL )
             return std::string();
         std::string result = c_result;
@@ -255,7 +258,7 @@ public:
      */
     void setMeta(libvlc_meta_t e_meta, const std::string& psz_value)
     {
-        libvlc_media_set_meta(get(), e_meta, psz_value.c_str());
+        libvlc_media_set_meta(*this, e_meta, psz_value.c_str());
     }
 
 
@@ -266,7 +269,7 @@ public:
      */
     int saveMeta()
     {
-        return libvlc_media_save_meta(get());
+        return libvlc_media_save_meta(*this);
     }
 
     /**
@@ -281,7 +284,7 @@ public:
      */
     libvlc_state_t state()
     {
-        return libvlc_media_get_state(get());
+        return libvlc_media_get_state(*this);
     }
 
     /**
@@ -294,7 +297,7 @@ public:
      */
     bool stats(libvlc_media_stats_t * p_stats)
     {
-        return libvlc_media_get_stats(get(), p_stats);
+        return libvlc_media_get_stats(*this,p_stats);
     }
 
     /**
@@ -307,7 +310,7 @@ public:
     {
         if ( m_eventManager == NULL )
         {
-            libvlc_event_manager_t* obj = libvlc_media_event_manager(get());
+            libvlc_event_manager_t* obj = libvlc_media_event_manager(*this);
             m_eventManager = std::make_shared<EventManager>( obj );
         }
         return m_eventManager;
@@ -320,7 +323,7 @@ public:
      */
     libvlc_time_t duration()
     {
-        return libvlc_media_get_duration(get());
+        return libvlc_media_get_duration(*this);
     }
 
     /**
@@ -337,7 +340,7 @@ public:
      */
     void parse()
     {
-        libvlc_media_parse(get());
+        libvlc_media_parse(*this);
     }
 
     /**
@@ -360,7 +363,7 @@ public:
      */
     void parseAsync()
     {
-        libvlc_media_parse_async(get());
+        libvlc_media_parse_async(*this);
     }
 
     /**
@@ -373,7 +376,7 @@ public:
      */
     bool isParsed()
     {
-        return libvlc_media_is_parsed(get());
+        return libvlc_media_is_parsed(*this);
     }
 
     /**
@@ -385,7 +388,7 @@ public:
      */
     void setUserData(void * p_new_user_data)
     {
-        libvlc_media_set_user_data(get(), p_new_user_data);
+        libvlc_media_set_user_data(*this, p_new_user_data);
     }
 
     /**
@@ -395,7 +398,7 @@ public:
      */
     void* userData()
     {
-        return libvlc_media_get_user_data(get());
+        return libvlc_media_get_user_data(*this);
     }
 
     /**
@@ -412,7 +415,7 @@ public:
     std::vector<MediaTrack> tracks()
     {
         libvlc_media_track_t**  tracks;
-        uint32_t                nbTracks = libvlc_media_tracks_get(get(), &tracks);
+        uint32_t                nbTracks = libvlc_media_tracks_get(*this, &tracks);
         std::vector<MediaTrack> res;
 
         if ( nbTracks == 0 )
@@ -434,7 +437,7 @@ private:
     void retain()
     {
         if ( isValid() )
-            libvlc_media_retain(get());
+            libvlc_media_retain(*this);
     }
 
 

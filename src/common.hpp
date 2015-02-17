@@ -50,21 +50,6 @@ namespace VLC
     class Media;
     using MediaPtr = std::shared_ptr<Media>;
 
-    class Instance;
-    using InstancePtr = std::shared_ptr<Instance>;
-
-    class MediaDiscoverer;
-    using MediaDiscovererPtr = std::shared_ptr<MediaDiscoverer>;
-
-    class MediaPlayer;
-    using MediaPlayerPtr = std::shared_ptr<MediaPlayer>;
-
-    class MediaList;
-    using MediaListPtr = std::shared_ptr<MediaList>;
-
-    class MediaLibrary;
-    using MediaLibraryPtr = std::shared_ptr<MediaLibrary>;
-
     // Work around cross class dependencies
     // Class A needs to access B's internal pointer
     // Class B needs to access A's internal pointer
@@ -73,10 +58,10 @@ namespace VLC
     // already knows everything it needs.
     // The only drawback is that we can't return decltype(ptr->get()), since when
     // the compiler checks for the prototype, it hasn't parsed all the declarations yet.
-    template <typename TYPE, typename PTR>
-    TYPE* getInternalPtr(const std::shared_ptr<PTR>& ptr)
+    template <typename TYPE, typename REF>
+    TYPE* getInternalPtr(const REF& ref)
     {
-        return ptr->get();
+        return ref.get();
     }
 }
 

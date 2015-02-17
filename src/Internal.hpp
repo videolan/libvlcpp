@@ -38,17 +38,24 @@ class Internal
     public:
         using InternalType  = T;
         using InternalPtr   = T*;
-        using Pointer       = std::unique_ptr<T, Releaser>;
+        using Pointer       = std::shared_ptr<T>;
 
-        InternalPtr get() { return m_obj.get(); }
+        InternalPtr get() const { return m_obj.get(); }
+
         bool isValid() const { return (bool)m_obj; }
+
+        operator T*() const { return m_obj.get(); }
+
     protected:
+        Internal() = default;
+
         Internal( InternalPtr obj, Releaser releaser )
             : m_obj{ obj, releaser }
         {
             if ( obj == nullptr )
                 throw std::runtime_error("Wrapping a NULL instance");
         }
+
         Internal(Releaser releaser)
             : m_obj{ nullptr, releaser }
         {

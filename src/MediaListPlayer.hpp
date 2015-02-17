@@ -53,8 +53,9 @@ public:
      *
      * \param p_instance  libvlc instance
      */
-    MediaListPlayer(InstancePtr instance)
-        : Internal{ libvlc_media_list_player_new( instance->get() ), libvlc_media_list_player_release }
+    MediaListPlayer(Instance& instance)
+        : Internal{ libvlc_media_list_player_new( getInternalPtr<libvlc_instance_t>( instance ) ),
+                    libvlc_media_list_player_release }
     {
     }
 
@@ -68,7 +69,7 @@ public:
     {
         if ( m_eventManager )
         {
-            libvlc_event_manager_t* obj = libvlc_media_list_player_event_manager(get());
+            libvlc_event_manager_t* obj = libvlc_media_list_player_event_manager(*this);
             m_eventManager = std::make_shared<EventManager>( obj );
         }
         return m_eventManager;
@@ -80,9 +81,9 @@ public:
      *
      * \param p_mi  media player instance
      */
-    void setMediaPlayer(MediaPlayerPtr mi)
+    void setMediaPlayer(const MediaPlayer& mi)
     {
-        libvlc_media_list_player_set_media_player( get(),
+        libvlc_media_list_player_set_media_player( *this,
                         getInternalPtr<libvlc_media_player_t>( mi ) );
     }
 
@@ -91,9 +92,9 @@ public:
      *
      * \param p_mlist  list of media
      */
-    void setMediaList(MediaListPtr mlist)
+    void setMediaList(const MediaList& mlist)
     {
-        libvlc_media_list_player_set_media_list( get(),
+        libvlc_media_list_player_set_media_list( *this,
                             getInternalPtr<libvlc_media_list_t>( mlist ) );
     }
 
@@ -102,7 +103,7 @@ public:
      */
     void play()
     {
-        libvlc_media_list_player_play(get());
+        libvlc_media_list_player_play(*this);
     }
 
     /**
@@ -110,7 +111,7 @@ public:
      */
     void pause()
     {
-        libvlc_media_list_player_pause(get());
+        libvlc_media_list_player_pause(*this);
     }
 
     /**
@@ -120,7 +121,7 @@ public:
      */
     bool isPlaying()
     {
-        return libvlc_media_list_player_is_playing(get()) != 0;
+        return libvlc_media_list_player_is_playing(*this) != 0;
     }
 
     /**
@@ -130,7 +131,7 @@ public:
      */
     libvlc_state_t state()
     {
-        return libvlc_media_list_player_get_state( get() );
+        return libvlc_media_list_player_get_state( *this );
     }
 
     /**
@@ -142,7 +143,7 @@ public:
      */
     int playItemAtIndex(int i_index)
     {
-        return libvlc_media_list_player_play_item_at_index(get(), i_index);
+        return libvlc_media_list_player_play_item_at_index(*this, i_index);
     }
 
     /**
@@ -152,9 +153,9 @@ public:
      *
      * \return 0 upon success, -1 if the media is not part of the media list
      */
-    int playItem(MediaPtr md)
+    int playItem(const Media& md)
     {
-        return libvlc_media_list_player_play_item( get(),
+        return libvlc_media_list_player_play_item( *this,
                         getInternalPtr<libvlc_media_t>( md ) );
     }
 
@@ -163,7 +164,7 @@ public:
      */
     void stop()
     {
-        libvlc_media_list_player_stop(get());
+        libvlc_media_list_player_stop(*this);
     }
 
     /**
@@ -173,7 +174,7 @@ public:
      */
     int next()
     {
-        return libvlc_media_list_player_next(get());
+        return libvlc_media_list_player_next(*this);
     }
 
     /**
@@ -183,7 +184,7 @@ public:
      */
     int previous()
     {
-        return libvlc_media_list_player_previous(get());
+        return libvlc_media_list_player_previous(*this);
     }
 
     /**
@@ -193,7 +194,7 @@ public:
      */
     void setPlaybackMode(libvlc_playback_mode_t e_mode)
     {
-        libvlc_media_list_player_set_playback_mode(get(), e_mode);
+        libvlc_media_list_player_set_playback_mode(*this, e_mode);
     }
 
 private:

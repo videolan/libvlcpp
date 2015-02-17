@@ -19,22 +19,15 @@ include(cpp11)
 add_definitions("-Wall -Wextra -pedantic")
 EnableCpp11()
 
+file(GLOB LIBVLCPP_HEADERS "${CMAKE_SOURCE_DIR}/src/*.hpp")
 add_executable(${PROJECT_NAME}
     test/main.cpp
+    ${LIBVLCPP_HEADERS}
 )
 
 include_directories("${CMAKE_SOURCE_DIR}/src/")
 
-file(GLOB LIBVLCPP_PUBLIC_HEADERS "${CMAKE_SOURCE_DIR}/src/*.hpp")
-set_target_properties(${PROJECT_NAME} PROPERTIES
-    PUBLIC_HEADER "${LIBVLCPP_PUBLIC_HEADERS}"
-)
 
 find_package(LIBVLC REQUIRED)
 target_link_libraries( ${PROJECT_NAME} ${LIBVLC_LIBRARY} ${LIBVLCCORE_LIBRARY} )
 include_directories(${LIBVLC_INCLUDE_DIR})
-
-file(RELATIVE_PATH REL_INCLUDE_DIR "${INSTALL_CMAKE_DIR}" "${INSTALL_INCLUDE_DIR}")
-set(CONF_INCLUDE_DIRS "\${LIBVLCPP_CMAKE_DIR}/${REL_INCLUDE_DIR}")
-
-
