@@ -201,12 +201,10 @@ public:
      */
     std::string mrl()
     {
-        char* c_result = libvlc_media_get_mrl(*this);
-        if ( c_result == NULL )
-            return std::string();
-        std::string result = c_result;
-        libvlc_free(c_result);
-        return result;
+        auto str = wrapCStr( libvlc_media_get_mrl(*this) );
+        if ( str == nullptr )
+            return {};
+        return str.get();
     }
 
     /**
@@ -240,12 +238,10 @@ public:
      */
     std::string meta(libvlc_meta_t e_meta)
     {
-        char* c_result = libvlc_media_get_meta(*this, e_meta);
-        if ( c_result == NULL )
-            return std::string();
-        std::string result = c_result;
-        libvlc_free(c_result);
-        return result;
+        auto str = wrapCStr(libvlc_media_get_meta(*this, e_meta) );
+        if ( str == nullptr )
+            return {};
+        return str.get();
     }
 
     /**

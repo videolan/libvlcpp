@@ -1147,12 +1147,10 @@ public:
      */
     std::string aspectRatio()
     {
-        char* c_result = libvlc_video_get_aspect_ratio(*this);
-        if ( c_result == NULL )
-            return std::string();
-        std::string result = c_result;
-        libvlc_free(c_result);
-        return result;
+        auto str = wrapCStr( libvlc_video_get_aspect_ratio(*this) );
+        if ( str == nullptr )
+            return {};
+        return str.get();
     }
 
     /**
@@ -1289,12 +1287,10 @@ public:
      */
     std::string cropGeometry()
     {
-        char* c_result = libvlc_video_get_crop_geometry(*this);
-        if ( c_result == NULL )
-            return std::string();
-        std::string result = c_result;
-        libvlc_free(c_result);
-        return result;
+        auto str = wrapCStr( libvlc_video_get_crop_geometry(*this) );
+        if ( str == nullptr )
+            return {};
+        return str.get();
     }
 
     /**
@@ -1424,12 +1420,10 @@ public:
      */
     std::string marqueeString(unsigned option)
     {
-        char* c_result = libvlc_video_get_marquee_string(*this, option);
-        if ( c_result == NULL )
-            return std::string();
-        std::string result = c_result;
-        libvlc_free(c_result);
-        return result;
+        auto str = wrapCStr( libvlc_video_get_marquee_string(*this, option) );
+        if ( str == nullptr )
+            return {};
+        return str.get();
     }
 
     /**

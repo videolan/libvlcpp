@@ -60,12 +60,10 @@ public:
      */
     std::string localizedName()
     {
-        char* c_result = libvlc_media_discoverer_localized_name(*this);
-        if ( c_result == NULL )
-            return std::string();
-        std::string result = c_result;
-        libvlc_free(c_result);
-        return result;
+        auto str = wrapCStr( libvlc_media_discoverer_localized_name(*this) );
+        if ( str == nullptr )
+            return {};
+        return str.get();
     }
 
     /**
