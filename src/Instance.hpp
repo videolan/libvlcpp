@@ -207,17 +207,17 @@ public:
      */
     std::vector<ModuleDescription> audioFilterList()
     {
-        libvlc_module_description_t* result = libvlc_audio_filter_list_get(*this);
+        auto releaser = [](libvlc_module_description_t* ptr) { libvlc_module_description_list_release(ptr); };
+        auto ptr = std::unique_ptr<libvlc_module_description_t, decltype(releaser)>( libvlc_audio_filter_list_get(*this), releaser );
+        if ( ptr == nullptr )
+            return {};
+        libvlc_module_description_t* p = ptr.get();
         std::vector<ModuleDescription> res;
-        if ( result == NULL )
-            return res;
-        libvlc_module_description_t* p = result;
         while ( p != NULL )
         {
             res.push_back( ModuleDescription( p ) );
             p = p->p_next;
         }
-        libvlc_module_description_list_release( result );
         return res;
     }
 
@@ -235,17 +235,17 @@ public:
      */
     std::vector<ModuleDescription> videoFilterList()
     {
-        libvlc_module_description_t* result = libvlc_video_filter_list_get(*this);
+        auto releaser = [](libvlc_module_description_t* ptr) { libvlc_module_description_list_release(ptr); };
+        auto ptr = std::unique_ptr<libvlc_module_description_t, decltype(releaser)>( libvlc_video_filter_list_get(*this), releaser );
+        if ( ptr == nullptr )
+            return {};
+        libvlc_module_description_t* p = ptr.get();
         std::vector<ModuleDescription> res;
-        if ( result == NULL )
-            return res;
-        libvlc_module_description_t* p = result;
         while ( p != NULL )
         {
             res.push_back( ModuleDescription( p ) );
             p = p->p_next;
         }
-        libvlc_module_description_list_release( result );
         return res;
     }
 
