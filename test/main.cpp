@@ -11,6 +11,13 @@ int main(int ac, char** av)
         return 1;
     }
     auto instance = VLC::Instance(0, nullptr);
+
+    auto audioFilters = instance.audioFilterList();
+    for (const auto& f : audioFilters)
+    {
+        std::cout << f.name() << std::endl;
+    }
+
     auto media = VLC::Media(instance, av[1], VLC::Media::FromPath);
     auto mp = VLC::MediaPlayer(media);
     auto eventManager = mp.eventManager();
@@ -19,9 +26,6 @@ int main(int ac, char** av)
     });
     mp.play();
 
-    std::this_thread::sleep_for( std::chrono::seconds( 20 ) );
+    std::this_thread::sleep_for( std::chrono::seconds( 10 ) );
     mp.stop();
-
-    // This should not compile:
-    //VLC::Media m = *(media.get());
 }
