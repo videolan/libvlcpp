@@ -1537,9 +1537,7 @@ public:
      */
     float adjustFloat(unsigned option)
     {
-        float c_result = libvlc_video_get_adjust_float(*this,option);
-        float result = c_result;
-        return result;
+        return libvlc_video_get_adjust_float(*this, option);
     }
 
     /**
