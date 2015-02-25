@@ -13,6 +13,10 @@ int main(int ac, char** av)
     auto instance = VLC::Instance(0, nullptr);
     auto media = VLC::Media(instance, av[1], VLC::Media::FromPath);
     auto mp = VLC::MediaPlayer(media);
+    auto eventManager = mp.eventManager();
+    eventManager->onPlaying([&media]() {
+        std::cout << media.mrl() << " is playing" << std::endl;
+    });
     mp.play();
 
     std::this_thread::sleep_for( std::chrono::seconds( 20 ) );

@@ -32,11 +32,11 @@
 namespace VLC
 {
 
-class EventManager;
 class AudioOutputDeviceDescription;
 class TrackDescription;
 class Instance;
 class Media;
+class MediaPlayerEventManager;
 
 class MediaPlayer : public Internal<libvlc_media_player_t>
 {
@@ -105,12 +105,12 @@ public:
      *
      * \return the event manager associated with p_mi
      */
-    EventManagerPtr eventManager()
+    MediaPlayerEventManagerPtr eventManager()
     {
         if ( m_eventManager == NULL )
         {
             libvlc_event_manager_t* obj = libvlc_media_player_event_manager( *this );
-            m_eventManager = std::make_shared<EventManager>( obj );
+            m_eventManager = std::make_shared<MediaPlayerEventManager>( obj );
         }
         return m_eventManager;
     }
@@ -1575,7 +1575,7 @@ private:
     }
 
 private:
-    EventManagerPtr m_eventManager;
+    MediaPlayerEventManagerPtr m_eventManager;
 
 };
 
