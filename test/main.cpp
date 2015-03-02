@@ -24,6 +24,12 @@ int main(int ac, char** av)
     eventManager->onPlaying([&media]() {
         std::cout << media.mrl() << " is playing" << std::endl;
     });
+    /*
+     * Should trigger static_assert:
+     *
+     * eventManager->onPlaying([](std::string){});
+     * eventManager->onPlaying([] { return 0;} );
+    */
     mp.play();
 
     std::this_thread::sleep_for( std::chrono::seconds( 10 ) );
