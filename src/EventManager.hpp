@@ -77,8 +77,6 @@ private:
         virtual void unregister() = 0;
     };
 
-    using RegisteredEvent = EventHandlerBase&;
-
     template <typename Func>
     class EventHandler : public EventHandlerBase
     {
@@ -162,6 +160,8 @@ public:
     EventManager& operator=(EventManager&&) = default;
 
 protected:
+    using RegisteredEvent = EventHandlerBase&;
+
     /**
      * @brief handle        Provides the common behavior for all event handlers
      * @param eventType     The libvlc type of event
