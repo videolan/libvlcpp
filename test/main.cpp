@@ -32,6 +32,19 @@ int main(int ac, char** av)
     */
     mp.play();
 
-    std::this_thread::sleep_for( std::chrono::seconds( 10 ) );
+    bool expected = true;
+
+    auto& handler = mp.eventManager()->onPositionChanged([&expected](float pos) {
+        std::cout << "position changed " << pos << std::endl;
+        assert(expected);
+    });
+    std::this_thread::sleep_for( std::chrono::seconds( 2 ) );
+    handler.unregister();
+    // handler must be considered a dangling reference from now on.
+    // We might want to fix this, but is it worth the cost of a shared/weak_pointer?
+    expected = false;
+
+    std::this_thread::sleep_for( std::chrono::seconds( 2 ) );
+
     mp.stop();
 }
