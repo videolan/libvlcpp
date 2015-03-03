@@ -1,7 +1,7 @@
 /*****************************************************************************
  * EventManager.hpp: Exposes libvlc events
  *****************************************************************************
- * Copyright © 2014 the VideoLAN team
+ * Copyright © 2015 libvlcpp authors & VideoLAN
  *
  * Authors: Hugo Beauzée-Luyssen <hugo@beauzee.fr>
  *

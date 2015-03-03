@@ -1,7 +1,7 @@
 /*****************************************************************************
  * MediaLibrary.hpp: MediaLibrary API
  *****************************************************************************
- * Copyright © 2014 the VideoLAN team
+ * Copyright © 2015 libvlcpp authors & VideoLAN
  *
  * Authors: Alexey Sokolov <alexey@alexeysokolov.co.cc>
  *          Hugo Beauzée-Luyssen <hugo@beauzee.fr>
