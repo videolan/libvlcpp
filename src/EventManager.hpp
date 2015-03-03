@@ -52,9 +52,6 @@ class EventManager : public Internal<libvlc_event_manager_t>
 {
 protected:
     template <typename T>
-    using Decay = typename std::decay<T>::type;
-
-    template <typename T>
     using DecayPtr = typename std::add_pointer<typename std::decay<T>::type>::type;
 
     template <typename, typename, typename = void>
@@ -111,7 +108,10 @@ private:
         EventHandler(const EventHandler&) = delete;
 
     private:
-        Decay<Func> m_userCallback;
+        // Deduced type is Func& in case of lvalue; Func in case of rvalue.
+        // So we hold a reference to the callback when passed a lvalue, we
+        // copy construct it when passing a rvalue
+        Func m_userCallback;
         // EventManager always outlive EventHandler, no need for smart pointer
         EventManager* m_eventManager;
         Wrapper m_wrapper;
