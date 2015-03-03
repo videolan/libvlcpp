@@ -152,6 +152,8 @@ public:
 
     EventManager& operator=(const EventManager& em)
     {
+        if (this == &em)
+            return *this;
         Internal::operator=(em);
         return *this;
     }
