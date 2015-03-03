@@ -34,24 +34,13 @@ int main(int ac, char** av)
     }
     auto instance = VLC::Instance(0, nullptr);
 
-    auto audioFilters = instance.audioFilterList();
-    for (const auto& f : audioFilters)
-    {
-        std::cout << f.name() << std::endl;
-    }
-
     auto media = VLC::Media(instance, av[1], VLC::Media::FromPath);
     auto mp = VLC::MediaPlayer(media);
     auto eventManager = mp.eventManager();
     eventManager.onPlaying([&media]() {
         std::cout << media.mrl() << " is playing" << std::endl;
     });
-    /*
-     * Should trigger static_assert:
-     *
-     * eventManager->onPlaying([](std::string){});
-     * eventManager->onPlaying([] { return 0;} );
-    */
+
     mp.play();
 
     bool expected = true;
@@ -115,4 +104,11 @@ int main(int ac, char** av)
     // by leaving the scope, it won't be unregistered from mp2's eventManager.
     // If it did, libvlc would assert as the event has been unregistered already.
     mp.eventManager().unregister(h3);
+
+    // List audio filters
+    auto audioFilters = instance.audioFilterList();
+    for (const auto& f : audioFilters)
+    {
+        std::cout << f.name() << std::endl;
+    }
 }
