@@ -1,5 +1,5 @@
 /*****************************************************************************
- * libvlc_MediaDiscoverer.hpp: MediaDiscoverer API
+ * MediaDiscoverer.hpp: MediaDiscoverer API
  *****************************************************************************
  * Copyright © 2014 the VideoLAN team
  *

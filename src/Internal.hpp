@@ -1,7 +1,7 @@
 /*****************************************************************************
- * libvlc_Internal.hpp: Handles an internal vlc type.
+ * Internal.hpp: Wraps an internal vlc type.
  *****************************************************************************
- * Copyright (C) 2008-2014 VideoLAN
+ * Copyright © 2014 VideoLAN
  *
  * Authors: Hugo Beauzée-Luyssen <hugo@beauzee.fr>
  *

@@ -1,5 +1,5 @@
 /*****************************************************************************
- * libvlc_structures.hpp: LibVLC++ structures
+ * structures.hpp: LibVLC++ structures
  *****************************************************************************
  * Copyright © 2014 the VideoLAN team
  *

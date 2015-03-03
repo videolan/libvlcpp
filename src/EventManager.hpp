@@ -1,5 +1,5 @@
 /*****************************************************************************
- * libvlc_EventManager.hpp: Exposes libvlc events
+ * EventManager.hpp: Exposes libvlc events
  *****************************************************************************
  * Copyright © 2014 the VideoLAN team
  *

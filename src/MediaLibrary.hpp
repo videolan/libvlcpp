@@ -1,5 +1,5 @@
 /*****************************************************************************
- * libvlc_MediaLibrary.hpp: MediaLibrary API
+ * MediaLibrary.hpp: MediaLibrary API
  *****************************************************************************
  * Copyright © 2014 the VideoLAN team
  *
