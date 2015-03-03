@@ -46,5 +46,20 @@ int main(int ac, char** av)
 
     std::this_thread::sleep_for( std::chrono::seconds( 2 ) );
 
+    expected = true;
+    auto l = [&expected] (float){
+        std::cout << "Lambda called" << std::endl;
+        assert(expected);
+    };
+    auto& h1 = mp.eventManager()->onTimeChanged(l);
+    auto& h2 = mp.eventManager()->onPositionChanged(l);
+
+    std::this_thread::sleep_for( std::chrono::seconds( 2 ) );
+
+    // Unregistering multiple events at once.
+    // h1 and h2 are now invalid.
+    mp.eventManager()->unregister(h1, h2);
+    expected = false;
+
     mp.stop();
 }

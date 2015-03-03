@@ -118,14 +118,25 @@ private:
         libvlc_event_e m_eventType;
     };
 
+private:
+    // variadic template recursion termination
+    void unregister(){}
+
 public:
-    void unregister(const RegisteredEvent e)
+    template <typename T, typename... Args>
+    void unregister(const T& e, const Args&... args)
     {
-        auto it = std::find_if(begin(m_lambdas), end(m_lambdas), [&e](decltype(m_lambdas)::value_type &value) {
-            return &e == value.get();
-        });
-        if (it != end(m_lambdas))
-            m_lambdas.erase( it );
+        static_assert(std::is_convertible<decltype(e), const EventHandlerBase&>::value, "Expected const RegisteredEvent");
+
+        {
+            auto it = std::find_if(begin(m_lambdas), end(m_lambdas), [&e](decltype(m_lambdas)::value_type &value) {
+                return &e == value.get();
+            });
+            if (it != end(m_lambdas))
+                m_lambdas.erase( it );
+        }
+
+        unregister(args...);
     }
 
 protected:
