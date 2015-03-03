@@ -29,24 +29,6 @@
 
 namespace VLC
 {
-    class EventManager;
-    using EventManagerPtr = std::shared_ptr<EventManager>;
-
-    class MediaEventManager;
-    using MediaEventManagerPtr = std::shared_ptr<MediaEventManager>;
-
-    class MediaPlayerEventManager;
-    using MediaPlayerEventManagerPtr = std::shared_ptr<MediaPlayerEventManager>;
-
-    class MediaListPlayerEventManager;
-    using MediaListPlayerEventManagerPtr = std::shared_ptr<MediaListPlayerEventManager>;
-
-    class MediaDiscovererEventManager;
-    using MediaDiscovererEventManagerPtr = std::shared_ptr<MediaDiscovererEventManager>;
-
-    class MediaListEventManager;
-    using MediaListEventManagerPtr = std::shared_ptr<MediaListEventManager>;
-
     class Media;
     using MediaPtr = std::shared_ptr<Media>;
 

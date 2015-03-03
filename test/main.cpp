@@ -21,7 +21,7 @@ int main(int ac, char** av)
     auto media = VLC::Media(instance, av[1], VLC::Media::FromPath);
     auto mp = VLC::MediaPlayer(media);
     auto eventManager = mp.eventManager();
-    eventManager->onPlaying([&media]() {
+    eventManager.onPlaying([&media]() {
         std::cout << media.mrl() << " is playing" << std::endl;
     });
     /*
@@ -34,7 +34,7 @@ int main(int ac, char** av)
 
     bool expected = true;
 
-    auto& handler = mp.eventManager()->onPositionChanged([&expected](float pos) {
+    auto& handler = mp.eventManager().onPositionChanged([&expected](float pos) {
         std::cout << "position changed " << pos << std::endl;
         assert(expected);
     });
@@ -51,15 +51,46 @@ int main(int ac, char** av)
         std::cout << "Lambda called" << std::endl;
         assert(expected);
     };
-    auto& h1 = mp.eventManager()->onTimeChanged(l);
-    auto& h2 = mp.eventManager()->onPositionChanged(l);
+    auto& h1 = mp.eventManager().onTimeChanged(l);
+    auto& h2 = mp.eventManager().onPositionChanged(l);
 
     std::this_thread::sleep_for( std::chrono::seconds( 2 ) );
 
     // Unregistering multiple events at once.
     // h1 and h2 are now invalid.
-    mp.eventManager()->unregister(h1, h2);
+    mp.eventManager().unregister(h1, h2);
     expected = false;
 
+    std::this_thread::sleep_for( std::chrono::milliseconds(500) );
+
+    // Using scopped event manager to automatically unregister events
+    {
+        expected = true;
+        // This is a copy. Assigning to a reference wouldn't clear the registered events
+        auto em = mp.eventManager();
+        em.onPositionChanged([&expected](float) {
+            assert(expected);
+        });
+        std::this_thread::sleep_for( std::chrono::seconds(1) );
+    }
+    // From here, the lambda declared in the scope isn't registered anymore
+    expected = false;
+
+    std::this_thread::sleep_for( std::chrono::milliseconds(500) );
+
+    // Showing that copying an object shares the associated eventmanager
+    auto mp2 = mp;
+    expected = true;
+    auto& h3 = mp2.eventManager().onStopped([&expected]() {
+        std::cout << "MediaPlayer stopped" << std::endl;
+        assert(expected);
+        // expect a single call since both media player share the same event manager
+        expected = false;
+    });
     mp.stop();
+    // Unregister the RegisteredEvent from the other MP's event manager.
+    // It will be unregistered from both, and when the object gets destroyed
+    // by leaving the scope, it won't be unregistered from mp2's eventManager.
+    // If it did, libvlc would assert as the event has been unregistered already.
+    mp.eventManager().unregister(h3);
 }

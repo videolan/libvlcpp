@@ -33,7 +33,7 @@ namespace VLC
 {
 
 class MediaPlayer;
-class EventManager;
+class MediaEventManager;
 class Instance;
 class MediaList;
 
@@ -302,14 +302,14 @@ public:
      *
      * \return event manager object
      */
-    MediaEventManagerPtr eventManager()
+    MediaEventManager& eventManager()
     {
         if ( m_eventManager == NULL )
         {
             libvlc_event_manager_t* obj = libvlc_media_event_manager(*this);
             m_eventManager = std::make_shared<MediaEventManager>( obj );
         }
-        return m_eventManager;
+        return *m_eventManager;
     }
 
     /**
@@ -438,7 +438,7 @@ private:
 
 
 private:
-    MediaEventManagerPtr m_eventManager;
+    std::shared_ptr<MediaEventManager> m_eventManager;
 };
 
 } // namespace VLC

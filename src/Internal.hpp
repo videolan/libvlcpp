@@ -49,6 +49,7 @@ class Internal
     protected:
         Internal() = default;
 
+
         Internal( InternalPtr obj, Releaser releaser )
             : m_obj{ obj, releaser }
         {

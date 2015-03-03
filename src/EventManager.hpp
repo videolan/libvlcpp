@@ -145,6 +145,23 @@ protected:
     {
     }
 
+public:
+    EventManager(const EventManager& em)
+        : Internal( em )
+    {
+        // Use an empty list of events
+    }
+
+    EventManager& operator=(const EventManager& em)
+    {
+        Internal::operator=(em);
+        return *this;
+    }
+
+    EventManager(EventManager&&) = default;
+    EventManager& operator=(EventManager&&) = default;
+
+protected:
     /**
      * @brief handle        Provides the common behavior for all event handlers
      * @param eventType     The libvlc type of event
