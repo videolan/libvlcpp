@@ -46,7 +46,7 @@ namespace VLC
         return ref.get();
     }
 
-    std::unique_ptr<char, void (*)(void*)> wrapCStr(char* str)
+    inline std::unique_ptr<char, void (*)(void*)> wrapCStr(char* str)
     {
         return std::unique_ptr<char, void(*)(void*)>( str, [](void* ptr) { libvlc_free(ptr); } );
     }
