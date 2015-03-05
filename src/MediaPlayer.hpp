@@ -24,8 +24,10 @@
 #ifndef LIBVLC_CXX_MEDIAPLAYER_H
 #define LIBVLC_CXX_MEDIAPLAYER_H
 
+#include <array>
 #include <string>
 #include <vector>
+#include <memory>
 
 #include "common.hpp"
 
@@ -38,8 +40,26 @@ class Instance;
 class Media;
 class MediaPlayerEventManager;
 
-class MediaPlayer : public Internal<libvlc_media_player_t>
+class MediaPlayer : public Internal<libvlc_media_player_t>, public EventOwner<13>
 {
+private:
+    enum class EventIdx : unsigned int
+    {
+        AudioPlay,
+        AudioPause,
+        AudioResume,
+        AudioFlush,
+        AudioDrain,
+        AudioVolume,
+        AudioSetup,
+        AudioCleanup,
+
+        VideoLock,
+        VideoUnlock,
+        VideoDisplay,
+        VideoFormat,
+        VideoCleanup,
+    };
 public:
     /**
      * Check if 2 MediaPlayer objects contain the same libvlc_media_player_t.
@@ -648,24 +668,41 @@ public:
      * MediaPlayer::setFormat() or MediaPlayer::setFormatCallbacks() to configure the
      * decoded audio format.
      *
-     * \param play  callback to play audio samples (must not be NULL)
+     * \param play  callback to play audio samples (must not be nullptr)
+     *              Required prototype is: void(const void *samples, unsigned count, int64_t pts)
      *
-     * \param pause  callback to pause playback (or NULL to ignore)
+     * \param pause  callback to pause playback (or nullptr to ignore)
+     *               Required prototype is void(int64_t pts);
      *
-     * \param resume  callback to resume playback (or NULL to ignore)
+     * \param resume callback to resume playback (or nullptr to ignore)
+     *               Required prototype is void(int64_t pts);
      *
-     * \param flush  callback to flush audio buffers (or NULL to ignore)
+     * \param flush  callback to flush audio buffers (or nullptr to ignore)
+     *               Required prototype is void(int64_t pts);
      *
-     * \param drain  callback to drain audio buffers (or NULL to ignore)
-     *
-     * \param opaque  private pointer for the audio callbacks (as first
-     * parameter)
+     * \param drain  callback to drain audio buffers (or nullptr to ignore)
+     * *             Required prototype is void();
      *
      * \version LibVLC 2.0.0 or later
      */
-    void setAudioCallbacks(libvlc_audio_play_cb play, libvlc_audio_pause_cb pause, libvlc_audio_resume_cb resume, libvlc_audio_flush_cb flush, libvlc_audio_drain_cb drain, void * opaque)
+    template <typename PlayCb, typename PauseCb, typename ResumeCb, typename FlushCb, typename DrainCb>
+    void setAudioCallbacks(PlayCb&& play, PauseCb&& pause, ResumeCb&& resume, FlushCb&& flush, DrainCb&& drain)
     {
-        libvlc_audio_set_callbacks(*this, play, pause, resume, flush, drain, opaque);
+        static_assert(signature_match<PlayCb, void(const void*, unsigned int, int64_t)>::value, "Mismatched play callback prototype");
+        static_assert(signature_match_or_nullptr<PauseCb, void(int64_t)>::value, "Mismatched pause callback prototype");
+        static_assert(signature_match_or_nullptr<ResumeCb, void(int64_t)>::value, "Mismatched resume callback prototype");
+        static_assert(signature_match_or_nullptr<FlushCb, void(int64_t pts)>::value, "Mismatched flush callback prototype");
+        static_assert(signature_match_or_nullptr<DrainCb, void()>::value, "Mismatched drain callback prototype");
+
+        libvlc_audio_set_callbacks( *this,
+            CallbackWrapper<(int)EventIdx::AudioPlay,     PlayCb,  libvlc_audio_play_cb>::wrap(   this, std::forward<PlayCb>( play ) ),
+            CallbackWrapper<(int)EventIdx::AudioPause,    PauseCb, libvlc_audio_pause_cb>::wrap(  this, std::forward<PauseCb>( pause ) ),
+            CallbackWrapper<(int)EventIdx::AudioResume,   ResumeCb,libvlc_audio_resume_cb>::wrap( this, std::forward<ResumeCb>( resume ) ),
+            CallbackWrapper<(int)EventIdx::AudioFlush,    FlushCb, libvlc_audio_flush_cb>::wrap(  this, std::forward<FlushCb>( flush ) ),
+            CallbackWrapper<(int)EventIdx::AudioDrain,    DrainCb, libvlc_audio_drain_cb>::wrap(  this, std::forward<DrainCb>( drain ) ),
+            // We will receive the pointer as a void*, we need to offset the value *now*, otherwise we'd get
+            // a shifted value, resulting in an empty callback array.
+            static_cast<EventOwner<13>*>( this ) );
     }
 
     /**
@@ -673,29 +710,42 @@ public:
      * MediaPlayer::setFormat() or MediaPlayer::setFormatCallbacks() to configure the
      * decoded audio format.
      *
-     * \param set_volume  callback to apply audio volume, or NULL to apply
-     * volume in software
+     * \param set_volume  callback to apply audio volume, or nullptr to apply
+     *                    volume in software
+     *                    Expected prototype is void(float volume, bool mute)
      *
      * \version LibVLC 2.0.0 or later
      */
-    void setVolumeCallback(libvlc_audio_set_volume_cb set_volume)
+    template <typename VolumeCb>
+    void setVolumeCallback(VolumeCb&& func)
     {
-        libvlc_audio_set_volume_callback(*this, set_volume);
+        static_assert(signature_match_or_nullptr<VolumeCb, void(float, bool)>::value, "Mismatched set volume callback");
+        libvlc_audio_set_volume_callback(*this,
+            CallbackWrapper<(int)EventIdx::AudioVolume, VolumeCb, libvlc_audio_set_volume_cb>::wrap( this, std::forward<VolumeCb>( func ) ) );
     }
 
     /**
      * Set decoded audio format. This only works in combination with
      * MediaPlayer::setCallbacks() .
      *
-     * \param setup  callback to select the audio format (cannot be NULL)
+     * \param setup  callback to select the audio format (cannot be a nullptr)
+     *               Expected prototype is int(char *format, unsigned *rate, unsigned *channels)
+     *               Where the return value is 0 for success, anything else to skip audio playback
      *
-     * \param cleanup  callback to release any allocated resources (or NULL)
+     * \param cleanup  callback to release any allocated resources (or nullptr)
+     *                 Expected prototype is void()
      *
      * \version LibVLC 2.0.0 or later
      */
-    void setAudioFormatCallbacks(libvlc_audio_setup_cb setup, libvlc_audio_cleanup_cb cleanup)
+    template <typename SetupCb, typename CleanupCb>
+    void setAudioFormatCallbacks(SetupCb&& setup, CleanupCb&& cleanup)
     {
-        libvlc_audio_set_format_callbacks(*this, setup, cleanup);
+        static_assert(signature_match<SetupCb, int(char*, uint32_t*, uint32_t*)>::value, "Mismatched Setup callback");
+        static_assert(signature_match_or_nullptr<CleanupCb, void()>::value, "Mismatched cleanup callback");
+
+        libvlc_audio_set_format_callbacks(*this,
+            CallbackWrapper<(int)EventIdx::AudioSetup, SetupCb, libvlc_audio_setup_cb>::wrap( this, std::forward<SetupCb>( setup ) ),
+            CallbackWrapper<(int)EventIdx::AudioCleanup, CleanupCb, libvlc_audio_cleanup_cb>::wrap( this, std::forward<CleanupCb>( cleanup ) ) );
     }
 
     /**
@@ -977,20 +1027,36 @@ public:
      * area in memory. Use MediaPlayer::setFormat() or MediaPlayer::setFormatCallbacks()
      * to configure the decoded format.
      *
-     * \param lock  callback to lock video memory (must not be NULL)
+     * \param lock  callback to lock video memory (must not be nullptr)
+     *              Expected prototype is void*(void** planes)
+     *              planes is a pointer to an array of planes, that must be provided with some allocated buffers
+     *              Return value is a picture identifier, to be passed to unlock & display callbacks
      *
-     * \param unlock  callback to unlock video memory (or NULL if not needed)
+     * \param unlock  callback to unlock video memory (or nullptr if not needed)
+     *                Expected prototype is void(void* pictureId, void*const* planes);
+     *                pictureId is the value returned by the lock callback.
+     *                planes is the planes provided by the lock callback
      *
-     * \param display  callback to display video (or NULL if not needed)
-     *
-     * \param opaque  private pointer for the three callbacks (as first
-     * parameter)
+     * \param display callback to display video (or nullptr if not needed)
+     *                Expected prototype is void(void* pictureId);
+     *                pictureId is the value returned by the lock callback.
      *
      * \version LibVLC 1.1.1 or later
      */
-    void setVideoCallbacks(libvlc_video_lock_cb lock, libvlc_video_unlock_cb unlock, libvlc_video_display_cb display, void * opaque)
+    template <typename LockCb, typename UnlockCb, typename DisplayCb>
+    void setVideoCallbacks(LockCb&& lock, UnlockCb&& unlock, DisplayCb&& display)
     {
-        libvlc_video_set_callbacks(*this, lock, unlock, display, opaque);
+        static_assert(signature_match<LockCb, void*(void**)>::value, "Mismatched lock callback signature");
+        static_assert(signature_match_or_nullptr<UnlockCb, void(void*, void *const *)>::value, "Mismatched unlock callback signature");
+        static_assert(signature_match_or_nullptr<DisplayCb, void(void*)>::value, "Mismatched lock callback signature");
+
+        libvlc_video_set_callbacks(*this,
+                CallbackWrapper<(int)EventIdx::VideoLock, LockCb, libvlc_video_lock_cb>::wrap( this, std::forward<LockCb>( lock ) ),
+                CallbackWrapper<(int)EventIdx::VideoUnlock, UnlockCb, libvlc_video_unlock_cb>::wrap( this, std::forward<UnlockCb>( unlock ) ),
+                CallbackWrapper<(int)EventIdx::VideoDisplay, DisplayCb, libvlc_video_display_cb>::wrap( this, std::forward<DisplayCb>( display ) ),
+                // We will receive the pointer as a void*, we need to offset the value *now*, otherwise we'd get
+                // a shifted value, resulting in an empty callback array.
+                static_cast<EventOwner<13>*>( this ) );
     }
 
     /**
@@ -1018,15 +1084,29 @@ public:
      * Set decoded video chroma and dimensions. This only works in
      * combination with MediaPlayer::setCallbacks() .
      *
-     * \param setup  callback to select the video format (cannot be NULL)
+     * \param setup  callback to lock video memory (must not be nullptr)
+     *              Expected prototype is uint32_t(char *chroma,       // Must be filled with the required fourcc
+     *                                              unsigned *width,   // Must be filled with the required width
+     *                                              unsigned *height,  // Must be filled with the required height
+     *                                              unsigned *pitches, // Must be filled with the required pitch for each plane
+     *                                              unsigned *lines);  // Must be filled with the required number of lines for each plane
+     *              The return value reprensent the amount of pictures to create in a pool. 0 to indicate an error
      *
-     * \param cleanup  callback to release any allocated resources (or NULL)
+     * \param cleanup  callback to release any allocated resources (or nullptr)
+     *                 Expected prototype is void()
      *
      * \version LibVLC 2.0.0 or later
      */
-    void setVideoFormatCallbacks(libvlc_video_format_cb setup, libvlc_video_cleanup_cb cleanup)
+    template <typename FormatCb, typename CleanupCb>
+    void setVideoFormatCallbacks(FormatCb&& setup, CleanupCb&& cleanup)
     {
-        libvlc_video_set_format_callbacks(*this, setup, cleanup);
+        static_assert(signature_match<FormatCb, uint32_t(char*, uint32_t*, uint32_t*, uint32_t*, uint32_t*)>::value,
+                      "Unmatched prototype for format callback" );
+        static_assert(signature_match_or_nullptr<CleanupCb, void()>::value, "Unmatched prototype for cleanup callback");
+
+        libvlc_video_set_format_callbacks(*this,
+                CallbackWrapper<(int)EventIdx::VideoFormat, FormatCb, libvlc_video_format_cb>::wrap( static_cast<EventOwner<13>*>( this ), std::forward<FormatCb>( setup ) ),
+                CallbackWrapper<(int)EventIdx::VideoCleanup, CleanupCb, libvlc_video_cleanup_cb>::wrap( this, std::forward<CleanupCb>( cleanup ) ) );
     }
 
     /**

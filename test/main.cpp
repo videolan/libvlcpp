@@ -24,6 +24,7 @@
 
 #include <iostream>
 #include <thread>
+#include <cstring>
 
 int main(int ac, char** av)
 {
@@ -41,9 +42,33 @@ int main(int ac, char** av)
         std::cout << media.mrl() << " is playing" << std::endl;
     });
 
+    auto imgBuffer = malloc(480 * 320 * 4);
+    mp.setVideoCallbacks([imgBuffer](void** pBuffer) -> void* {
+        std::cout << "Lock" << std::endl;
+        *pBuffer = imgBuffer;
+        return NULL;
+    }, [](void*, void*const*) {
+        std::cout << "unlock" << std::endl;
+    }, nullptr);
+
+    mp.setVideoFormatCallbacks([](char* chroma, uint32_t* width, uint32_t* height, uint32_t* pitch, uint32_t* lines) -> int {
+        memcpy(chroma, "RV32", 4);
+        *width = 480;
+        *height = 320;
+        *pitch = *width * 4;
+        *lines = 320;
+        return 1;
+    }, nullptr);
+
+
     mp.play();
 
     bool expected = true;
+
+    mp.setAudioCallbacks([](const void*, uint32_t count, int64_t pts) {
+            std::cout << "Playing " << count << " samples at pts " << pts << std::endl;
+        }, nullptr, nullptr, nullptr, nullptr
+    );
 
     auto& handler = mp.eventManager().onPositionChanged([&expected](float pos) {
         std::cout << "position changed " << pos << std::endl;
@@ -111,4 +136,5 @@ int main(int ac, char** av)
     {
         std::cout << f.name() << std::endl;
     }
+    free(imgBuffer);
 }

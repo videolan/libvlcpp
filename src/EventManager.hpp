@@ -54,20 +54,6 @@ protected:
     template <typename T>
     using DecayPtr = typename std::add_pointer<typename std::decay<T>::type>::type;
 
-    template <typename, typename, typename = void>
-    struct signature_match : std::false_type {};
-
-    // Kudos to 3xxO
-    template <typename Func, typename Ret, typename... Args>
-    struct signature_match<Func, Ret(Args...),
-        typename std::enable_if<
-            std::is_convertible<
-                decltype(std::declval<Func>()(std::declval<Args>()...)),
-                Ret
-            >::value
-        >::type
-    > : std::true_type {};
-
 private:
     // Polymorphic base to hold a templated implementation
     struct EventHandlerBase
