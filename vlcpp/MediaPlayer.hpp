@@ -40,7 +40,7 @@ class Instance;
 class Media;
 class MediaPlayerEventManager;
 
-class MediaPlayer : public Internal<libvlc_media_player_t>, public EventOwner<13>
+class MediaPlayer : public Internal<libvlc_media_player_t>, private EventOwner<13>
 {
 private:
     enum class EventIdx : unsigned int
