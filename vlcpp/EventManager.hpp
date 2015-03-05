@@ -24,7 +24,6 @@
 #define LIBVLC_EVENTMANAGER_HPP
 
 #include <string>
-#include <iostream>
 
 #include "common.hpp"
 #include "Internal.hpp"
