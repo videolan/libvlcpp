@@ -53,6 +53,7 @@ namespace VLC
         return std::unique_ptr<char, void(*)(void*)>( str, [](void* ptr) { libvlc_free(ptr); } );
     }
 
+#if !defined(_MSC_VER)
     // Kudos to 3xxO for the signature_match helper
     template <typename, typename, typename = void>
     struct signature_match : std::false_type {};
@@ -66,6 +67,17 @@ namespace VLC
             >::value // true or false
         >::type // void or SFINAE
     > : std::true_type {};
+#else
+    template <typename... Args>
+    struct signature_match : std::false_type {};
+
+    template <typename Func, typename Ret, class... Args>
+    struct signature_match<Func, Ret(Args...)>
+        : std::integral_constant < bool,
+            std::is_convertible < decltype(std::declval<Func>()(std::declval<Args>()...)), Ret
+        > ::value
+    > {};
+#endif
 
     template <typename Func, typename Ret, typename... Args>
     struct signature_match_or_nullptr : std::integral_constant<bool,
