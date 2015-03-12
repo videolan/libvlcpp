@@ -85,7 +85,7 @@ private:
 
         virtual void unregister() override
         {
-            m_eventManager->unregister(*this);
+            m_eventManager->unregister(this);
         }
 
         EventHandler(const EventHandler&) = delete;
@@ -107,13 +107,13 @@ private:
 
 public:
     template <typename T, typename... Args>
-    void unregister(const T& e, const Args&... args)
+    void unregister(const T e, const Args... args)
     {
-        static_assert(std::is_convertible<decltype(e), const EventHandlerBase&>::value, "Expected const RegisteredEvent");
+        static_assert(std::is_convertible<decltype(e), const EventHandlerBase*>::value, "Expected const RegisteredEvent");
 
         {
             auto it = std::find_if(begin(m_lambdas), end(m_lambdas), [&e](decltype(m_lambdas)::value_type &value) {
-                return &e == value.get();
+                return e == value.get();
             });
             if (it != end(m_lambdas))
                 m_lambdas.erase( it );
@@ -147,7 +147,7 @@ public:
     EventManager& operator=(EventManager&&) = default;
 
 protected:
-    using RegisteredEvent = EventHandlerBase&;
+    using RegisteredEvent = EventHandlerBase*;
 
     /**
      * @brief handle        Provides the common behavior for all event handlers
@@ -170,7 +170,7 @@ protected:
                                 *this, eventType, std::forward<Func>( f ), wrapper ) );
         auto raw = ptr.get();
         m_lambdas.push_back( std::move( ptr ) );
-        return *raw;
+        return raw;
     }
 
     template <typename Func>

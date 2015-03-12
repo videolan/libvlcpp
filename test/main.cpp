@@ -70,12 +70,12 @@ int main(int ac, char** av)
         }, nullptr, nullptr, nullptr, nullptr
     );
 
-    auto& handler = mp.eventManager().onPositionChanged([&expected](float pos) {
+    auto handler = mp.eventManager().onPositionChanged([&expected](float pos) {
         std::cout << "position changed " << pos << std::endl;
         assert(expected);
     });
     std::this_thread::sleep_for( std::chrono::seconds( 2 ) );
-    handler.unregister();
+    handler->unregister();
     // handler must be considered a dangling reference from now on.
     // We might want to fix this, but is it worth the cost of a shared/weak_pointer?
     expected = false;
@@ -87,8 +87,8 @@ int main(int ac, char** av)
         std::cout << "Lambda called" << std::endl;
         assert(expected);
     };
-    auto& h1 = mp.eventManager().onTimeChanged(l);
-    auto& h2 = mp.eventManager().onPositionChanged(l);
+    auto h1 = mp.eventManager().onTimeChanged(l);
+    auto h2 = mp.eventManager().onPositionChanged(l);
 
     std::this_thread::sleep_for( std::chrono::seconds( 2 ) );
 
@@ -117,7 +117,7 @@ int main(int ac, char** av)
     // Showing that copying an object shares the associated eventmanager
     auto mp2 = mp;
     expected = true;
-    auto& h3 = mp2.eventManager().onStopped([&expected]() {
+    auto h3 = mp2.eventManager().onStopped([&expected]() {
         std::cout << "MediaPlayer stopped" << std::endl;
         assert(expected);
         // expect a single call since both media player share the same event manager
