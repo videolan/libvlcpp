@@ -143,8 +143,24 @@ public:
         return *this;
     }
 
+#if !defined(_MSC_VER) || _MSC_VER >= 1900
     EventManager(EventManager&&) = default;
     EventManager& operator=(EventManager&&) = default;
+#else
+    EventManager(EventManager&& em)
+        : Internal( std::move( em ) )
+        , m_lambdas(std::move( em.m_lambdas ) )
+    {
+    }
+
+    EventManager& operator=(EventManager&& em)
+    {
+        if ( this == &em )
+            return *this;
+        Internal::operator=( std::move( em ) );
+        m_lambdas = std::move( em.m_lambdas );
+    }
+#endif
 
     using RegisteredEvent = EventHandlerBase*;
 
