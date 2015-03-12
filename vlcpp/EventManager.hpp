@@ -146,8 +146,9 @@ public:
     EventManager(EventManager&&) = default;
     EventManager& operator=(EventManager&&) = default;
 
-protected:
     using RegisteredEvent = EventHandlerBase*;
+
+protected:
 
     /**
      * @brief handle        Provides the common behavior for all event handlers
