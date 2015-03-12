@@ -312,11 +312,23 @@ class AudioOutputDeviceDescription
 class TrackDescription
 {
 public:
-    int id() const;
-    const std::string& name() const;
+    int id() const
+    {
+        return m_id;
+    }
+
+    const std::string& name() const
+    {
+        return m_name;
+    }
 
 private:
-    explicit TrackDescription( libvlc_track_description_t* c );
+    explicit TrackDescription( libvlc_track_description_t* c )
+        : m_id( c->i_id )
+    {
+        if ( c->psz_name != nullptr )
+            m_name = c->psz_name;
+    }
     int m_id;
     std::string m_name;
 
