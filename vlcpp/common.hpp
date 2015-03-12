@@ -25,6 +25,7 @@
 #define LIBVLC_CXX_COMMON_H
 
 #include <vlc/vlc.h>
+#include <array>
 #include <cassert>
 #include <memory>
 
