@@ -65,6 +65,13 @@ public:
     }
 
     /**
+     * Create an empty VLC instance.
+     *
+     * Calling any method on such an instance is undefined.
+    */
+    Instance() = default;
+
+    /**
      * Check if 2 Instance objects contain the same libvlc_instance_t.
      * \param another another Instance
      * \return true if they contain the same libvlc_instance_t
