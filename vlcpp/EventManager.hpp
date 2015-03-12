@@ -329,7 +329,12 @@ class MediaPlayerEventManager : public EventManager
         template <typename Func>
         RegisteredEvent onBuffering( Func&& f )
         {
-            return handle(libvlc_MediaPlayerBuffering, std::forward<Func>( f ) );
+            EXPECT_SIGNATURE(void(float));
+            return handle(libvlc_MediaPlayerBuffering, std::forward<Func>(f), [](const libvlc_event_t* e, void* data)
+            {
+                auto callback = static_cast<DecayPtr<Func>>( data );
+                (*callback)( e->u.media_player_buffering.new_cache );
+            });
         }
 
         template <typename Func>
