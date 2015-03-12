@@ -22,7 +22,7 @@
 
 #pragma once
 
-#include "structures.hpp"
+#include <vlcpp/vlc.hpp>
 #include "Helpers.h"
 
 namespace libVLCX

@@ -29,8 +29,8 @@
 namespace libVLCX
 {
     Media::Media(Instance^ instance, Platform::String^ location)
+        : m_media(VLC::Media( instance->m_instance, VLCString(location), VLC::Media::FromLocation ) )
     {
-        m_media = VLC::Media::fromLocation(instance->m_instance, VLCString(location));
     }
 
     void Media::addOption(Platform::String^ options)
@@ -50,7 +50,7 @@ namespace libVLCX
 
     Media^ Media::duplicate()
     {
-        return ref new Media(m_media.duplicate());
+        return ref new Media(*m_media.duplicate().get());
     }
 
     Platform::String^ Media::meta(MediaMeta e_meta)
@@ -75,10 +75,10 @@ namespace libVLCX
 
     //bool Media::stats(libvlc_media_stats_t * p_stats);
 
-    EventManager^ Media::eventManager()
+    MediaEventManager^ Media::eventManager()
     {
         if (m_eventManager == nullptr)
-            m_eventManager = ref new EventManager(m_media.eventManager());
+            m_eventManager = ref new MediaEventManager(m_media.eventManager());
         return m_eventManager;
     }
 

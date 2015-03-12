@@ -23,12 +23,12 @@
 #pragma once
 
 #include "structuresCX.hpp"
-#include "Media.hpp"
 #include <collection.h>
+#include <vlcpp/vlc.hpp>
 
 namespace libVLCX
 {
-    ref class EventManager;
+    ref class MediaEventManager;
     ref class Instance;
 
     public enum class MediaState
@@ -193,7 +193,7 @@ namespace libVLCX
         *
         * \return event manager object
         */
-        EventManager^ eventManager();
+        MediaEventManager^ eventManager();
 
         /**
         * Get duration (in ms) of media descriptor object item.
@@ -267,7 +267,7 @@ namespace libVLCX
         VLC::Media m_media;
 
     private:
-        EventManager^ m_eventManager;
+        MediaEventManager^ m_eventManager;
     };
 
 } // namespace libVLCX

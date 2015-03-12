@@ -20,9 +20,9 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
 *****************************************************************************/
 
-#include "EventManager.hpp"
-#include "Media.hpp"
+#include <vlcpp/vlc.hpp>
 #include "StructuresCX.hpp"
+#include "MediaCX.hpp"
 
 #include <memory>
 
@@ -56,74 +56,483 @@ namespace libVLCX
 
     ref class EventManager;
 
-    class MediaPlayerEventCb : public VLC::IMediaPlayerEventCb
+    public ref class MediaPlayerEventManager sealed
     {
     public:
-        MediaPlayerEventCb(EventManager^ em);
-        virtual void mediaChanged(const VLC::Media&);
-        virtual void nothingSpecial();
-        virtual void opening();
-        virtual void buffering(float);
-        virtual void playing();
-        virtual void paused();
-        virtual void stopped();
-        virtual void forward();
-        virtual void backward();
-        virtual void endReached();
-        virtual void encounteredError();
-        virtual void timeChanged(libvlc_time_t);
-        virtual void positionChanged(float);
-        virtual void seekableChanged(bool);
-        virtual void pausableChanged(bool);
-        virtual void titleChanged(int);
-        virtual void snapshotTaken(const std::string&);
-        virtual void lengthChanged(libvlc_time_t);
-        virtual void vout(int);
-        virtual void scrambledChanged(int);
-        virtual void eSAdded(libvlc_track_type_t, int);
-        virtual void eSDeleted(libvlc_track_type_t, int);
-        virtual void eSSelected(libvlc_track_type_t, int);
+        event MediaChanged^ OnMediaChanged
+        {
+            Windows::Foundation::EventRegistrationToken add(MediaChanged^ handler)
+            {
+                auto h = m_em.onMediaChanged([handler](VLC::MediaPtr media) {
+                    handler(ref new Media(*media.get()));
+                });
+                m_events.push_back(h);
+                return Windows::Foundation::EventRegistrationToken{ (int64) h };
+            }
+            void remove(Windows::Foundation::EventRegistrationToken token)
+            {
+                auto h = (VLC::EventManager::RegisteredEvent)token.Value;
+                auto it = std::find(begin(m_events), end(m_events), h);
+                assert(it != end(m_events));
+                (*it)->unregister();
+                m_events.erase(it);
+            }
+        }
 
-    private:
-        EventManager^ m_em;
-    };
+        event Opening^ OnOpening
+        {
+            Windows::Foundation::EventRegistrationToken add(Opening^ handler)
+            {
+                auto h = m_em.onOpening([handler]() {
+                    handler();
+                });
+                m_events.push_back(h);
+                return Windows::Foundation::EventRegistrationToken{ (int64) h };
+            }
 
-    public ref class EventManager sealed
-    {
-    public:
-        event MediaChanged^ OnMediaChanged;
-        event Opening^ OnOpening;
-        event Buffering^ OnBuffering;
-        event Playing^ OnPlaying;
-        event Paused^ OnPaused;
-        event Stopped^ OnStopped;
-        event Forward^ OnForward;
-        event Backward^ OnBackward;
-        event EndReached^ OnEndReached;
-        event EncounteredError^ OnEncounteredError;
-        event TimeChanged^ OnTimeChanged;
-        event PositionChanged^ OnPositionChanged;
-        event SeekableChanged^ OnSeekableChanged;
-        event PausableChanged^ OnPausableChanged;
-        event TitleChanged^ OnTitleChanged;
-        event SnapshotTaken^ OnSnapshotTaken;
-        event LengthChanged^ OnLengthChanged;
-        event Vout^ OnVoutCountChanged;
-        event ScrambledChanged^ OnScrambledChanged;
-        event ESAdded^ OnTrackAdded;
-        event ESDeleted^ OnTrackDeleted;
-        event ESSelected^ OnTrackSelected;
+            void remove(Windows::Foundation::EventRegistrationToken token)
+            {
+                auto h = (VLC::EventManager::RegisteredEvent)token.Value;
+                auto it = std::find(begin(m_events), end(m_events), h);
+                assert(it != end(m_events));
+                (*it)->unregister();
+                m_events.erase(it);
+            }
+        }
+
+        event Buffering^ OnBuffering
+        {
+            Windows::Foundation::EventRegistrationToken add(Buffering^ handler)
+            {
+                auto h = m_em.onBuffering([handler](float b) {
+                    handler(b);
+                });
+                m_events.push_back(h);
+                return Windows::Foundation::EventRegistrationToken{ (int64) h };
+            }
+            
+            void remove(Windows::Foundation::EventRegistrationToken token)
+            {
+                auto h = (VLC::EventManager::RegisteredEvent)token.Value;
+                auto it = std::find(begin(m_events), end(m_events), h);
+                assert(it != end(m_events));
+                (*it)->unregister();
+                m_events.erase(it);
+            }
+        }
+
+        event Playing^ OnPlaying
+        {
+            Windows::Foundation::EventRegistrationToken add(Playing^ handler)
+            {
+                auto h = m_em.onPlaying([handler]() {
+                    handler();
+                });
+                m_events.push_back(h);
+                return Windows::Foundation::EventRegistrationToken{ (int64) h };
+            }
+
+            void remove(Windows::Foundation::EventRegistrationToken token)
+            {
+                auto h = (VLC::EventManager::RegisteredEvent)token.Value;
+                auto it = std::find(begin(m_events), end(m_events), h);
+                assert(it != end(m_events));
+                (*it)->unregister();
+                m_events.erase(it);
+            }
+        }
+
+        event Paused^ OnPaused
+        {
+            Windows::Foundation::EventRegistrationToken add(Paused^ handler)
+            {
+                auto h = m_em.onPaused([handler]() {
+                    handler();
+                });
+                m_events.push_back(h);
+                return Windows::Foundation::EventRegistrationToken{ (int64) h };
+            }
+
+            void remove(Windows::Foundation::EventRegistrationToken token)
+            {
+                auto h = (VLC::EventManager::RegisteredEvent)token.Value;
+                auto it = std::find(begin(m_events), end(m_events), h);
+                assert(it != end(m_events));
+                (*it)->unregister();
+                m_events.erase(it);
+            }
+        }
+
+        event Stopped^ OnStopped
+        {
+            Windows::Foundation::EventRegistrationToken add(Stopped^ handler)
+            {
+                auto h = m_em.onStopped([handler]() {
+                    handler();
+                });
+                m_events.push_back(h);
+                return Windows::Foundation::EventRegistrationToken{ (int64) h };
+            }
+
+            void remove(Windows::Foundation::EventRegistrationToken token)
+            {
+                auto h = (VLC::EventManager::RegisteredEvent)token.Value;
+                auto it = std::find(begin(m_events), end(m_events), h);
+                assert(it != end(m_events));
+                (*it)->unregister();
+                m_events.erase(it);
+            }
+        }
+
+        event Forward^ OnForward
+        {
+            Windows::Foundation::EventRegistrationToken add(Forward^ handler)
+            {
+                auto h = m_em.onForward([handler]() {
+                    handler();
+                });
+                m_events.push_back(h);
+                return Windows::Foundation::EventRegistrationToken{ (int64) h };
+            }
+
+            void remove(Windows::Foundation::EventRegistrationToken token)
+            {
+                auto h = (VLC::EventManager::RegisteredEvent)token.Value;
+                auto it = std::find(begin(m_events), end(m_events), h);
+                assert(it != end(m_events));
+                (*it)->unregister();
+                m_events.erase(it);
+            }
+        }
+
+        event Backward^ OnBackward
+        {
+            Windows::Foundation::EventRegistrationToken add(Backward^ handler)
+            {
+                auto h = m_em.onBackward([handler]() {
+                    handler();
+                });
+                m_events.push_back(h);
+                return Windows::Foundation::EventRegistrationToken{ (int64) h };
+            }
+
+            void remove(Windows::Foundation::EventRegistrationToken token)
+            {
+                auto h = (VLC::EventManager::RegisteredEvent)token.Value;
+                auto it = std::find(begin(m_events), end(m_events), h);
+                assert(it != end(m_events));
+                (*it)->unregister();
+                m_events.erase(it);
+            }
+        }
+
+        event EndReached^ OnEndReached
+        {
+            Windows::Foundation::EventRegistrationToken add(EndReached^ handler)
+            {
+                auto h = m_em.onEndReached([handler]() {
+                    handler();
+                });
+                m_events.push_back(h);
+                return Windows::Foundation::EventRegistrationToken{ (int64) h };
+            }
+            
+            void remove(Windows::Foundation::EventRegistrationToken token)
+            {
+                auto h = (VLC::EventManager::RegisteredEvent)token.Value;
+                auto it = std::find(begin(m_events), end(m_events), h);
+                assert(it != end(m_events));
+                (*it)->unregister();
+                m_events.erase(it);
+            }
+        }
+
+        event EncounteredError^ OnEncounteredError
+        {
+            Windows::Foundation::EventRegistrationToken add(EncounteredError^ handler)
+            {
+                auto h = m_em.onEncounteredError([handler]() {
+                    handler();
+                });
+                m_events.push_back(h);
+                return Windows::Foundation::EventRegistrationToken{ (int64) h };
+            }
+
+            void remove(Windows::Foundation::EventRegistrationToken token)
+            {
+                auto h = (VLC::EventManager::RegisteredEvent)token.Value;
+                auto it = std::find(begin(m_events), end(m_events), h);
+                assert(it != end(m_events));
+                (*it)->unregister();
+                m_events.erase(it);
+            }
+        }
+
+        event TimeChanged^ OnTimeChanged
+        {
+            Windows::Foundation::EventRegistrationToken add(TimeChanged^ handler)
+            {
+                auto h = m_em.onTimeChanged([handler](int64_t time) {
+                    handler(time);
+                });
+                m_events.push_back(h);
+                return Windows::Foundation::EventRegistrationToken{ (int64) h };
+            }
+
+            void remove(Windows::Foundation::EventRegistrationToken token)
+            {
+                auto h = (VLC::EventManager::RegisteredEvent)token.Value;
+                auto it = std::find(begin(m_events), end(m_events), h);
+                assert(it != end(m_events));
+                (*it)->unregister();
+                m_events.erase(it);
+            }
+        }
+
+        event PositionChanged^ OnPositionChanged
+        {
+            Windows::Foundation::EventRegistrationToken add(PositionChanged^ handler)
+            {
+                auto h = m_em.onPositionChanged([handler](float p) {
+                    handler(p);
+                });
+                m_events.push_back(h);
+                return Windows::Foundation::EventRegistrationToken{ (int64) h };
+            }
+
+            void remove(Windows::Foundation::EventRegistrationToken token)
+            {
+                auto h = (VLC::EventManager::RegisteredEvent)token.Value;
+                auto it = std::find(begin(m_events), end(m_events), h);
+                assert(it != end(m_events));
+                (*it)->unregister();
+                m_events.erase(it);
+            }
+        }
+
+        event SeekableChanged^ OnSeekableChanged
+        {
+            Windows::Foundation::EventRegistrationToken add(SeekableChanged^ handler)
+            {
+                auto h = m_em.onSeekableChanged([handler](bool b) {
+                    handler(b);
+                });
+                m_events.push_back(h);
+                return Windows::Foundation::EventRegistrationToken{ (int64) h };
+            }
+
+            void remove(Windows::Foundation::EventRegistrationToken token)
+            {
+                auto h = (VLC::EventManager::RegisteredEvent)token.Value;
+                auto it = std::find(begin(m_events), end(m_events), h);
+                assert(it != end(m_events));
+                (*it)->unregister();
+                m_events.erase(it);
+            }
+        }
+
+        event PausableChanged^ OnPausableChanged
+        {
+            Windows::Foundation::EventRegistrationToken add(PausableChanged^ handler)
+            {
+                auto h = m_em.onPausableChanged([handler](bool b) {
+                    handler(b);
+                });
+                m_events.push_back(h);
+                return Windows::Foundation::EventRegistrationToken{ (int64) h };
+            }
+
+            void remove(Windows::Foundation::EventRegistrationToken token)
+            {
+                auto h = (VLC::EventManager::RegisteredEvent)token.Value;
+                auto it = std::find(begin(m_events), end(m_events), h);
+                assert(it != end(m_events));
+                (*it)->unregister();
+                m_events.erase(it);
+            }
+        }
+
+        event TitleChanged^ OnTitleChanged
+        {
+            Windows::Foundation::EventRegistrationToken add(TitleChanged^ handler)
+            {
+                auto h = m_em.onTitleChanged([handler](int t) {
+                    handler(t);
+                });
+                m_events.push_back(h);
+                return Windows::Foundation::EventRegistrationToken{ (int64) h };
+            }
+
+            void remove(Windows::Foundation::EventRegistrationToken token)
+            {
+                auto h = (VLC::EventManager::RegisteredEvent)token.Value;
+                auto it = std::find(begin(m_events), end(m_events), h);
+                assert(it != end(m_events));
+                (*it)->unregister();
+                m_events.erase(it);
+            }
+        }
+
+        event SnapshotTaken^ OnSnapshotTaken
+        {
+            Windows::Foundation::EventRegistrationToken add(SnapshotTaken^ handler)
+            {
+                auto h = m_em.onSnapshotTaken([handler](const std::string& path) {
+                    handler(ToPlatformString( path ) );
+                });
+                m_events.push_back(h);
+                return Windows::Foundation::EventRegistrationToken{ (int64) h };
+            }
+
+            void remove(Windows::Foundation::EventRegistrationToken token)
+            {
+                auto h = (VLC::EventManager::RegisteredEvent)token.Value;
+                auto it = std::find(begin(m_events), end(m_events), h);
+                assert(it != end(m_events));
+                (*it)->unregister();
+                m_events.erase(it);
+            }
+        }
+
+        event LengthChanged^ OnLengthChanged
+        {
+            Windows::Foundation::EventRegistrationToken add(LengthChanged^ handler)
+            {
+                auto h = m_em.onLengthChanged([handler](int64 length) {
+                    handler(length);
+                });
+                m_events.push_back(h);
+                return Windows::Foundation::EventRegistrationToken{ (int64) h };
+            }
+
+            void remove(Windows::Foundation::EventRegistrationToken token)
+            {
+                auto h = (VLC::EventManager::RegisteredEvent)token.Value;
+                auto it = std::find(begin(m_events), end(m_events), h);
+                assert(it != end(m_events));
+                (*it)->unregister();
+                m_events.erase(it);
+            }
+        }
+
+        event Vout^ OnVoutCountChanged
+        {
+            Windows::Foundation::EventRegistrationToken add(Vout^ handler)
+            {
+                auto h = m_em.onVout([handler](int nbVout) {
+                    handler(nbVout);
+                });
+                m_events.push_back(h);
+                return Windows::Foundation::EventRegistrationToken{ (int64) h };
+            }
+
+            void remove(Windows::Foundation::EventRegistrationToken token)
+            {
+                auto h = (VLC::EventManager::RegisteredEvent)token.Value;
+                auto it = std::find(begin(m_events), end(m_events), h);
+                assert(it != end(m_events));
+                (*it)->unregister();
+                m_events.erase(it);
+            }
+        }
+
+        event ScrambledChanged^ OnScrambledChanged
+        {
+            Windows::Foundation::EventRegistrationToken add(ScrambledChanged^ handler)
+            {
+                auto h = m_em.onScrambledChanged([handler](bool b) {
+                    handler(b);
+                });
+                m_events.push_back(h);
+                return Windows::Foundation::EventRegistrationToken{ (int64) h };
+            }
+
+            void remove(Windows::Foundation::EventRegistrationToken token)
+            {
+                auto h = (VLC::EventManager::RegisteredEvent)token.Value;
+                auto it = std::find(begin(m_events), end(m_events), h);
+                assert(it != end(m_events));
+                (*it)->unregister();
+                m_events.erase(it);
+            }
+        }
+
+        event ESAdded^ OnTrackAdded
+        {
+            Windows::Foundation::EventRegistrationToken add(ESAdded^ handler)
+            {
+                auto h = m_em.onESAdded([handler](libvlc_track_type_t type, int id) {
+                    handler((libVLCX::TrackType)type, id);
+                });
+                m_events.push_back(h);
+                return Windows::Foundation::EventRegistrationToken{ (int64) h };
+            }
+
+            void remove(Windows::Foundation::EventRegistrationToken token)
+            {
+                auto h = (VLC::EventManager::RegisteredEvent)token.Value;
+                auto it = std::find(begin(m_events), end(m_events), h);
+                assert(it != end(m_events));
+                (*it)->unregister();
+                m_events.erase(it);
+            }
+        }
+
+        event ESDeleted^ OnTrackDeleted
+        {
+            Windows::Foundation::EventRegistrationToken add(ESDeleted^ handler)
+            {
+                auto h = m_em.onESDeleted([handler](libvlc_track_type_t type, int id) {
+                    handler((TrackType)type, id);
+                });
+                m_events.push_back(h);
+                return Windows::Foundation::EventRegistrationToken{ (int64) h };
+            }
+
+            void remove(Windows::Foundation::EventRegistrationToken token)
+            {
+                auto h = (VLC::EventManager::RegisteredEvent)token.Value;
+                auto it = std::find(begin(m_events), end(m_events), h);
+                assert(it != end(m_events));
+                (*it)->unregister();
+                m_events.erase(it);
+            }
+        }
+
+        event ESSelected^ OnTrackSelected
+        {
+            Windows::Foundation::EventRegistrationToken add(ESSelected^ handler)
+            {
+                auto h = m_em.onESSelected([handler](libvlc_track_type_t type, int id) {
+                    handler((TrackType)type, id);
+                });
+                m_events.push_back(h);
+                return Windows::Foundation::EventRegistrationToken{ (int64) h };
+            }
+
+            void remove(Windows::Foundation::EventRegistrationToken token)
+            {
+                auto h = (VLC::EventManager::RegisteredEvent)token.Value;
+                auto it = std::find(begin(m_events), end(m_events), h);
+                assert(it != end(m_events));
+                (*it)->unregister();
+                m_events.erase(it);
+            }
+        }
 
     internal:
-        EventManager(VLC::EventManager& em);
+        MediaPlayerEventManager(VLC::MediaPlayerEventManager& em);
 
     private:
-        ~EventManager(){}
+        VLC::MediaPlayerEventManager m_em;
+        std::vector<VLC::EventManager::RegisteredEvent> m_events;
+    };
 
+    public ref class MediaEventManager sealed
+    {
+    internal:
+        MediaEventManager(VLC::MediaEventManager& em);
     private:
-        VLC::EventManager m_em;
-        std::unique_ptr<MediaPlayerEventCb> m_cb;
-
-        friend class MediaPlayerEventCb;
+        VLC::MediaEventManager m_em;
     };
 }

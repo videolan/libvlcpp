@@ -41,7 +41,7 @@ namespace libVLCX
             c_argv[i++] = _strdup((const char*) VLCString(arg));
         }
         InitializeHack(c_argv, i);
-        m_instance = VLC::Instance::create(argv->Size + extraArgs, c_argv);
+        m_instance = VLC::Instance(argv->Size + extraArgs, c_argv);
         for (i = 0; i < argv->Size + extraArgs; ++i)
             free(c_argv[i]);
         delete [] c_argv;

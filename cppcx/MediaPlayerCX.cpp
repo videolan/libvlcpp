@@ -30,13 +30,13 @@
 namespace libVLCX
 {
     MediaPlayer::MediaPlayer(Instance^ instance)
+        : m_mp(VLC::MediaPlayer(instance->m_instance))
     {
-        m_mp = VLC::MediaPlayer::create(instance->m_instance);
     }
 
     MediaPlayer::MediaPlayer(Media^ md)
+        : m_mp(VLC::MediaPlayer(md->m_media))
     {
-        m_mp = VLC::MediaPlayer::fromMedia(md->m_media);
     }
 
     void MediaPlayer::setMedia(Media^ md)
@@ -46,13 +46,13 @@ namespace libVLCX
 
     Media^ MediaPlayer::media()
     {
-        return ref new Media(m_mp.media());
+        return ref new Media(*m_mp.media().get());
     }
 
-    EventManager^ MediaPlayer::eventManager()
+    MediaPlayerEventManager^ MediaPlayer::eventManager()
     {
         if (m_eventManager == nullptr)
-            m_eventManager = ref new EventManager(m_mp.eventManager());
+            m_eventManager = ref new MediaPlayerEventManager(m_mp.eventManager());
         return m_eventManager;
 
     }

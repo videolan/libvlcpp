@@ -23,8 +23,8 @@
 #pragma once
 
 #include "StructuresCX.hpp"
-#include "Instance.hpp"
 #include <collection.h>
+#include <vlcpp/vlc.hpp>
 
 //<ugly>
 #include "DirectXManager.h"

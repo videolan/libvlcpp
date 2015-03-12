@@ -24,12 +24,12 @@
 
 #include <collection.h>
 #include "StructuresCX.hpp"
-#include "MediaPlayer.hpp"
 #include "MediaCX.hpp"
+#include <vlcpp/vlc.hpp>
 
 namespace libVLCX
 {
-    ref class EventManager;
+    ref class MediaPlayerEventManager;
     ref class AudioOutputDeviceDescription;
     ref class TrackDescription;
     ref class Instance;
@@ -83,7 +83,7 @@ namespace libVLCX
         *
         * \return the event manager associated with p_mi
         */
-        EventManager^ eventManager();
+        MediaPlayerEventManager^ eventManager();
 
         /**
         * is_playing
@@ -1120,7 +1120,7 @@ namespace libVLCX
 
     private:
         VLC::MediaPlayer m_mp;
-        EventManager^ m_eventManager;
+        MediaPlayerEventManager^ m_eventManager;
 
     };
 
