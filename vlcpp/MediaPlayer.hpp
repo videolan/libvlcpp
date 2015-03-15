@@ -391,7 +391,7 @@ public:
      */
     bool willPlay()
     {
-        return libvlc_media_player_will_play(*this);
+        return libvlc_media_player_will_play(*this) != 0;
     }
 
     /**
@@ -518,7 +518,7 @@ public:
      */
     bool isSeekable()
     {
-        return libvlc_media_player_is_seekable(*this);
+        return libvlc_media_player_is_seekable(*this) != 0;
     }
 
     /**
@@ -528,7 +528,7 @@ public:
      */
     bool canPause()
     {
-        return libvlc_media_player_can_pause(*this);
+        return libvlc_media_player_can_pause(*this) != 0;
     }
 
     /**
@@ -540,7 +540,7 @@ public:
      */
     bool programScrambled()
     {
-        return libvlc_media_player_program_scrambled(*this);
+        return libvlc_media_player_program_scrambled(*this) != 0;
     }
 
     /**

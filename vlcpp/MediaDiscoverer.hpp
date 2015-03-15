@@ -88,7 +88,7 @@ public:
      */
     bool isRunning()
     {
-        return libvlc_media_discoverer_is_running(*this);
+        return libvlc_media_discoverer_is_running(*this) != 0;
     }
 
 private:

@@ -293,7 +293,7 @@ public:
      */
     bool stats(libvlc_media_stats_t * p_stats)
     {
-        return libvlc_media_get_stats(*this,p_stats);
+        return libvlc_media_get_stats(*this, p_stats) != 0;
     }
 
     /**
@@ -372,7 +372,7 @@ public:
      */
     bool isParsed()
     {
-        return libvlc_media_is_parsed(*this);
+        return libvlc_media_is_parsed(*this) != 0;
     }
 
     /**

@@ -199,7 +199,7 @@ public:
      */
     bool isReadonly()
     {
-        return libvlc_media_list_is_readonly(*this);
+        return libvlc_media_list_is_readonly(*this) != 0;
     }
 
     /**

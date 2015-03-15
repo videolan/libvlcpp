@@ -408,7 +408,7 @@ class MediaPlayerEventManager : public EventManager
             return handle( libvlc_MediaPlayerSeekableChanged, std::forward<Func>( f ), [](const libvlc_event_t* e, void* data)
             {
                 auto callback = static_cast<DecayPtr<Func>>( data );
-                (*callback)( e->u.media_player_seekable_changed.new_seekable );
+                (*callback)( e->u.media_player_seekable_changed.new_seekable != 0 );
             });
         }
 
@@ -419,7 +419,7 @@ class MediaPlayerEventManager : public EventManager
             return handle( libvlc_MediaPlayerSeekableChanged, std::forward<Func>( f ), [](const libvlc_event_t* e, void* data)
             {
                 auto callback = static_cast<DecayPtr<Func>>( data );
-                (*callback)( e->u.media_player_seekable_changed.new_seekable );
+                (*callback)( e->u.media_player_seekable_changed.new_seekable != 0 );
             });
         }
 
@@ -474,7 +474,7 @@ class MediaPlayerEventManager : public EventManager
             return handle( libvlc_MediaPlayerScrambledChanged, std::forward<Func>( f ), [](const libvlc_event_t* e, void* data)
             {
                 auto callback = static_cast<DecayPtr<Func>>( data );
-                (*callback)( e->u.media_player_scrambled_changed.new_scrambled );
+                (*callback)( e->u.media_player_scrambled_changed.new_scrambled != 0 );
             });
         }
 
