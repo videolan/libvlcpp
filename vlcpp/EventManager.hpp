@@ -470,7 +470,7 @@ class MediaPlayerEventManager : public EventManager
         template <typename Func>
         RegisteredEvent onScrambledChanged( Func&& f )
         {
-            EXPECT_SIGNATURE(void(int));
+            EXPECT_SIGNATURE(void(bool));
             return handle( libvlc_MediaPlayerScrambledChanged, std::forward<Func>( f ), [](const libvlc_event_t* e, void* data)
             {
                 auto callback = static_cast<DecayPtr<Func>>( data );
