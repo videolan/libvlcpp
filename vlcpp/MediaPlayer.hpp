@@ -1469,11 +1469,12 @@ public:
     /**
      * Enable or disable deinterlace filter
      *
-     * \param psz_mode  type of deinterlace filter, NULL to disable
+     * \param psz_mode  type of deinterlace filter, empty string to disable
      */
-    void setDeinterlace(const std::string& psz_mode)
+    void setDeinterlace(const std::string& mode)
     {
-        libvlc_video_set_deinterlace(*this, psz_mode.c_str());
+        libvlc_video_set_deinterlace(*this,
+                                     mode.empty() ? NULL : mode.c_str());
     }
 
     /**
