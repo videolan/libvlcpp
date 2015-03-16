@@ -162,7 +162,7 @@ public:
      */
     int count()
     {
-        return libvlc_media_list_count(*this);
+        return libvlc_media_list_count( *this );
     }
 
     /**
@@ -211,7 +211,7 @@ public:
      */
     void lock()
     {
-        libvlc_media_list_lock(*this);
+        libvlc_media_list_lock( *this );
     }
 
     /**
@@ -220,7 +220,7 @@ public:
      */
     void unlock()
     {
-        libvlc_media_list_unlock(*this);
+        libvlc_media_list_unlock( *this );
     }
 
     /**

@@ -508,11 +508,11 @@ public:
     }
 
     /**
-     * end bug How many video outputs does this media player have?
+     * Get the amount of video outputs this media player has?
      *
      * \return the number of video outputs
      */
-    unsigned hasVout()
+    uint32_t hasVout()
     {
         return libvlc_media_player_has_vout(*this);
     }
