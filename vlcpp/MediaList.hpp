@@ -26,6 +26,8 @@
 
 #include "common.hpp"
 
+#include <mutex>
+
 namespace VLC
 {
 
@@ -37,6 +39,8 @@ class MediaLibrary;
 class MediaList : public Internal<libvlc_media_list_t>
 {
 public:
+    using Lock = std::lock_guard<MediaList>;
+
     /**
      * Check if 2 MediaList objects contain the same libvlc_media_list_t.
      * \param another another MediaList
