@@ -124,12 +124,10 @@ public:
      * held upon entering this function.
      *
      * \param p_md  a media instance
-     *
-     * \return 0 on success, -1 if the media list is read-only
      */
-    int addMedia(Media& md)
+    bool addMedia(Media& md)
     {
-        return libvlc_media_list_add_media( *this, getInternalPtr<libvlc_media_t>( md ) );
+        return libvlc_media_list_add_media( *this, getInternalPtr<libvlc_media_t>( md ) ) == 0;
     }
 
     /**
@@ -139,12 +137,10 @@ public:
      * \param p_md  a media instance
      *
      * \param i_pos  position in array where to insert
-     *
-     * \return 0 on success, -1 if the media list is read-only
      */
-    int insertMedia(Media& md, int pos)
+    bool insertMedia(Media& md, int pos)
     {
-        return libvlc_media_list_insert_media( *this, getInternalPtr<libvlc_media_t>( md ), pos );
+        return libvlc_media_list_insert_media( *this, getInternalPtr<libvlc_media_t>( md ), pos ) == 0;
     }
 
     /**
@@ -152,13 +148,10 @@ public:
      * libvlc_media_list_lock should be held upon entering this function.
      *
      * \param i_pos  position in array where to insert
-     *
-     * \return 0 on success, -1 if the list is read-only or the item was not
-     * found
      */
-    int removeIndex(int i_pos)
+    bool removeIndex(int i_pos)
     {
-        return libvlc_media_list_remove_index(*this,i_pos);
+        return libvlc_media_list_remove_index( *this, i_pos ) == 0;
     }
 
     /**
@@ -210,7 +203,7 @@ public:
      */
     bool isReadonly()
     {
-        return libvlc_media_list_is_readonly(*this) != 0;
+        return libvlc_media_list_is_readonly(*this) == 1;
     }
 
     /**

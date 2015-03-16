@@ -144,25 +144,21 @@ public:
      * Play media list item at position index
      *
      * \param i_index  index in media list to play
-     *
-     * \return 0 upon success -1 if the item wasn't found
      */
-    int playItemAtIndex(int i_index)
+    bool playItemAtIndex(int i_index)
     {
-        return libvlc_media_list_player_play_item_at_index(*this, i_index);
+        return libvlc_media_list_player_play_item_at_index(*this, i_index) == 0;
     }
 
     /**
      * Play the given media item
      *
      * \param p_md  the media instance
-     *
-     * \return 0 upon success, -1 if the media is not part of the media list
      */
-    int playItem(const Media& md)
+    bool playItem(const Media& md)
     {
         return libvlc_media_list_player_play_item( *this,
-                        getInternalPtr<libvlc_media_t>( md ) );
+                        getInternalPtr<libvlc_media_t>( md ) ) == 0;
     }
 
     /**
@@ -175,22 +171,18 @@ public:
 
     /**
      * Play next item from media list
-     *
-     * \return 0 upon success -1 if there is no next item
      */
-    int next()
+    bool next()
     {
-        return libvlc_media_list_player_next(*this);
+        return libvlc_media_list_player_next(*this) == 0;
     }
 
     /**
      * Play previous item from media list
-     *
-     * \return 0 upon success -1 if there is no previous item
      */
-    int previous()
+    bool previous()
     {
-        return libvlc_media_list_player_previous(*this);
+        return libvlc_media_list_player_previous(*this) == 0;
     }
 
     /**

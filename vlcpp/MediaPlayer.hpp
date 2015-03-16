@@ -880,13 +880,10 @@ public:
 
     /**
      * Get current mute status.
-     *
-     * \return the mute status (boolean) if defined, -1 if
-     * undefined/unapplicable
      */
-    int mute()
+    bool mute()
     {
-        return libvlc_audio_get_mute(*this);
+        return libvlc_audio_get_mute( *this ) == 1;
     }
 
     /**
@@ -923,12 +920,10 @@ public:
      * Set current software audio volume.
      *
      * \param i_volume  the volume in percents (0 = mute, 100 = 0dB)
-     *
-     * \return 0 if the volume was set, -1 if it was out of range
      */
-    int setVolume(int i_volume)
+    bool setVolume(int i_volume)
     {
-        return libvlc_audio_set_volume(*this, i_volume);
+        return libvlc_audio_set_volume(*this, i_volume) == 0;
     }
 
     /**
@@ -967,12 +962,10 @@ public:
      * Set current audio track.
      *
      * \param i_track  the track ID (i_id field from track description)
-     *
-     * \return 0 on success, -1 on error
      */
-    int setAudioTrack(int i_track)
+    bool setAudioTrack(int i_track)
     {
-        return libvlc_audio_set_track(*this, i_track);
+        return libvlc_audio_set_track(*this, i_track) == 0;
     }
 
     /**
@@ -993,12 +986,10 @@ public:
      * \param channel  the audio channel,
      *
      * \see libvlc_audio_output_channel_t
-     *
-     * \return 0 on success, -1 on error
      */
-    int setChannel(int channel)
+    bool setChannel(int channel)
     {
-        return libvlc_audio_set_channel(*this, channel);
+        return libvlc_audio_set_channel(*this, channel) == 0;
     }
 
     /**
