@@ -45,6 +45,13 @@ public:
     }
 
     /**
+     * Create an empty VLC MediaLibrary instance.
+     *
+     * Calling any method on such an instance is undefined.
+    */
+    MediaLibrary() = default;
+
+    /**
      * Check if 2 MediaLibrary objects contain the same libvlc_media_library_t.
      * \param another another MediaLibrary
      * \return true if they contain the same libvlc_media_library_t

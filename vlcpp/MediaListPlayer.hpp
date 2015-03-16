@@ -59,6 +59,12 @@ public:
     {
     }
 
+    /**
+     * Create an empty VLC MediaListPlayer instance.
+     *
+     * Calling any method on such an instance is undefined.
+    */
+    MediaListPlayer() = default;
 
     /**
      * Return the event manager of this media_list_player.

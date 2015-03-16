@@ -96,6 +96,12 @@ public:
     {
     }
 
+    /**
+     * Create an empty VLC MediaPlayer instance.
+     *
+     * Calling any method on such an instance is undefined.
+    */
+    MediaPlayer() = default;
 
     /**
      * Set the media that will be used by the media_player. If any, previous

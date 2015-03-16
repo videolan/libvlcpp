@@ -97,6 +97,13 @@ public:
     }
 
     /**
+     * Create an empty VLC MediaList instance.
+     *
+     * Calling any method on such an instance is undefined.
+    */
+    MediaList() = default;
+
+    /**
      * Associate media instance with this media list instance. If another
      * media instance was present it will be released. The
      * libvlc_media_list_lock should NOT be held upon entering this function.
