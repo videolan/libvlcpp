@@ -27,6 +27,7 @@
 #include "common.hpp"
 
 #include <string>
+#include <vlc/libvlc_version.h>
 
 namespace VLC
 {
@@ -37,7 +38,6 @@ class Instance;
 class MediaDiscoverer : public Internal<libvlc_media_discoverer_t>
 {
 public:
-    // libvlc_media_discoverer_new_from_name
     /**
      * Discover media service by name.
      *
@@ -48,10 +48,41 @@ public:
      *          fairly expensive to instantiate.
      */
     MediaDiscoverer(Instance& inst, const std::string& name)
+#if LIBVLC_VERSION(3, 0, 0, 0) >= LIBVLC_VERSION_INT
+        : Internal{ libvlc_media_discoverer_new(getInternalPtr<libvlc_instance_t>( inst ), name.c_str()),
+#else
         : Internal{ libvlc_media_discoverer_new_from_name(getInternalPtr<libvlc_instance_t>( inst ), name.c_str()),
+#endif
                     libvlc_media_discoverer_release }
     {
     }
+
+#if LIBVLC_VERSION(3, 0, 0, 0) >= LIBVLC_VERSION_INT
+    /**
+     * Start media discovery.
+     *
+     * To stop it, call MediaDiscover::stop() or
+     * destroy the object directly.
+     *
+     * \see MediaDiscover::stop
+     *
+     * \return false in case of error, true otherwise
+     */
+    bool start()
+    {
+        return libvlc_media_discoverer_start( *this ) == 0;
+    }
+
+    /**
+     * Stop media discovery.
+     *
+     * \see MediaDiscoverer::start()
+     */
+    void stop()
+    {
+        libvlc_media_discoverer_stop( *this );
+    }
+#endif
 
     /**
      * Get media service discover object its localized name.
