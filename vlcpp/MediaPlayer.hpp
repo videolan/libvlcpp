@@ -1237,9 +1237,9 @@ public:
      *
      * \note Invalid aspect ratios are ignored.
      */
-    void setAspectRatio(const std::string& psz_aspect)
+    void setAspectRatio( const std::string& ar )
     {
-        libvlc_video_set_aspect_ratio(*this,psz_aspect.c_str());
+        libvlc_video_set_aspect_ratio( *this, ar.size() > 0 ? ar.c_str() : nullptr );
     }
 
     /**
