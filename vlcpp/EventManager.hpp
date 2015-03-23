@@ -92,9 +92,9 @@ private:
 
     private:
         // Deduced type is Func& in case of lvalue; Func in case of rvalue.
-        // So we hold a reference to the callback when passed a lvalue, we
-        // copy construct it when passing a rvalue
-        Func m_userCallback;
+        // We decay the type to ensure we either copy or take ownership.
+        // Taking a reference would quite likely lead to unexpected behavior
+        typename std::decay<Func>::type m_userCallback;
         // EventManager always outlive EventHandler, no need for smart pointer
         EventManager* m_eventManager;
         Wrapper m_wrapper;
