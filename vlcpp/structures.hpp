@@ -28,11 +28,11 @@
 
 #include "common.hpp"
 
+//FIXME:
+//Should we make the constructors private again and implement our own vector allocator?
+
 namespace VLC
 {
-
-class Instance;
-class Media;
 
 class ModuleDescription
 {
@@ -57,7 +57,6 @@ public:
         return m_help;
     }
 
-private:
     explicit ModuleDescription( libvlc_module_description_t* c )
     {
         if ( c->psz_name != NULL )
@@ -70,12 +69,11 @@ private:
             m_help = c->psz_help;
     }
 
+private:
     std::string m_name;
     std::string m_shortname;
     std::string m_longname;
     std::string m_help;
-
-    friend class Instance;
 };
 
 
@@ -183,7 +181,6 @@ public:
         return m_encoding;
     }
 
-private:
     explicit MediaTrack(libvlc_media_track_t* c)
         : m_codec( c->i_codec )
         , m_originalFourcc( c->i_original_fourcc )
@@ -224,6 +221,7 @@ private:
         }
     }
 
+private:
     uint32_t m_codec;
     uint32_t m_originalFourcc;
     uint32_t m_id;
@@ -245,8 +243,6 @@ private:
     uint32_t m_fpsDen;
     // Subtitles
     std::string m_encoding;
-
-    friend class Media;
 };
 
 
@@ -263,8 +259,7 @@ public:
         return m_description;
     }
 
-private:
-    AudioOutputDescription( libvlc_audio_output_t* c )
+    explicit AudioOutputDescription( libvlc_audio_output_t* c )
     {
         if ( c->psz_name != NULL )
             m_name = c->psz_name;
@@ -272,10 +267,9 @@ private:
             m_description = c->psz_description;
     }
 
+private:
     std::string m_name;
     std::string m_description;
-
-    friend class Instance;
 };
 
 class AudioOutputDeviceDescription
@@ -293,7 +287,6 @@ class AudioOutputDeviceDescription
             return m_description;
         }
 
-    private:
         explicit AudioOutputDeviceDescription( libvlc_audio_output_device_t* d )
         {
             if ( d->psz_device != NULL )
@@ -302,11 +295,9 @@ class AudioOutputDeviceDescription
                 m_device = d->psz_description;
         }
 
+    private:
         std::string m_device;
         std::string m_description;
-
-        friend class Instance;
-        friend class MediaPlayer;
 };
 
 class TrackDescription
@@ -322,17 +313,16 @@ public:
         return m_name;
     }
 
-private:
     explicit TrackDescription( libvlc_track_description_t* c )
         : m_id( c->i_id )
     {
         if ( c->psz_name != nullptr )
             m_name = c->psz_name;
     }
+
+private:
     int m_id;
     std::string m_name;
-
-    friend class MediaPlayer;
 };
 
 } // namespace VLC

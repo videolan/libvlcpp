@@ -222,7 +222,7 @@ public:
         std::vector<ModuleDescription> res;
         while ( p != NULL )
         {
-            res.push_back( ModuleDescription( p ) );
+            res.emplace_back( p );
             p = p->p_next;
         }
         return res;
@@ -250,7 +250,7 @@ public:
         std::vector<ModuleDescription> res;
         while ( p != NULL )
         {
-            res.push_back( ModuleDescription( p ) );
+            res.emplace_back( p );
             p = p->p_next;
         }
         return res;
@@ -274,7 +274,7 @@ public:
         libvlc_audio_output_t* p = result;
         while ( p != NULL )
         {
-            res.push_back( AudioOutputDescription( p ) );
+            res.emplace_back( p );
             p = p->p_next;
         }
         libvlc_audio_output_list_release(result);
@@ -310,7 +310,7 @@ public:
         if ( devices == NULL )
             return res;
         for ( libvlc_audio_output_device_t* p = devices; p != NULL; p = p->p_next )
-            res.push_back( AudioOutputDeviceDescription( p ) );
+            res.emplace_back( p );
         libvlc_audio_output_device_list_release( devices );
         return res;
     }

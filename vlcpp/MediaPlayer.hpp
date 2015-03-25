@@ -816,8 +816,8 @@ public:
         std::vector<AudioOutputDeviceDescription> res;
         if ( devices == NULL )
             return res;
-        for ( libvlc_audio_output_device_t* p = devices; p != NULL; p = p->p_next )
-            res.push_back( AudioOutputDeviceDescription( p ) );
+        for ( auto* p = devices; p != NULL; p = p->p_next )
+            res.emplace_back( p );
         libvlc_audio_output_device_list_release( devices );
         return res;
     }
@@ -1643,7 +1643,7 @@ private:
         libvlc_track_description_t* p = tracks;
         while ( p != NULL )
         {
-            result.push_back( TrackDescription( p ) );
+            result.emplace_back( p );
             p = p->p_next;
         }
         libvlc_track_description_list_release(tracks);

@@ -425,7 +425,7 @@ public:
             return res;
 
         for ( uint32_t i = 0; i < nbTracks; ++i )
-            res.push_back( MediaTrack(tracks[i]));
+            res.emplace_back( tracks[i] );
         libvlc_media_tracks_release( tracks, nbTracks );
         return res;
     }
