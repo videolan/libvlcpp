@@ -1151,12 +1151,10 @@ public:
      * \param px  pointer to get the pixel width [OUT]
      *
      * \param py  pointer to get the pixel height [OUT]
-     *
-     * \return 0 on success, -1 if the specified video does not exist
      */
-    int size(unsigned num, unsigned * px, unsigned * py)
+    bool size(unsigned num, unsigned * px, unsigned * py)
     {
-        return libvlc_video_get_size(*this, num, px, py);
+        return libvlc_video_get_size( *this, num, px, py ) == 0;
     }
 
     /**
@@ -1182,12 +1180,10 @@ public:
      * \param px  pointer to get the abscissa [OUT]
      *
      * \param py  pointer to get the ordinate [OUT]
-     *
-     * \return 0 on success, -1 if the specified video does not exist
      */
-    int cursor(unsigned num, int * px, int * py)
+    bool cursor(unsigned num, int * px, int * py)
     {
-        return libvlc_video_get_cursor(*this, num, px, py);
+        return libvlc_video_get_cursor( *this, num, px, py ) == 0;
     }
 
     /**
@@ -1458,12 +1454,10 @@ public:
      * \param i_width  the snapshot's width
      *
      * \param i_height  the snapshot's height
-     *
-     * \return 0 on success, -1 if the video was not found
      */
-    int takeSnapshot(unsigned num, const std::string& psz_filepath, unsigned int i_width, unsigned int i_height)
+    bool takeSnapshot(unsigned num, const std::string& psz_filepath, unsigned int i_width, unsigned int i_height)
     {
-        return libvlc_video_take_snapshot(*this, num, psz_filepath.c_str(), i_width, i_height);
+        return libvlc_video_take_snapshot(*this, num, psz_filepath.c_str(), i_width, i_height) == 0;
     }
 
     /**
