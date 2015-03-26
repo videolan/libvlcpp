@@ -238,7 +238,8 @@ class MediaEventManager : public EventManager
             return handle(libvlc_MediaSubItemAdded, std::forward<Func>( f ), [](const libvlc_event_t* e, void* data)
             {
                 auto callback = static_cast<DecayPtr<Func>>(data);
-                (*callback)( std::make_shared<Media>( e->u.media_subitem_added.new_child, true ) );
+                auto media = e->u.media_subitem_added.new_child;
+                (*callback)( media != nullptr ? std::make_shared<Media>( media, true ) : nullptr );
             });
         }
 
@@ -271,7 +272,8 @@ class MediaEventManager : public EventManager
             return handle(libvlc_MediaFreed, std::forward<Func>( f ), [](const libvlc_event_t* e, void* data)
             {
                 auto callback = static_cast<DecayPtr<Func>>(data);
-                (*callback)( std::make_shared<Media>( e->u.media_freed.md, true ) );
+                auto media = e->u.media_freed.md;
+                (*callback)( media != nullptr ? std::make_shared<Media>( media, true ) : nullptr );
             });
         }
 
@@ -293,7 +295,8 @@ class MediaEventManager : public EventManager
             return handle(libvlc_MediaSubItemAdded, std::forward<Func>( f ), [](const libvlc_event_t* e, void* data)
             {
                 auto callback = static_cast<DecayPtr<Func>>(data);
-                (*callback)( std::make_shared<Media>( e->u.media_subitemtree_added.item, true ) );
+                auto media = e->u.media_subitemtree_added.item;
+                (*callback)( media != nullptr ? std::make_shared<Media>( media, true ) : nullptr );
             });
         }
 };
@@ -310,7 +313,8 @@ class MediaPlayerEventManager : public EventManager
             return handle(libvlc_MediaPlayerMediaChanged, std::forward<Func>( f ), [](const libvlc_event_t* e, void* data)
             {
                 auto callback = static_cast<DecayPtr<Func>>( data );
-                (*callback)( std::make_shared<Media>( e->u.media_player_media_changed.new_media, true ) );
+                auto media = e->u.media_player_media_changed.new_media;
+                (*callback)( media != nullptr ? std::make_shared<Media>( media, true ) : nullptr );
             });
         }
 
@@ -524,7 +528,9 @@ class MediaListEventManager : public EventManager
             return handle(libvlc_MediaListItemAdded, std::forward<Func>( f ), [](const libvlc_event_t* e, void* data)
             {
                 auto callback = static_cast<DecayPtr<Func>>( data );
-                (*callback)( std::make_shared<Media>( e->u.media_list_item_added.item, true ), e->u.media_list_item_added.index );
+                auto media = e->u.media_list_item_added.item;
+                (*callback)( media != nullptr ? std::make_shared<Media>( media, true ) : nullptr,
+                             e->u.media_list_item_added.index );
             });
         }
 
@@ -535,7 +541,9 @@ class MediaListEventManager : public EventManager
             return handle( libvlc_MediaListWillAddItem, std::forward<Func>( f ), [](const libvlc_event_t* e, void* data)
             {
                 auto callback = static_cast<DecayPtr<Func>>( data );
-                (*callback)(std::make_shared<Media>( e->u.media_list_will_add_item.item, true ), e->u.media_list_will_add_item.index );
+                auto media = e->u.media_list_will_add_item.item;
+                (*callback)(media != nullptr ? std::make_shared<Media>( media, true ) : nullptr,
+                            e->u.media_list_will_add_item.index );
             });
         }
 
@@ -546,7 +554,9 @@ class MediaListEventManager : public EventManager
             return handle(libvlc_MediaListItemDeleted, std::forward<Func>( f ), [](const libvlc_event_t* e, void* data)
             {
                 auto callback = static_cast<DecayPtr<Func>>( data );
-                (*callback)( std::make_shared<Media>( e->u.media_list_item_deleted.item, true ), e->u.media_list_item_deleted.index );
+                auto media = e->u.media_list_item_deleted.item;
+                (*callback)( media != nullptr ? std::make_shared<Media>( media, true ) : nullptr,
+                             e->u.media_list_item_deleted.index );
             });
         }
 
@@ -557,7 +567,9 @@ class MediaListEventManager : public EventManager
             return handle(libvlc_MediaListWillDeleteItem, std::forward<Func>( f ), [](const libvlc_event_t* e, void* data)
             {
                 auto callback = static_cast<DecayPtr<Func>>( data );
-                (*callback)( std::make_shared<Media>( e->u.media_list_will_delete_item.item, true ), e->u.media_list_will_delete_item.index );
+                auto media = e->u.media_list_will_delete_item.item;
+                (*callback)( media != nullptr ? std::make_shared<Media>( media, true ) : nullptr,
+                             e->u.media_list_will_delete_item.index );
             });
         }
 };
@@ -582,7 +594,8 @@ class MediaListPlayerEventManager : public EventManager
             return handle(libvlc_MediaListPlayerNextItemSet, std::forward<Func>( f ), [](const libvlc_event_t* e, void* data)
             {
                 auto callback = static_cast<DecayPtr<Func>>( data );
-                (*callback)( std::make_shared<Media>( e->u.media_list_player_next_item_set.item, true ) );
+                auto media = e->u.media_list_player_next_item_set.item;
+                (*callback)( media != nullptr ? std::make_shared<Media>( media, true ) : nullptr );
             });
         }
 
