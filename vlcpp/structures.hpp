@@ -80,13 +80,17 @@ private:
 class MediaTrack
 {
 public:
-    enum Type
+    enum class Type
     {
         Unknown = -1,
         Audio,
         Video,
         Subtitle
     };
+    constexpr static Type Unknown = Type::Unknown;
+    constexpr static Type Audio = Type::Audio;
+    constexpr static Type Video = Type::Video;
+    constexpr static Type Subtitle = Type::Subtitle;
 
     uint32_t codec() const
     {

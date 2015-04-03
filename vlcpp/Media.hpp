@@ -41,7 +41,7 @@ class Media : public Internal<libvlc_media_t>
 {
 public:
 
-    enum FromType
+    enum class FromType
     {
         /**
          * Create a media for a certain file path.
@@ -62,6 +62,10 @@ public:
          */
         AsNode,
     };
+    // To be able to write Media::FromLocation
+    constexpr static FromType FromPath = FromType::FromPath;
+    constexpr static FromType FromLocation = FromType::FromLocation;
+    constexpr static FromType AsNode = FromType::AsNode;
 
     /**
      * @brief Media Constructs a libvlc Media instance
