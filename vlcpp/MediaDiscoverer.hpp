@@ -48,7 +48,7 @@ public:
      *          fairly expensive to instantiate.
      */
     MediaDiscoverer(Instance& inst, const std::string& name)
-#if LIBVLC_VERSION(3, 0, 0, 0) >= LIBVLC_VERSION_INT
+#if LIBVLC_VERSION_INT >= LIBVLC_VERSION(3, 0, 0, 0)
         : Internal{ libvlc_media_discoverer_new(getInternalPtr<libvlc_instance_t>( inst ), name.c_str()),
 #else
         : Internal{ libvlc_media_discoverer_new_from_name(getInternalPtr<libvlc_instance_t>( inst ), name.c_str()),
@@ -57,7 +57,7 @@ public:
     {
     }
 
-#if LIBVLC_VERSION(3, 0, 0, 0) >= LIBVLC_VERSION_INT
+#if LIBVLC_VERSION_INT >= LIBVLC_VERSION(3, 0, 0, 0)
     /**
      * Start media discovery.
      *

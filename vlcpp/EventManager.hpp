@@ -482,6 +482,7 @@ class MediaPlayerEventManager : public EventManager
             });
         }
 
+#if LIBVLC_VERSION_INT >= LIBVLC_VERSION(3, 0, 0, 0)
         template <typename Func>
         RegisteredEvent onESAdded( Func&& f )
         {
@@ -514,6 +515,7 @@ class MediaPlayerEventManager : public EventManager
                 (*callback)( e->u.media_player_es_changed.i_type, e->u.media_player_es_changed.i_id );
             });
         }
+#endif
 };
 
 class MediaListEventManager : public EventManager
