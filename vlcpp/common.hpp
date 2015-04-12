@@ -108,60 +108,58 @@ namespace VLC
         EventOwner() = default;
     };
 
-    template <int Idx, typename Func, typename... Args>
+    template <int, typename>
+    struct FromOpaque;
+
+    template <int NbEvents>
+    struct FromOpaque<NbEvents, void*>
+    {
+        static EventOwner<NbEvents>* get(void* opaque)
+        {
+            return reinterpret_cast<EventOwner<NbEvents>*>( opaque );
+        }
+    };
+
+    template <int NbEvents>
+    struct FromOpaque<NbEvents, void**>
+    {
+        static EventOwner<NbEvents>* get(void** opaque)
+        {
+            return reinterpret_cast<EventOwner<NbEvents>*>( *opaque );
+        }
+    };
+
+    template <int Idx, typename... Args>
     struct CallbackWrapper;
 
-    // We assume that any callback will take a void* opaque as its first parameter.
+    // We assume that any callback will take a void*/void** opaque as its first parameter.
     // We intercept this parameter, and use it to fetch the list of user provided
     // functions. Once we know what function to call, we forward the rest of the
     // parameters.
     // Using partial specialization also allows us to get the list of the expected
     // callback parameters automatically, rather than having to specify them.
-    template <int Idx, typename Func, typename Ret, typename... Args>
-    struct CallbackWrapper<Idx, Func, Ret(*)(void*, Args...)>
+    template <int Idx, typename Ret, typename Opaque, typename... Args>
+    struct CallbackWrapper<Idx, Ret(*)(Opaque, Args...)>
     {
-        using Wrapped = Ret(void*, Args...);
-        template <int NbEvents>
+        using Wrapped = Ret(Opaque, Args...);
+
+        template <int NbEvents, typename Func>
         static Wrapped* wrap(EventOwner<NbEvents>* owner, Func&& func)
         {
             owner->callbacks[Idx] = std::shared_ptr<CallbackHandlerBase>( new CallbackHandler<Func>( std::forward<Func>( func ) ) );
-            return [](void* opaque, Args... args) -> Ret {
-                auto self = reinterpret_cast<EventOwner<NbEvents>*>(opaque);
+            return [](Opaque opaque, Args... args) -> Ret {
+                auto self = FromOpaque<NbEvents, Opaque>::get( opaque );
                 assert(self->callbacks[Idx].get());
                 auto cbHandler = static_cast<CallbackHandler<Func>*>( self->callbacks[Idx].get() );
                 return cbHandler->func( std::forward<Args>(args)... );
             };
         }
-    };
 
-    // Special handling for events with a void** opaque first parameter.
-    // We fetch it and do our business with it, then forward the parameters
-    // to the user callback, without this opaque param.
-    template <int Idx, typename Func, typename Ret, typename... Args>
-    struct CallbackWrapper<Idx, Func, Ret(*)(void**, Args...)>
-    {
-        using Wrapped = Ret(void**, Args...);
-        template <int NbEvents>
-        static Wrapped* wrap(EventOwner<NbEvents>* owner, Func&& func)
-        {
-            owner->callbacks[Idx] = std::shared_ptr<CallbackHandlerBase>( new CallbackHandler<Func>( std::forward<Func>( func ) ) );
-            return [](void** opaque, Args... args) -> Ret {
-                auto self = reinterpret_cast<EventOwner<NbEvents>*>(*opaque);
-                assert(self->callbacks[Idx].get());
-                auto cbHandler = static_cast<CallbackHandler<Func>*>( self->callbacks[Idx].get() );
-                return cbHandler->func( std::forward<Args>(args)... );
-            };
-        }
-    };
-
-    // Specialization to handle null callbacks at build time.
-    // We could try to compare any "Func" against nullptr at runtime, though
-    // since Func is a template type, which roughly has to satisfy the "Callable" concept,
-    // it could be an instance of a function object, which doesn't compare nicely against nullptr.
-    // Using the specialization at build time is easier and performs better.
-    template <int Idx, typename... Args>
-    struct CallbackWrapper<Idx, std::nullptr_t, void(*)(void*, Args...)>
-    {
+        // Overload to handle null callbacks at build time.
+        // We could try to compare any "Func" against nullptr at runtime, though
+        // since Func is a template type, which roughly has to satisfy the "Callable" concept,
+        // it could be an instance of a function object, which doesn't compare nicely against nullptr.
+        // Using the specialization at build time is easier and performs better.
         template <int NbEvents>
         static std::nullptr_t wrap(EventOwner<NbEvents>*, std::nullptr_t)
         {
