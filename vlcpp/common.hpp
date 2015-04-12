@@ -146,7 +146,7 @@ namespace VLC
         template <int NbEvents, typename Func>
         static Wrapped* wrap(EventOwner<NbEvents>* owner, Func&& func)
         {
-            owner->callbacks[Idx] = std::shared_ptr<CallbackHandlerBase>( new CallbackHandler<Func>( std::forward<Func>( func ) ) );
+            owner->callbacks[Idx] = std::make_shared<CallbackHandler<Func>>( std::forward<Func>( func ) );
             return [](Opaque opaque, Args... args) -> Ret {
                 auto self = FromOpaque<NbEvents, Opaque>::get( opaque );
                 assert(self->callbacks[Idx].get());
