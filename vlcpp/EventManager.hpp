@@ -66,12 +66,20 @@ private:
     class EventHandler : public EventHandlerBase
     {
     public:
-        EventHandler(EventManager& em, libvlc_event_e eventType, Func&& userCallback, Wrapper wrapper)
+        // We have to re-declare a template type, otherwise userCallback wouldn't be a forwarding reference
+        // Not doing so works since EventHandler is instantiated with a perfect forwarded type, so Func type
+        // will be a reference-less type if the callback was an lvalue, and an lvalue if the callback was an lvalue
+        // As described here: http://stackoverflow.com/questions/24497311/is-this-a-universal-reference-does-stdforward-make-sense-here
+        // this would still make sense, in a perverted kind of way.
+        template <typename FuncTpl>
+        EventHandler(EventManager& em, libvlc_event_e eventType, FuncTpl&& userCallback, Wrapper wrapper)
             : m_userCallback( std::forward<Func>(userCallback) )
             , m_eventManager(&em)
             , m_wrapper(wrapper)
             , m_eventType( eventType )
         {
+            static_assert(std::is_same<typename std::decay<Func>::type,
+                                        typename std::decay<FuncTpl>::type>::value, "");
             if (libvlc_event_attach( *m_eventManager, m_eventType, m_wrapper, &m_userCallback ) != 0)
                 throw std::bad_alloc();
         }
