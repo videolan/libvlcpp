@@ -87,8 +87,9 @@ int main(int ac, char** av)
         std::cout << "Lambda called" << std::endl;
         assert(expected);
     };
-    auto h1 = mp.eventManager().onTimeChanged(l);
-    auto h2 = mp.eventManager().onPositionChanged(l);
+    auto lFunc = std::function<void(float)>{ l };
+    auto h1 = mp.eventManager().onTimeChanged(lFunc);
+    auto h2 = mp.eventManager().onPositionChanged(lFunc);
 
     std::this_thread::sleep_for( std::chrono::seconds( 2 ) );
 
