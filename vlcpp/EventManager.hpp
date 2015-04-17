@@ -637,7 +637,7 @@ class MediaDiscovererEventManager : public EventManager
 class VLMEventManager : public EventManager
 {
     public:
-        using EventManager::EventManager;
+        VLMEventManager(InternalPtr ptr) : EventManager(ptr) {}
 
         template <typename Func>
         RegisteredEvent onMediaAdded( Func&& f )
