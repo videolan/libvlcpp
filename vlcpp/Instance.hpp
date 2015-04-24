@@ -34,8 +34,14 @@
 namespace VLC
 {
 
-class Instance : public Internal<libvlc_instance_t>
+class Instance : public Internal<libvlc_instance_t>, private EventOwner<2>
 {
+private:
+    enum class EventIdx : unsigned int
+    {
+        Exit,
+        Log
+    };
 public:
     /**
      * Create and initialize a libvlc instance. This functions accept a list
@@ -113,9 +119,13 @@ public:
      * \warning This function and Instance::wait() cannot be used at the same
      * time.
      */
-    void setExitHandler(void(*cb)(void *), void * opaque)
+    template <typename ExitCb>
+    void setExitHandler(ExitCb&& exitCb)
     {
-        libvlc_set_exit_handler( *this, cb, opaque );
+        static_assert(signature_match_or_nullptr<ExitCb, void()>::value, "Mismatched exit callback" );
+        libvlc_set_exit_handler( *this,
+            CallbackWrapper<(int)EventIdx::Exit, void(*)(void*)>::wrap( this, std::forward<ExitCb>( exitCb ) ),
+            static_cast<EventOwner<2>*>( this ) );
     }
 
     /**
@@ -170,8 +180,6 @@ public:
      * thread-safe: it will wait for any pending callbacks invocation to
      * complete.
      *
-     * \param data  opaque data pointer for the callback function
-     *
      * \note Some log messages (especially debug) are emitted by LibVLC while
      * is being initialized. These messages cannot be captured with this
      * interface.
@@ -183,9 +191,19 @@ public:
      *
      * \version LibVLC 2.1.0 or later
      */
-    void logSet(libvlc_log_cb cb, void * data)
+    template <typename LogCb>
+    void logSet(LogCb&& logCb)
     {
-        libvlc_log_set(*this, cb, data);
+        static_assert(signature_match<LogCb, void(int, const libvlc_log_t*, std::string)>::value,
+                      "Mismatched log callback" );
+        auto wrapper = [logCb](int level, const libvlc_log_t* ctx, const char* format, va_list va) {
+            char *message;
+            vasprintf( &message, format, va);
+            std::unique_ptr<char, void(*)(void*)> mPtr{ message, free };
+            logCb( level, ctx, std::string{ message } );
+        };
+        libvlc_log_set( *this, CallbackWrapper<(int)EventIdx::Log, libvlc_log_cb>::wrap( this, std::move( wrapper ) ),
+                        static_cast<EventOwner<2>*>( this ) );
     }
 
     /**
