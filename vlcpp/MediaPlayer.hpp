@@ -707,7 +707,7 @@ public:
             CallbackWrapper<(int)EventIdx::AudioFlush,  libvlc_audio_flush_cb>::wrap(  this, std::forward<FlushCb>( flush ) ),
             CallbackWrapper<(int)EventIdx::AudioDrain,  libvlc_audio_drain_cb>::wrap(  this, std::forward<DrainCb>( drain ) ),
             // We will receive the pointer as a void*, we need to offset the value *now*, otherwise we'd get
-            // a shifted value, resulting in an empty callback array.
+            // a shifted value, resulting in an invalid callback array.
             static_cast<EventOwner<13>*>( this ) );
     }
 
