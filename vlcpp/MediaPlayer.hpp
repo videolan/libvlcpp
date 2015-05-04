@@ -169,9 +169,9 @@ public:
      *
      * \version LibVLC 1.1.1 or later
      */
-    void setPause(int do_pause)
+    void setPause(bool pause)
     {
-        libvlc_media_player_set_pause(*this, do_pause);
+        libvlc_media_player_set_pause(*this, pause);
     }
 
     /**
@@ -608,9 +608,9 @@ public:
      *
      * \param b_fullscreen  boolean for fullscreen status
      */
-    void setFullscreen(int b_fullscreen)
+    void setFullscreen(bool fullscreen)
     {
-        libvlc_set_fullscreen(*this, b_fullscreen);
+        libvlc_set_fullscreen( *this, fullscreen );
     }
 
     /**
@@ -900,9 +900,9 @@ public:
      * \note To force silent playback, disable all audio tracks. This is more
      * efficient and reliable than mute.
      */
-    void setMute(int status)
+    void setMute(bool mute)
     {
-        libvlc_audio_set_mute(*this,status);
+        libvlc_audio_set_mute( *this, (int)mute );
     }
 
     /**
@@ -1121,9 +1121,9 @@ public:
      *
      * \param on  true to handle key press events, false to ignore them.
      */
-    void setKeyInput(unsigned on)
+    void setKeyInput(bool enable)
     {
-        libvlc_video_set_key_input(*this, on);
+        libvlc_video_set_key_input(*this, (int)enable);
     }
 
     /**
@@ -1138,9 +1138,9 @@ public:
      *
      * \param on  true to handle mouse click events, false to ignore them.
      */
-    void setMouseInput(unsigned on)
+    void setMouseInput(bool enable)
     {
-        libvlc_video_set_mouse_input(*this, on);
+        libvlc_video_set_mouse_input(*this, (int)enable);
     }
 
     /**
