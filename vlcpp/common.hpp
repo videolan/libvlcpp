@@ -81,9 +81,13 @@ namespace VLC
 
     template <typename Func, typename Ret, typename... Args>
     struct signature_match_or_nullptr : std::integral_constant<bool,
-            signature_match<Func, Ret, Args...>::value ||
-            std::is_same<Func, std::nullptr_t>::value
+        signature_match<Func, Ret, Args...>::value
         >
+    {
+    };
+
+    template <typename Func>
+    struct signature_match_or_nullptr<nullptr_t, Func> : std::true_type
     {
     };
 
