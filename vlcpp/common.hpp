@@ -87,7 +87,7 @@ namespace VLC
     };
 
     template <typename Func>
-    struct signature_match_or_nullptr<nullptr_t, Func> : std::true_type
+    struct signature_match_or_nullptr<std::nullptr_t, Func> : std::true_type
     {
     };
 

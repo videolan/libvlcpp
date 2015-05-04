@@ -63,7 +63,7 @@ public:
         AsNode,
     };
     // To be able to write Media::FromLocation
-#if _MSC_VER >= 1900
+#if !defined(_MSC_VER) || _MSC_VER >= 1900
     constexpr static FromType FromPath = FromType::FromPath;
     constexpr static FromType FromLocation = FromType::FromLocation;
     constexpr static FromType AsNode = FromType::AsNode;

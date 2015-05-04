@@ -87,7 +87,7 @@ public:
         Video,
         Subtitle
     };
-#if _MSC_VER >= 1900
+#if !defined(_MSC_VER) || _MSC_VER >= 1900
     constexpr static Type Unknown = Type::Unknown;
     constexpr static Type Audio = Type::Audio;
     constexpr static Type Video = Type::Video;
