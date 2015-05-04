@@ -63,9 +63,15 @@ public:
         AsNode,
     };
     // To be able to write Media::FromLocation
+#if _MSC_VER >= 1900
     constexpr static FromType FromPath = FromType::FromPath;
     constexpr static FromType FromLocation = FromType::FromLocation;
     constexpr static FromType AsNode = FromType::AsNode;
+#else
+    static const FromType FromPath = FromType::FromPath;
+    static const FromType FromLocation = FromType::FromLocation;
+    static const FromType AsNode = FromType::AsNode;
+#endif
 
     /**
      * @brief Media Constructs a libvlc Media instance

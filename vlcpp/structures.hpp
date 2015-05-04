@@ -87,10 +87,17 @@ public:
         Video,
         Subtitle
     };
+#if _MSC_VER >= 1900
     constexpr static Type Unknown = Type::Unknown;
     constexpr static Type Audio = Type::Audio;
     constexpr static Type Video = Type::Video;
     constexpr static Type Subtitle = Type::Subtitle;
+#else
+    const static Type Unknown = Type::Unknown;
+    const static Type Audio = Type::Audio;
+    const static Type Video = Type::Video;
+    const static Type Subtitle = Type::Subtitle;
+#endif
 
     uint32_t codec() const
     {
