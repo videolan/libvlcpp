@@ -31,6 +31,11 @@
 #include <string>
 #include <vector>
 
+#if !defined(_MSC_VER) && !defined(_GNU_SOURCE)
+#define _GNU_SOURCE
+#endif
+#include <cstdio>
+
 namespace VLC
 {
 
@@ -198,9 +203,11 @@ public:
                       "Mismatched log callback" );
         auto wrapper = [logCb](int level, const libvlc_log_t* ctx, const char* format, va_list va) {
             char *message;
-            vasprintf( &message, format, va);
-            std::unique_ptr<char, void(*)(void*)> mPtr{ message, free };
-            logCb( level, ctx, std::string{ message } );
+            if ( vasprintf( &message, format, va) != -1 )
+            {
+                std::unique_ptr<char, void(*)(void*)> mPtr{ message, free };
+                logCb( level, ctx, std::string{ message } );
+            }
         };
         libvlc_log_set( *this, CallbackWrapper<(int)EventIdx::Log, libvlc_log_cb>::wrap( this, std::move( wrapper ) ),
                         static_cast<EventOwner<2>*>( this ) );
