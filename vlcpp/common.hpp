@@ -145,10 +145,10 @@ namespace VLC
     template <int Idx, typename Ret, typename Opaque, typename... Args>
     struct CallbackWrapper<Idx, Ret(*)(Opaque, Args...)>
     {
-        using Wrapped = Ret(Opaque, Args...);
+        using Wrapped = Ret(*)(Opaque, Args...);
 
         template <int NbEvents, typename Func>
-        static Wrapped* wrap(EventOwner<NbEvents>* owner, Func&& func)
+        static Wrapped wrap(EventOwner<NbEvents>* owner, Func&& func)
         {
             owner->callbacks[Idx] = std::make_shared<CallbackHandler<Func>>( std::forward<Func>( func ) );
             return [](Opaque opaque, Args... args) -> Ret {
