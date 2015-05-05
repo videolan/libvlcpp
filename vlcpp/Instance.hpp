@@ -31,11 +31,6 @@
 #include <string>
 #include <vector>
 
-#if !defined(_MSC_VER) && !defined(_GNU_SOURCE)
-#define _GNU_SOURCE
-#endif
-#include <cstdio>
-
 namespace VLC
 {
 
@@ -202,10 +197,9 @@ public:
         static_assert(signature_match<LogCb, void(int, const libvlc_log_t*, std::string)>::value,
                       "Mismatched log callback" );
         auto wrapper = [logCb](int level, const libvlc_log_t* ctx, const char* format, va_list va) {
-            char *message;
-            if ( vasprintf( &message, format, va) != -1 )
+            char message[256];
+            if ( vsnprintf( message, 256, format, va) != -1 )
             {
-                std::unique_ptr<char, void(*)(void*)> mPtr{ message, free };
                 logCb( level, ctx, std::string{ message } );
             }
         };
