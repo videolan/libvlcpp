@@ -197,10 +197,13 @@ public:
         static_assert(signature_match<LogCb, void(int, const libvlc_log_t*, std::string)>::value,
                       "Mismatched log callback" );
         auto wrapper = [logCb](int level, const libvlc_log_t* ctx, const char* format, va_list va) {
-            char message[256];
-            if ( vsnprintf( message, 256, format, va) != -1 )
+            VaCopy vaCopy( va );
+            int len = vsnprintf( nullptr, 0, format, vaCopy.va );
+            if ( len > 0 )
             {
-                logCb( level, ctx, std::string{ message } );
+                std::unique_ptr<char[]> message{ new char[len] };
+                if ( vsnprintf( message.get(), len, format, va ) != -1 )
+                    logCb( level, ctx, std::string{ message.get() } );
             }
         };
         libvlc_log_set( *this, CallbackWrapper<(int)EventIdx::Log, libvlc_log_cb>::wrap( this, std::move( wrapper ) ),

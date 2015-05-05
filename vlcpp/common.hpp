@@ -170,6 +170,25 @@ namespace VLC
             return nullptr;
         }
     };
+
+    struct VaCopy
+    {
+        VaCopy(va_list va_)
+        {
+            va_copy( va, va_ );
+        }
+        ~VaCopy()
+        {
+            va_end( va );
+        }
+
+        VaCopy( const VaCopy& ) = delete;
+        VaCopy& operator=(const VaCopy& ) = delete;
+        VaCopy( VaCopy&& ) = delete;
+        VaCopy& operator=( VaCopy&& ) = delete;
+
+        va_list va;
+    };
 }
 
 #endif
