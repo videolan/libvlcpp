@@ -225,8 +225,8 @@ public:
      */
     std::vector<ModuleDescription> audioFilterList()
     {
-        auto releaser = [](libvlc_module_description_t* ptr) { libvlc_module_description_list_release(ptr); };
-        auto ptr = std::unique_ptr<libvlc_module_description_t, decltype(releaser)>( libvlc_audio_filter_list_get(*this), releaser );
+        std::unique_ptr<libvlc_module_description_t, decltype(&libvlc_module_description_list_release)>
+                ptr( libvlc_audio_filter_list_get(*this), libvlc_module_description_list_release );
         if ( ptr == nullptr )
             return {};
         libvlc_module_description_t* p = ptr.get();
@@ -247,8 +247,8 @@ public:
      */
     std::vector<ModuleDescription> videoFilterList()
     {
-        auto releaser = [](libvlc_module_description_t* ptr) { libvlc_module_description_list_release(ptr); };
-        auto ptr = std::unique_ptr<libvlc_module_description_t, decltype(releaser)>( libvlc_video_filter_list_get(*this), releaser );
+        std::unique_ptr<libvlc_module_description_t, decltype(&libvlc_module_description_list_release)>
+                ptr( libvlc_video_filter_list_get(*this), &libvlc_module_description_list_release );
         if ( ptr == nullptr )
             return {};
         libvlc_module_description_t* p = ptr.get();
@@ -268,17 +268,18 @@ public:
      */
     std::vector<AudioOutputDescription> audioOutputList()
     {
-        libvlc_audio_output_t* result = libvlc_audio_output_list_get(*this);
+        std::unique_ptr<libvlc_audio_output_t, decltype(&libvlc_audio_output_list_release)>
+                result( libvlc_audio_output_list_get(*this), libvlc_audio_output_list_release );
+        if ( result == nullptr )
+            return {};
         std::vector<AudioOutputDescription> res;
-        if ( result == NULL )
-            return res;
-        libvlc_audio_output_t* p = result;
+
+        libvlc_audio_output_t* p = result.get();
         while ( p != NULL )
         {
             res.emplace_back( p );
             p = p->p_next;
         }
-        libvlc_audio_output_list_release(result);
         return res;
     }
 
@@ -306,13 +307,14 @@ public:
      */
     std::vector<AudioOutputDeviceDescription> audioOutputDeviceList(const std::string& aout)
     {
-        libvlc_audio_output_device_t* devices = libvlc_audio_output_device_list_get( *this, aout.c_str() );
+        std::unique_ptr<libvlc_audio_output_device_t, decltype(&libvlc_audio_output_device_list_release)>
+                devices(  libvlc_audio_output_device_list_get( *this, aout.c_str() ), libvlc_audio_output_device_list_release );
+        if ( devices == nullptr )
+            return {};
         std::vector<AudioOutputDeviceDescription> res;
-        if ( devices == NULL )
-            return res;
-        for ( libvlc_audio_output_device_t* p = devices; p != NULL; p = p->p_next )
+
+        for ( auto p = devices.get(); p != nullptr; p = p->p_next )
             res.emplace_back( p );
-        libvlc_audio_output_device_list_release( devices );
         return res;
     }
 
