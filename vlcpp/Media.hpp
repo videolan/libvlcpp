@@ -145,7 +145,7 @@ public:
     explicit Media( Internal::InternalPtr ptr, bool incrementRefCount)
         : Internal{ ptr, libvlc_media_release }
     {
-        if (incrementRefCount)
+        if ( incrementRefCount && ptr != nullptr )
             retain();
     }
 
