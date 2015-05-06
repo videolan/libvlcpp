@@ -53,8 +53,6 @@ class Internal
         Internal( InternalPtr obj, Releaser releaser )
             : m_obj{ obj, releaser }
         {
-            if ( obj == nullptr )
-                throw std::runtime_error("Wrapping a NULL instance");
         }
 
         Internal(Releaser releaser)
