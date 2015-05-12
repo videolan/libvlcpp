@@ -34,24 +34,39 @@
 namespace VLC
 {
 
+///
+/// \brief The ModuleDescription class describes a module
+///
 class ModuleDescription
 {
 public:
+    ///
+    /// \brief name Returns the module name
+    ///
     const std::string& name() const
     {
         return m_name;
     }
 
+    ///
+    /// \brief shortname Returns the module short name
+    ///
     const std::string& shortname() const
     {
         return m_shortname;
     }
 
+    ///
+    /// \brief longname returns the module long name
+    ///
     const std::string& longname() const
     {
         return m_longname;
     }
 
+    ///
+    /// \brief help Returns a basic help string for this module
+    ///
     const std::string& help() const
     {
         return m_help;
@@ -76,15 +91,23 @@ private:
     std::string m_help;
 };
 
-
+///
+/// \brief The MediaTrack class describes a track
+///
 class MediaTrack
 {
 public:
+    ///
+    /// \brief The Type enum indicates the type of a track
+    ///
     enum class Type
     {
         Unknown = -1,
+        /// Audio track
         Audio,
+        /// Video track
         Video,
+        /// Subtitle track (also called SPU sometimes)
         Subtitle
     };
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
@@ -99,94 +122,182 @@ public:
     const static Type Subtitle = Type::Subtitle;
 #endif
 
+    ///
+    /// \brief codec Returns the codec as a fourcc
+    ///
+    /// This is the fourcc will use to select a codec, but it might be an
+    /// interpretation of the original fourcc.
+    /// \see originalFourCC()
+    ///
     uint32_t codec() const
     {
         return m_codec;
     }
 
+    ///
+    /// \brief originalFourCC Returns the fourcc as found in the file.
+    ///
+    /// VLC might chose to use a different fourcc internally.
+    /// For instance, AVC1 & H264 fourcc are (almost?) identical. VLC would
+    /// use H264 as the codec/fourcc, and store AVC1/H264 as the original fourcc
+    ///
     uint32_t originalFourCC() const
     {
         return m_originalFourcc;
     }
 
+    ///
+    /// \brief id The track internal ID.
+    ///
+    /// This can't be assume to grow one by one monotonically.
+    ///
     int32_t id() const
     {
         return m_id;
     }
 
+    ///
+    /// \brief type The track type
+    ///
+    /// \see MediaTrack::Type
+    ///
     Type type() const
     {
         return m_type;
     }
 
+    ///
+    /// \brief profile This track profile
+    ///
+    /// This might or might not be set, depending on the codec.
+    ///
     int32_t profile() const
     {
         return m_profile;
     }
 
+    ///
+    /// \brief level This track level
+    ///
+    /// This might or might not be set, depending on the codec
+    ///
     int32_t level() const
     {
         return m_level;
     }
 
+    ///
+    /// \brief bitrate This track bitrate, in bytes per second
+    /// \return
+    ///
     uint32_t bitrate() const
     {
         return m_bitrate;
     }
 
+    ///
+    /// \brief language This track language, if available.
+    ///
     const std::string& language() const
     {
         return m_language;
     }
 
+    ///
+    /// \brief description This track description
+    ///
     const std::string& description() const
     {
         return m_description;
     }
 
-    // Audio specific
+    ////////////////////////////////////////////////////////////////////////////
+    /// Audio specific
+    ////////////////////////////////////////////////////////////////////////////
+
+    ///
+    /// \brief channels This track number of channels
+    ///
     uint32_t channels() const
     {
         return m_channels;
     }
 
+    ///
+    /// \brief rate This track samplerate, in hertz (Hz)
+    ///
     uint32_t rate() const
     {
         return m_rate;
     }
 
+    ////////////////////////////////////////////////////////////////////////////
     // Video specific
+    ////////////////////////////////////////////////////////////////////////////
+
+    ///
+    /// \brief height This track video height
+    ///
     uint32_t height() const
     {
         return m_height;
     }
 
+    ///
+    /// \brief width This track video width
+    ///
     uint32_t width() const
     {
         return m_width;
     }
 
+    ///
+    /// \brief sarNum This track aspect ratio numerator
+    ///
+    /// \see sarDen
+    ///
     uint32_t sarNum() const
     {
         return m_sarNum;
     }
 
+    ///
+    /// \brief sarDen This track aspect ratio denominator
+    ///
+    /// \see sarNum
+    ///
     uint32_t sarDen() const
     {
         return m_sarDen;
     }
 
+    ///
+    /// \brief fpsNum This track frame per second numerator
+    ///
+    /// \see fpsDen
+    ///
     uint32_t fpsNum() const
     {
         return m_fpsNum;
     }
 
+    ///
+    /// \brief fpsDen This track frame per second denominator
+    ///
+    /// \see fpsNum
+    ///
     uint32_t fpsDen() const
     {
         return m_fpsDen;
     }
 
+    ////////////////////////////////////////////////////////////////////////////
     // Subtitles specific
+    ////////////////////////////////////////////////////////////////////////////
+
+    ///
+    /// \brief encoding Subtitles text encoding
+    ///
     const std::string& encoding() const
     {
         return m_encoding;
@@ -256,15 +367,23 @@ private:
     std::string m_encoding;
 };
 
-
+///
+/// \brief The AudioOutputDescription class describes an audio output module
+///
 class AudioOutputDescription
 {
 public:
+    ///
+    /// \brief name The module name
+    ///
     const std::string& name() const
     {
         return m_name;
     }
 
+    ///
+    /// \brief description The module description
+    ///
     const std::string& description() const
     {
         return m_description;
@@ -283,6 +402,10 @@ private:
     std::string m_description;
 };
 
+///
+/// \brief The AudioOutputDeviceDescription class describes an audio device, as seen
+///         by an audio output module
+///
 class AudioOutputDeviceDescription
 {
     public:
@@ -311,14 +434,23 @@ class AudioOutputDeviceDescription
         std::string m_description;
 };
 
+///
+/// \brief The TrackDescription class describes a track
+///
 class TrackDescription
 {
 public:
+    ///
+    /// \brief id The track id
+    ///
     int id() const
     {
         return m_id;
     }
 
+    ///
+    /// \brief name The track name
+    ///
     const std::string& name() const
     {
         return m_name;
