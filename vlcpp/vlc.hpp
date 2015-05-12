@@ -34,6 +34,4 @@
 #include "EventManager.hpp"
 #include "structures.hpp"
 
-#include <memory>
-
 #endif
