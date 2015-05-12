@@ -39,6 +39,9 @@ class MediaLibrary;
 class MediaList : public Internal<libvlc_media_list_t>
 {
 public:
+    ///
+    /// @brief A convenience RAII type to handle MediaList's lock
+    ///
     using Lock = std::lock_guard<MediaList>;
 
     /**
@@ -51,20 +54,14 @@ public:
         return m_obj == another.m_obj;
     }
 
-    // libvlc_media_subitems
     /**
-     * Get subitems of media descriptor object. This will increment the
-     * reference count of supplied media descriptor object. Use
-     * MediaList::release() to decrement the reference counting.
-     *
-     * \param p_md  media descriptor object
+     * Get subitems of media descriptor object.
      */
     MediaList(Media& md)
         : Internal{ libvlc_media_subitems( getInternalPtr<libvlc_media_t>( md ) ), libvlc_media_list_release }
     {
     }
 
-    // libvlc_media_discoverer_media_list
     /**
      * Get media service discover media list.
      *
@@ -76,7 +73,6 @@ public:
     {
     }
 
-    // libvlc_media_library_media_list
     /**
      * Get media library subitems.
      *
@@ -88,7 +84,6 @@ public:
     }
 
 
-    // libvlc_media_list_new
     /**
      * Create an empty media list.
      *
@@ -110,7 +105,7 @@ public:
     /**
      * Associate media instance with this media list instance. If another
      * media instance was present it will be released. The
-     * libvlc_media_list_lock should NOT be held upon entering this function.
+     * MediaList lock should NOT be held upon entering this function.
      *
      * \param p_md  media instance to add
      */
@@ -120,7 +115,7 @@ public:
     }
 
     /**
-     * Add media instance to media list The libvlc_media_list_lock should be
+     * Add media instance to media list The MediaList lock should be
      * held upon entering this function.
      *
      * \param p_md  a media instance
@@ -132,7 +127,7 @@ public:
 
     /**
      * Insert media instance in media list on a position The
-     * libvlc_media_list_lock should be held upon entering this function.
+     * MediaList lock should be held upon entering this function.
      *
      * \param p_md  a media instance
      *
@@ -145,7 +140,7 @@ public:
 
     /**
      * Remove media instance from media list on a position The
-     * libvlc_media_list_lock should be held upon entering this function.
+     * MediaList lock should be held upon entering this function.
      *
      * \param i_pos  position in array where to insert
      */
@@ -155,7 +150,7 @@ public:
     }
 
     /**
-     * Get count on media list items The libvlc_media_list_lock should be
+     * Get count on media list items The MediaList lock should be
      * held upon entering this function.
      *
      * \return number of items in media list
@@ -167,13 +162,11 @@ public:
 
     /**
      * List media instance in media list at a position The
-     * libvlc_media_list_lock should be held upon entering this function.
+     * MediaList lock should be held upon entering this function.
      *
      * \param i_pos  position in array where to insert
      *
-     * \return media instance at position i_pos, or NULL if not found. In
-     * case of success, Media::retain() is called to increase the refcount on
-     * the media.
+     * \return media instance at position i_pos, or nullptr if not found.
      */
     MediaPtr itemAtIndex(int i_pos)
     {
@@ -184,7 +177,7 @@ public:
     /**
      * Find index position of List media instance in media list. Warning: the
      * function will return the first matched position. The
-     * libvlc_media_list_lock should be held upon entering this function.
+     * MediaList lock should be held upon entering this function.
      *
      * \param p_md  media instance
      *
@@ -199,7 +192,7 @@ public:
      * This indicates if this media list is read-only from a user point of
      * view
      *
-     * \return 1 on readonly, 0 on readwrite
+     * \return true if readonly, false otherwise
      */
     bool isReadonly()
     {
@@ -215,7 +208,7 @@ public:
     }
 
     /**
-     * Release lock on media list items The libvlc_media_list_lock should be
+     * Release lock on media list items The MediaList lock should be
      * held upon entering this function.
      */
     void unlock()
