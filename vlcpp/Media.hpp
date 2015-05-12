@@ -226,10 +226,10 @@ public:
     /**
      * Duplicate a media descriptor object.
      */
-    MediaPtr duplicate()
+    Media duplicate()
     {
         auto obj = libvlc_media_duplicate(*this);
-        return std::make_shared<Media>( obj, false );
+        return Media( obj, false );
     }
 
     /**
