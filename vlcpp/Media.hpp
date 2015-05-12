@@ -39,7 +39,10 @@ class MediaList;
 class Media : public Internal<libvlc_media_t>
 {
 public:
-
+    ///
+    /// \brief The FromType enum is used to drive the media creation.
+    /// A media is usually created using a string, which can represent one of 3 things:
+    ///
     enum class FromType
     {
         /**
@@ -117,9 +120,9 @@ public:
      * rendered once in a media player. To render it a second time, the file
      * descriptor should probably be rewound to the beginning with lseek().
      *
-     * \param p_instance the instance
+     * \param instance the instance
      * \param fd open file descriptor
-     * \return the newly created media or NULL on error
+     * \return the newly created media
      */
     Media(Instance& instance, int fd)
         : Internal { libvlc_media_new_fd( getInternalPtr<libvlc_instance_t>( instance ), fd ),
@@ -132,7 +135,7 @@ public:
      * the refcount on the media instance.
      * The libvlc_media_list_lock should NOT be held upon entering this function.
      *
-     * \param p_ml a media list instance
+     * \param list a media list instance
      * \return media instance
      */
     Media(MediaList& list)
@@ -279,9 +282,9 @@ public:
      *
      * \return true if the write operation was successful
      */
-    int saveMeta()
+    bool saveMeta()
     {
-        return libvlc_media_save_meta(*this);
+        return libvlc_media_save_meta(*this) != 0;
     }
 
     /**
@@ -418,7 +421,7 @@ public:
      *
      * Note, you need to call parse() or play the media at least once
      * before calling this function. Not doing this will result in an empty
-     * array.
+     * list.
      *
      * \version LibVLC 2.1.0 and later.
      *
