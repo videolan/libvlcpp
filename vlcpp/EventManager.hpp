@@ -301,7 +301,7 @@ class MediaEventManager : public EventManager
         RegisteredEvent onSubItemTreeAdded( Func&& f)
         {
             EXPECT_SIGNATURE(void(MediaPtr));
-            return handle(libvlc_MediaSubItemAdded, std::forward<Func>( f ), [](const libvlc_event_t* e, void* data)
+            return handle(libvlc_MediaSubItemTreeAdded, std::forward<Func>( f ), [](const libvlc_event_t* e, void* data)
             {
                 auto callback = static_cast<DecayPtr<Func>>(data);
                 auto media = e->u.media_subitemtree_added.item;
