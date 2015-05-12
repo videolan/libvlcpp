@@ -91,13 +91,11 @@ public:
     /**
      * Try to start a user interface for the libvlc instance.
      *
-     * \param name  interface name, or NULL for default
-     *
-     * \return 0 on success, -1 on error.
+     * \param name  interface name, or empty string for default
      */
-    int addIntf(const std::string& name)
+    bool addIntf(const std::string& name)
     {
-        return libvlc_add_intf( *this, name.c_str() );
+        return libvlc_add_intf( *this, name.length() > 0 ? name.c_str() : nullptr ) == 0;
     }
 
     /**
