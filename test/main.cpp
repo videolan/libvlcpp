@@ -36,9 +36,18 @@ int main(int ac, char** av)
     const char* vlcArgs = "-vv";
     auto instance = VLC::Instance(1, &vlcArgs);
 
-    instance.setExitHandler([] {
-        std::cout << "Libvlc is exiting" << std::endl;
-    });
+    {
+        auto exitHandler = [] {
+            std::cout << "Libvlc is exiting" << std::endl;
+        };
+        // Uncommenting this line would cause undefined behavior, as libvlcpp
+        // would store a reference, which would become dangling as soon as
+        // we leave this scope.
+        //instance.setExitHandler( exitHandler );
+
+        // This is fine, since we are moving the exitHandler. No dangling ref.
+        instance.setExitHandler( std::move( exitHandler ) );
+    }
 
     instance.logSet([](int lvl, const libvlc_log_t*, std::string message ) {
         std::cout << "Hooked VLC log: " << lvl << ' ' << message << std::endl;
