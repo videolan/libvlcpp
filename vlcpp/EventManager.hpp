@@ -97,6 +97,7 @@ private:
         }
 
         EventHandler(const EventHandler&) = delete;
+        EventHandler& operator=( const EventHandler& ) = delete;
 
     private:
         // Deduced type is Func& in case of lvalue; Func in case of rvalue.
