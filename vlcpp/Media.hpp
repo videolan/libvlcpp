@@ -32,7 +32,6 @@
 namespace VLC
 {
 
-class MediaPlayer;
 class MediaEventManager;
 class Instance;
 class MediaList;
