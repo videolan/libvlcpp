@@ -38,8 +38,6 @@
 namespace VLC
 {
 
-class Media;
-
 /**
  * @brief This class serves as a base for all event managers.
  *
