@@ -109,13 +109,9 @@ public:
      * are started. Otherwise, there is a small race condition: the exit
      * event could be raised before the handler is registered.
      *
-     * \param cb  callback to invoke when LibVLC wants to exit, or NULL to
-     * disable the exit handler (as by default)
-     *
-     * \param opaque  data pointer for the callback
-     *
-     * \warning This function and Instance::wait() cannot be used at the same
-     * time.
+     * \param cb  callback to invoke when LibVLC wants to exit, or nullptr to
+     * disable the exit handler (as by default). It is expected to be a
+     * std::function<void()>, or an equivalent Callable type
      */
     template <typename ExitCb>
     void setExitHandler(ExitCb&& exitCb)
@@ -182,10 +178,11 @@ public:
      * is being initialized. These messages cannot be captured with this
      * interface.
      *
+     * \param logCb A std::function<void(int, const libvlc_log_t*, std::string)>
+     *              or an equivalent Callable type instance.
+     *
      * \warning A deadlock may occur if this function is called from the
      * callback.
-     *
-     * \param p_instance  libvlc instance
      *
      * \version LibVLC 2.1.0 or later
      */
@@ -224,13 +221,7 @@ public:
     /**
      * Returns a list of audio filters that are available.
      *
-     * \return a list of module descriptions. It should be freed with
-     * ModuleDescription::moduleDescriptionListRelease() . In case of an
-     * error, NULL is returned.
-     *
      * \see ModuleDescription
-     *
-     * \see ModuleDescription::moduleDescriptionListRelease()
      */
     std::vector<ModuleDescription> audioFilterList()
     {
@@ -252,13 +243,7 @@ public:
     /**
      * Returns a list of video filters that are available.
      *
-     * \return a list of module descriptions. It should be freed with
-     * ModuleDescription::moduleDescriptionListRelease() . In case of an
-     * error, NULL is returned.
-     *
      * \see ModuleDescription
-     *
-     * \see ModuleDescription::moduleDescriptionListRelease()
      */
     std::vector<ModuleDescription> videoFilterList()
     {
@@ -279,11 +264,7 @@ public:
     /**
      * Gets the list of available audio output modules.
      *
-     * \return list of available audio outputs. It must be freed it with
-     *
-     * \see AudioOutputDescription::audioOutputListRelease()
-     *
-     * \see AudioOutputDescription . In case of error, NULL is returned.
+     * \see AudioOutputDescription
      */
     std::vector<AudioOutputDescription> audioOutputList()
     {
