@@ -32,6 +32,10 @@
 namespace VLC
 {
 
+///
+/// @brief The Internal class is a helper to wrap a raw libvlc type in a common
+///         C++ type.
+///
 template <typename T, typename Releaser = void(*)(T*)>
 class Internal
 {
@@ -40,10 +44,21 @@ class Internal
         using InternalPtr   = T*;
         using Pointer       = std::shared_ptr<T>;
 
+        ///
+        /// \brief get returns the underlying libvlc type, or nullptr if this
+        ///        is an empty instance
+        ///
         InternalPtr get() const { return m_obj.get(); }
 
+        ///
+        /// \brief isValid returns true if this instance isn't wrapping a nullptr
+        /// \return
+        ///
         bool isValid() const { return (bool)m_obj; }
 
+        ///
+        /// \brief operator T * helper to convert to the underlying libvlc type
+        ///
         operator T*() const { return m_obj.get(); }
 
     protected:
