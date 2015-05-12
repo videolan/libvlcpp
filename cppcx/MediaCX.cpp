@@ -50,7 +50,7 @@ namespace libVLCX
 
     Media^ Media::duplicate()
     {
-        return ref new Media(*m_media.duplicate().get());
+        return ref new Media(m_media.duplicate());
     }
 
     Platform::String^ Media::meta(MediaMeta e_meta)
