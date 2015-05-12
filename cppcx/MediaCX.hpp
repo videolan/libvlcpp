@@ -70,10 +70,17 @@ namespace libVLCX
         Actors
     };
 
+    public enum class FromType
+    {
+        FromPath,
+        FromLocation,
+        AsNode,
+    };
+
     public ref class Media sealed
     {
     public:
-        Media(Instance^ instance, Platform::String^ location);
+        Media(Instance^ instance, Platform::String^ location, FromType from_type);
 
         /**
         * Add an option to the media.

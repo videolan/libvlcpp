@@ -28,8 +28,8 @@
 
 namespace libVLCX
 {
-    Media::Media(Instance^ instance, Platform::String^ location)
-        : m_media(VLC::Media( instance->m_instance, VLCString(location), VLC::Media::FromLocation ) )
+    Media::Media(Instance^ instance, Platform::String^ location, FromType from_type)
+        : m_media(VLC::Media( instance->m_instance, VLCString(location), (VLC::Media::FromType)from_type ))
     {
     }
 
