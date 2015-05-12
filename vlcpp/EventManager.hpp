@@ -60,7 +60,12 @@ private:
     struct EventHandlerBase
     {
         using Wrapper = std::add_pointer<void(const libvlc_event_t*, void*)>::type;
-        virtual ~EventHandlerBase() {}
+        virtual ~EventHandlerBase() = default;
+        /**
+         * @brief unregister Unregister this event handler.
+         *
+         * Calling this method makes the instance invalid.
+         */
         virtual void unregister() = 0;
     };
 
@@ -138,14 +143,32 @@ protected:
     }
 
 public:
+    /**
+     * @brief EventManager Wraps the same EventManager
+     *
+     * This will copy the underlying libvlc_event_manager_t, but will not copy
+     * the already registered events.
+     * This allows you to copy an event manager, register a few events for a
+     * punctual task, and unregister those events by destroying the new instance.
+     */
     EventManager(const EventManager& em)
         : Internal( em )
     {
-        // Use an empty list of events
+        // Don't rely on the default implementation, as we don't want to copy the
+        // current list of events.
     }
 
+    /**
+     * @brief operator= Wraps the same EventManager
+     *
+     * This will copy the underlying libvlc_event_manager_t, but will not copy
+     * the already registered events.
+     * This allows you to copy an event manager, register a few events for a
+     * punctual task, and unregister those events by destroying the new instance.
+     */
     EventManager& operator=(const EventManager& em)
     {
+        // See above notes, this isn't the same as the default assignment operator
         if (this == &em)
             return *this;
         Internal::operator=(em);
@@ -183,11 +206,11 @@ protected:
      * @param wrapper       Our implementation defined wrapper around the user's callback. It is expected to be able
      *                      able to decay to a regular C-style function pointer. It is currently implemented as a
      *                      captureless lambda (§5.1.2)
-     * @return              A reference to an abstract EventHandler type. It is assumed that the EventManager will
+     * @return              A pointer to an abstract EventHandler type. It is assumed that the EventManager will
      *                      outlive this reference. When EventManager::~EventManager is called, it will destroy all
      *                      the registered event handler, this making this reference a dangling reference, which is
      *                      undefined behavior.
-     *                      When calling unregister() on this object, the reference should immediatly be considered invalid.
+     *                      When calling unregister() on this object, the pointer should immediatly be considered invalid.
      */
     template <typename Func>
     RegisteredEvent handle(libvlc_event_e eventType, Func&& f, EventHandlerBase::Wrapper wrapper)
@@ -216,14 +239,17 @@ protected:
     std::vector<std::unique_ptr<EventHandlerBase>> m_lambdas;
 };
 
+/**
+ * @brief The MediaEventManager class allows one to register Media related events
+ */
 class MediaEventManager : public EventManager
 {
     public:
         MediaEventManager(InternalPtr ptr) : EventManager( ptr ) {}
 
         /**
-         * @brief onMetaChanged
-         * @param f A std::function<void(libvlc_meta_t)>
+         * @brief onMetaChanged Registers an event called when a Media meta changes
+         * @param f A std::function<void(libvlc_meta_t)> (or an equivalent Callable type)
          */
         template <typename Func>
         RegisteredEvent onMetaChanged( Func&& f)
@@ -237,8 +263,8 @@ class MediaEventManager : public EventManager
         }
 
         /**
-         * @brief onSubItemAdded
-         * @param f A std::function<void(MediaPtr)>
+         * @brief onSubItemAdded Registers an event called when a Media gets a subitem added
+         * @param f A std::function<void(MediaPtr)> (or an equivalent Callable type)
          */
         template <typename Func>
         RegisteredEvent onSubItemAdded( Func&& f )
@@ -252,6 +278,10 @@ class MediaEventManager : public EventManager
             });
         }
 
+        /**
+         * \brief onDurationChanged Registers an event called when a media duration changes
+         * \param f A std::function<void(int64_t)> (or an equivalent Callable type)
+         */
         template <typename Func>
         RegisteredEvent onDurationChanged( Func&& f )
         {
@@ -263,6 +293,11 @@ class MediaEventManager : public EventManager
             });
         }
 
+        /**
+         * \brief onParsedChanged Registers an event called when the preparsed state changes
+         * \param f A std::function<void(bool)> (or an equivalent Callable type)
+         *          The provided boolean will be true if the media has been parsed, false otherwise.
+         */
         template <typename Func>
         RegisteredEvent onParsedChanged( Func&& f )
         {
@@ -274,9 +309,18 @@ class MediaEventManager : public EventManager
             });
         }
 
+        /**
+         * \brief onFreed Registers an event called when the media reaches a refcount of 0
+         * \param f A std::function<void(MediaPtr)> (or an equivalent Callable type)
+         *          The media is being destroyed by libvlc when this event gets called.
+         *          Any Media instance that would live past this call would wrap
+         *          a dangling pointer.
+         *
+         */
         template <typename Func>
         RegisteredEvent onFreed( Func&& f)
         {
+            //FIXME: Provide a read-only Media wrapper, to avoid wild dangling references to appear.
             EXPECT_SIGNATURE(void(MediaPtr));
             return handle(libvlc_MediaFreed, std::forward<Func>( f ), [](const libvlc_event_t* e, void* data)
             {
@@ -286,9 +330,14 @@ class MediaEventManager : public EventManager
             });
         }
 
+        /**
+         * \brief onStateChanged Registers an event called when the Media state changes
+         * \param f A std::function<void(libvlc_state_t)> (or an equivalent Callable type)
+         */
         template <typename Func>
         RegisteredEvent onStateChanged( Func&& f)
         {
+            //FIXME: Wrap libvlc_state_t in a class enum
             EXPECT_SIGNATURE(void(libvlc_state_t));
             return handle(libvlc_MediaStateChanged, std::forward<Func>( f ), [](const libvlc_event_t* e, void* data)
             {
@@ -297,6 +346,12 @@ class MediaEventManager : public EventManager
             });
         }
 
+        /**
+         * \brief onSubItemTreeAdded Registers an event called when all subitem have been added.
+         * \param f A std::function<void(MediaPtr)> (or an equivalent Callable type)
+         *          The provided Media is the media for which this event has been registered,
+         *          not a potential child media
+         */
         template <typename Func>
         RegisteredEvent onSubItemTreeAdded( Func&& f)
         {
@@ -310,11 +365,18 @@ class MediaEventManager : public EventManager
         }
 };
 
+/**
+ * @brief The MediaPlayerEventManager class allows one to register MediaPlayer related events
+ */
 class MediaPlayerEventManager : public EventManager
 {
     public:
         MediaPlayerEventManager(InternalPtr ptr) : EventManager( ptr ) {}
 
+        /**
+         * \brief onMediaChanged Registers an event called when the played media changes
+         * \param f A std::function<void(MediaPtr)> (or an equivalent Callable type)
+         */
         template <typename Func>
         RegisteredEvent onMediaChanged( Func&& f )
         {
@@ -333,12 +395,21 @@ class MediaPlayerEventManager : public EventManager
             return handle(libvlc_MediaPlayerNothingSpecial, std::forward<Func>( f ));
         }
 
+        /**
+         * \brief onOpening Registers an event called when the MediaPlayer starts initializing
+         * \param f A std::function<void(void)> (or an equivalent Callable type)
+         */
         template <typename Func>
         RegisteredEvent onOpening( Func&& f )
         {
             return handle(libvlc_MediaPlayerOpening, std::forward<Func>( f ) );
         }
 
+        /**
+         * \brief onBuffering Registers an event called when the buffering state changes
+         * \param f A std::function<void(float)> (or an equivalent Callable type)
+         *          The provided float is the current media buffering percentage
+         */
         template <typename Func>
         RegisteredEvent onBuffering( Func&& f )
         {
@@ -350,48 +421,75 @@ class MediaPlayerEventManager : public EventManager
             });
         }
 
+        /**
+         * \brief onPlaying Registers an event called when the media player reaches playing state
+         * \param f A std::function<void(void)> (or an equivalent Callable type)
+         */
         template <typename Func>
         RegisteredEvent onPlaying( Func&& f )
         {
             return handle( libvlc_MediaPlayerPlaying, std::forward<Func>( f ) );
         }
 
+        /**
+         * \brief onPaused Registers an event called when the media player gets paused
+         * \param f A std::function<void(void)> (or an equivalent Callable type)
+         */
         template <typename Func>
         RegisteredEvent onPaused(Func&& f)
         {
             return handle( libvlc_MediaPlayerPaused, std::forward<Func>( f ) );
         }
 
+        /**
+         * \brief onStopped Registers an event called when the media player gets stopped
+         * \param f A std::function<void(void)> (or an equivalent Callable type)
+         */
         template <typename Func>
         RegisteredEvent onStopped(Func&& f)
         {
             return handle( libvlc_MediaPlayerStopped, std::forward<Func>( f ) );
         }
 
+        // This never gets invoked
         template <typename Func>
         RegisteredEvent onForward(Func&& f)
         {
             return handle( libvlc_MediaPlayerForward, std::forward<Func>( f ) );
         }
 
+        // This never gets invoked.
         template <typename Func>
         RegisteredEvent onBackward(Func&& f)
         {
             return handle( libvlc_MediaPlayerBackward, std::forward<Func>( f ) );
         }
 
+        /**
+         * \brief onEndReached Registers an event called when the media player reaches the end of a media
+         * \param f A std::function<void(void)> (or an equivalent Callable type)
+         */
         template <typename Func>
         RegisteredEvent onEndReached(Func&& f)
         {
             return handle( libvlc_MediaPlayerEndReached, std::forward<Func>( f ) );
         }
 
+        /**
+         * \brief onEncounteredError Registers an event called when the media player reaches encounters an error
+         * \param f A std::function<void(void)> (or an equivalent Callable type)
+         */
         template <typename Func>
         RegisteredEvent onEncounteredError(Func&& f)
         {
             return handle( libvlc_MediaPlayerEncounteredError, std::forward<Func>( f ) );
         }
 
+        /**
+         * \brief onTimeChanged Registers an event called periodically to indicate the current playback time
+         * \param f A std::function<void(int64_t)> (or an equivalent Callable type)
+         *          Time is in ms.
+         */
         template <typename Func>
         RegisteredEvent onTimeChanged( Func&& f )
         {
@@ -403,6 +501,11 @@ class MediaPlayerEventManager : public EventManager
             });
         }
 
+        /**
+         * \brief onPositionChanged Registers an event called periodically to indicate the current playback position.
+         * \param f A std::function<void(float)> (or an equivalent Callable type)
+         *          Provided float in a number between 0 (beginning of the media) and 1 (end of the media)
+         */
         template <typename Func>
         RegisteredEvent onPositionChanged( Func&& f )
         {
@@ -414,6 +517,11 @@ class MediaPlayerEventManager : public EventManager
             });
         }
 
+        /**
+         * \brief onSeekableChanged Registers an event called when the seekable state changes
+         * \param f A std::function<void(bool)> (or an equivalent Callable type)
+         *          The provided boolean will be true if the media is seekable, false otherwise.
+         */
         template <typename Func>
         RegisteredEvent onSeekableChanged( Func&& f )
         {
@@ -425,6 +533,11 @@ class MediaPlayerEventManager : public EventManager
             });
         }
 
+        /**
+         * \brief onPausableChanged Registers an event called when the pausable state changes
+         * \param f A std::function<void(bool)> (or an equivalent Callable type)
+         *          The provided boolean will be true if the playback can be paused, false otherwise.
+         */
         template <typename Func>
         RegisteredEvent onPausableChanged( Func&& f )
         {
@@ -436,6 +549,13 @@ class MediaPlayerEventManager : public EventManager
             });
         }
 
+        /**
+         * \brief onTitleChanged Registers an event called when the current title changes
+         * \param f A std::function<void(int)> (or an equivalent Callable type)
+         *          The provided integer is the new current title identifier.
+         *          Please note that this has nothing to do with a text title (the name of
+         *          the video being played, for instance)
+         */
         template <typename Func>
         RegisteredEvent onTitleChanged( Func&& f )
         {
@@ -447,6 +567,11 @@ class MediaPlayerEventManager : public EventManager
             });
         }
 
+        /**
+         * \brief onSnapshotTaken Registers an event called when a snapshot gets taken
+         * \param f A std::function<void(std::string)> (or an equivalent Callable type)
+         *          The provided string is the path of the created snapshot
+         */
         template <typename Func>
         RegisteredEvent onSnapshotTaken( Func&& f )
         {
@@ -458,6 +583,10 @@ class MediaPlayerEventManager : public EventManager
             });
         }
 
+        /**
+         * \brief onLengthChanged Registers an event called when the length gets updated.
+         * \param f A std::function<void(int64_t)> (or an equivalent Callable type)
+         */
         template <typename Func>
         RegisteredEvent onLengthChanged( Func&& f )
         {
@@ -469,6 +598,11 @@ class MediaPlayerEventManager : public EventManager
             });
         }
 
+        /**
+         * \brief onVout Registers an event called when the number of vout changes
+         * \param f A std::function<void(int)> (or an equivalent Callable type)
+         *          The provided int represents the number of currently available vout.
+         */
         template <typename Func>
         RegisteredEvent onVout( Func&& f )
         {
@@ -480,6 +614,11 @@ class MediaPlayerEventManager : public EventManager
             });
         }
 
+        /**
+         * \brief onScrambledChanged Registers an event called when the scrambled state changes
+         * \param f A std::function<void(bool)> (or an equivalent Callable type)
+         *          The provided boolean will be true if the media is scrambled, false otherwise.
+         */
         template <typename Func>
         RegisteredEvent onScrambledChanged( Func&& f )
         {
@@ -492,9 +631,16 @@ class MediaPlayerEventManager : public EventManager
         }
 
 #if LIBVLC_VERSION_INT >= LIBVLC_VERSION(3, 0, 0, 0)
+        /**
+         * \brief onESAdded Registers an event called when an elementary stream get added
+         * \param f A std::function<void(libvlc_track_type_t, int)> (or an equivalent Callable type)
+         *          libvlc_track_type_t: The new track type
+         *          int: the new track index
+         */
         template <typename Func>
         RegisteredEvent onESAdded( Func&& f )
         {
+            //FIXME: Expose libvlc_track_type_t as an enum class
             EXPECT_SIGNATURE(void(libvlc_track_type_t, int));
             return handle( libvlc_MediaPlayerESAdded, std::forward<Func>( f ), [](const libvlc_event_t* e, void* data)
             {
@@ -503,6 +649,12 @@ class MediaPlayerEventManager : public EventManager
             });
         }
 
+        /**
+         * \brief onESDeleted Registers an event called when an elementary stream get deleted
+         * \param f A std::function<void(libvlc_track_type_t, int)> (or an equivalent Callable type)
+         *          libvlc_track_type_t: The track type
+         *          int: the track index
+         */
         template <typename Func>
         RegisteredEvent onESDeleted( Func&& f )
         {
@@ -514,6 +666,12 @@ class MediaPlayerEventManager : public EventManager
             });
         }
 
+        /**
+         * \brief onESSelected Registers an event called when an elementary stream get selected
+         * \param f A std::function<void(libvlc_track_type_t, int)> (or an equivalent Callable type)
+         *          libvlc_track_type_t: The track type
+         *          int: the track index
+         */
         template <typename Func>
         RegisteredEvent onESSelected( Func&& f )
         {
@@ -527,11 +685,20 @@ class MediaPlayerEventManager : public EventManager
 #endif
 };
 
+/**
+ * @brief The MediaListEventManager class allows one to register MediaList related events
+ */
 class MediaListEventManager : public EventManager
 {
     public:
         MediaListEventManager(InternalPtr ptr) : EventManager( ptr ) {}
 
+        /**
+         * \brief onItemAdded Registers an event called when an item gets added to the media list
+         * \param f A std::function<void(MediaPtr, int)> (or an equivalent Callable type)
+         *          MediaPtr: The added media
+         *          int: The media index in the list
+         */
         template <typename Func>
         RegisteredEvent onItemAdded( Func&& f )
         {
@@ -545,6 +712,12 @@ class MediaListEventManager : public EventManager
             });
         }
 
+        /**
+         * \brief onWillAddItem Registers an event called when an item is about to be added to the media list
+         * \param f A std::function<void(MediaPtr, int)> (or an equivalent Callable type)
+         *          MediaPtr: The added media
+         *          int: The media index in the list
+         */
         template <typename Func>
         RegisteredEvent onWillAddItem( Func&& f )
         {
@@ -558,6 +731,12 @@ class MediaListEventManager : public EventManager
             });
         }
 
+        /**
+         * \brief onItemDeleted Registers an event called when an item gets deleted to the media list
+         * \param f A std::function<void(MediaPtr, int)> (or an equivalent Callable type)
+         *          MediaPtr: The added media
+         *          int: The media index in the list
+         */
         template <typename Func>
         RegisteredEvent onItemDeleted( Func&& f )
         {
@@ -571,6 +750,12 @@ class MediaListEventManager : public EventManager
             });
         }
 
+        /**
+         * \brief onWillDeleteItem Registers an event called when an item is about to be deleted
+         * \param f A std::function<void(MediaPtr, int)> (or an equivalent Callable type)
+         *          MediaPtr: The added media
+         *          int: The media index in the list
+         */
         template <typename Func>
         RegisteredEvent onWillDeleteItem( Func&& f )
         {
@@ -585,8 +770,10 @@ class MediaListEventManager : public EventManager
         }
 };
 
-// MediaListView events are not being sent by VLC, so we don't implement them here
-
+/**
+ * @brief The MediaListPlayerEventManager class
+ * Those events aren't sent by VLC so far.
+ */
 class MediaListPlayerEventManager : public EventManager
 {
     public:
@@ -617,17 +804,28 @@ class MediaListPlayerEventManager : public EventManager
         }
 };
 
+/**
+ * @brief The MediaDiscovererEventManager class allows one to register MediaDiscoverer related events
+ */
 class MediaDiscovererEventManager : public EventManager
 {
     public:
         MediaDiscovererEventManager(InternalPtr ptr) : EventManager( ptr ) {}
 
+        /**
+         * \brief onStarted Registers an event called when the discovery starts
+         * \param f A std::function<void(void)> (or an equivalent Callable type)
+         */
         template <typename Func>
         RegisteredEvent onStarted(Func&& f)
         {
             return handle(libvlc_MediaDiscovererStarted, std::forward<Func>( f ) );
         }
 
+        /**
+         * \brief onStopped Registers an event called when the discovery stops
+         * \param f A std::function<void(void)> (or an equivalent Callable type)
+         */
         template <typename Func>
         RegisteredEvent onStopped(Func&& f)
         {
@@ -635,11 +833,19 @@ class MediaDiscovererEventManager : public EventManager
         }
 };
 
+/**
+ * @brief The VLMEventManager class allows one to register VLM related events
+ */
 class VLMEventManager : public EventManager
 {
     public:
         VLMEventManager(InternalPtr ptr) : EventManager(ptr) {}
 
+        /**
+         * \brief onMediaAdded Registers an event called when a media gets added
+         * \param f A std::function<void(std::string)> (or an equivalent Callable type)
+         *          The given string is the name of the added media
+         */
         template <typename Func>
         RegisteredEvent onMediaAdded( Func&& f )
         {
@@ -651,6 +857,11 @@ class VLMEventManager : public EventManager
             });
         }
 
+        /**
+         * \brief onMediaRemoved Registers an event called when a media gets removed
+         * \param f A std::function<void(std::string)> (or an equivalent Callable type)
+         *          The given string is the name of the removed media
+         */
         template <typename Func>
         RegisteredEvent onMediaRemoved( Func&& f )
         {
@@ -662,6 +873,11 @@ class VLMEventManager : public EventManager
             });
         }
 
+        /**
+         * \brief onMediaChanged Registers an event called when a media changes
+         * \param f A std::function<void(std::string)> (or an equivalent Callable type)
+         *          The given string is the name of the changed media
+         */
         template <typename Func>
         RegisteredEvent onMediaChanged( Func&& f )
         {
@@ -673,6 +889,13 @@ class VLMEventManager : public EventManager
             });
         }
 
+        /**
+         * \brief onMediaInstanceStarted Registers an event called when a media instance starts
+         * \param f A std::function<void(std::string, std::string)> (or an equivalent Callable type)
+         *          Parameters are:
+         *              - The media name
+         *              - The instance name
+         */
         template <typename Func>
         RegisteredEvent onMediaInstanceStarted( Func&& f )
         {
@@ -685,6 +908,13 @@ class VLMEventManager : public EventManager
             });
         }
 
+        /**
+         * \brief onMediaInstanceStopped Registers an event called when a media instance stops
+         * \param f A std::function<void(std::string, std::string)> (or an equivalent Callable type)
+         *          Parameters are:
+         *              - The media name
+         *              - The instance name
+         */
         template <typename Func>
         RegisteredEvent onMediaInstanceStopped( Func&& f )
         {
@@ -697,6 +927,13 @@ class VLMEventManager : public EventManager
             });
         }
 
+        /**
+         * \brief onMediaInstanceStatusInit Registers an event called when a media instance is initializing
+         * \param f A std::function<void(std::string, std::string)> (or an equivalent Callable type)
+         *          Parameters are:
+         *              - The media name
+         *              - The instance name
+         */
         template <typename Func>
         RegisteredEvent onMediaInstanceStatusInit( Func&& f )
         {
@@ -709,6 +946,13 @@ class VLMEventManager : public EventManager
             });
         }
 
+        /**
+         * \brief onMediaInstanceStatusOpening Registers an event called when a media instance is opening
+         * \param f A std::function<void(std::string, std::string)> (or an equivalent Callable type)
+         *          Parameters are:
+         *              - The media name
+         *              - The instance name
+         */
         template <typename Func>
         RegisteredEvent onMediaInstanceStatusOpening( Func&& f )
         {
@@ -721,6 +965,13 @@ class VLMEventManager : public EventManager
             });
         }
 
+        /**
+         * \brief onMediaInstanceStatusPlaying Registers an event called when a media instance reaches playing state
+         * \param f A std::function<void(std::string, std::string)> (or an equivalent Callable type)
+         *          Parameters are:
+         *              - The media name
+         *              - The instance name
+         */
         template <typename Func>
         RegisteredEvent onMediaInstanceStatusPlaying( Func&& f )
         {
@@ -733,6 +984,13 @@ class VLMEventManager : public EventManager
             });
         }
 
+        /**
+         * \brief onMediaInstanceStatusPause Registers an event called when a media instance gets paused
+         * \param f A std::function<void(std::string, std::string)> (or an equivalent Callable type)
+         *          Parameters are:
+         *              - The media name
+         *              - The instance name
+         */
         template <typename Func>
         RegisteredEvent onMediaInstanceStatusPause( Func&& f )
         {
@@ -745,6 +1003,13 @@ class VLMEventManager : public EventManager
             });
         }
 
+        /**
+         * \brief onMediaInstanceStatusEnd Registers an event called when a media instance ends
+         * \param f A std::function<void(std::string, std::string)> (or an equivalent Callable type)
+         *          Parameters are:
+         *              - The media name
+         *              - The instance name
+         */
         template <typename Func>
         RegisteredEvent onMediaInstanceStatusEnd( Func&& f )
         {
@@ -757,6 +1022,13 @@ class VLMEventManager : public EventManager
             });
         }
 
+        /**
+         * \brief onMediaInstanceStatusError Registers an event called when a media instance encouters an error
+         * \param f A std::function<void(std::string, std::string)> (or an equivalent Callable type)
+         *          Parameters are:
+         *              - The media name
+         *              - The instance name
+         */
         template <typename Func>
         RegisteredEvent onMediaInstanceStatusError( Func&& f )
         {
