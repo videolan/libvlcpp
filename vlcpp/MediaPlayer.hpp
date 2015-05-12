@@ -40,6 +40,9 @@ class Instance;
 class Media;
 class MediaPlayerEventManager;
 
+///
+/// \brief The MediaPlayer class exposes libvlc_media_player_t functionnalities
+///
 class MediaPlayer : public Internal<libvlc_media_player_t>, private EventOwner<13>
 {
 private:
@@ -71,7 +74,6 @@ public:
         return m_obj == another.m_obj;
     }
 
-    // libvlc_media_player_new
     /**
      * Create an empty Media Player object
      *
@@ -83,7 +85,6 @@ public:
     {
     }
 
-    // libvlc_media_player_new_from_media
     /**
      * Create a Media Player object from a Media
      *
@@ -142,9 +143,7 @@ public:
     }
 
     /**
-     * is_playing
-     *
-     * \return 1 if the media player is playing, 0 otherwise
+     * \return true if the media player is playing, 0 otherwise
      */
     bool isPlaying()
     {
@@ -152,20 +151,19 @@ public:
     }
 
     /**
-     * Play
+     * @brief play Start playback
      *
-     * \return 0 if playback started (and was already started), or -1 on
-     * error.
+     * If playback was already started, this method has no effect
      */
-    int play()
+    bool play()
     {
-        return libvlc_media_player_play(*this);
+        return libvlc_media_player_play(*this) == 0;
     }
 
     /**
      * Pause or resume (no effect if there is no media)
      *
-     * \param do_pause  play/resume if zero, pause if non-zero
+     * \param do_pause  play/resume if true, pause if false
      *
      * \version LibVLC 1.1.1 or later
      */
@@ -175,7 +173,7 @@ public:
     }
 
     /**
-     * Toggle pause (no effect if there is no media)
+     * @brief pause Toggle pause (no effect if there is no media)
      */
     void pause()
     {
@@ -183,7 +181,11 @@ public:
     }
 
     /**
-     * Stop (no effect if there is no media)
+     * @brief stop Stop the playback (no effect if there is no media)
+     *
+     * \warning This is synchronous, and will block until all VLC threads have
+     *          been joined.
+     *          Calling this from a VLC callback is a bound to cause a deadlock.
      */
     void stop()
     {
@@ -197,9 +199,7 @@ public:
      * Use the vout called "macosx".
      *
      * The drawable is an NSObject that follow the
-     * VLCOpenGLVideoViewEmbedding protocol:
-     *
-     * @protocol VLCOpenGLVideoViewEmbedding <NSObject>
+     * VLCOpenGLVideoViewEmbedding protocol: VLCOpenGLVideoViewEmbedding <NSObject>
      *
      * Or it can be an NSView object.
      *
@@ -214,7 +214,7 @@ public:
      * \param drawable  the drawable that is either an NSView or an object
      * following the VLCOpenGLVideoViewEmbedding protocol.
      */
-    void setNsobject(void * drawable)
+    void setNsobject(void* drawable)
     {
         libvlc_media_player_set_nsobject(*this, drawable);
     }
@@ -225,7 +225,7 @@ public:
      *
      * \return the NSView handler or 0 if none where set
      */
-    void * nsobject()
+    void* nsobject()
     {
         return libvlc_media_player_get_nsobject(*this);
     }
@@ -300,9 +300,9 @@ public:
      * MediaPlayer::setHwnd() . The handle will be returned even if LibVLC is
      * not currently outputting any video to it.
      *
-     * \return a window handle or NULL if there are none.
+     * \return a window handle or nullptr if there are none.
      */
-    void * hwnd()
+    void* hwnd()
     {
         return libvlc_media_player_get_hwnd(*this);
     }
@@ -779,15 +779,15 @@ public:
      * \note Any change will take be effect only after playback is stopped
      * and restarted. Audio output cannot be changed while playing.
      *
-     * \param psz_name  name of audio output, use psz_name of
+     * \param name  name of audio output, use psz_name of
      *
      * \see AudioOutputDescription
      *
      * \return 0 if function succeded, -1 on error
      */
-    int setAudioOutput(const std::string& psz_name)
+    int setAudioOutput(const std::string& name)
     {
-        return libvlc_audio_output_set(*this, psz_name.c_str());
+        return libvlc_audio_output_set(*this, name.c_str());
     }
 
     /**
@@ -803,10 +803,6 @@ public:
      * \warning Some audio output devices in the list might not actually work
      * in some circumstances. By default, it is recommended to not specify
      * any explicit audio device.
-     *
-     * \return A NULL-terminated linked list of potential audio output
-     * devices. It must be freed it with
-     * libvlc_audio_output_device_list_release()
      *
      * \version LibVLC 2.2.0 or later.
      */
@@ -940,7 +936,7 @@ public:
     /**
      * Get the description of available audio tracks.
      *
-     * \return list with description of available audio tracks, or NULL
+     * \return list with description of available audio tracks
      */
     std::vector<TrackDescription> audioTrackDescription()
     {
@@ -1010,13 +1006,11 @@ public:
      *
      * \param i_delay  the audio delay (microseconds)
      *
-     * \return 0 on success, -1 on error
-     *
      * \version LibVLC 1.1.1 or later
      */
-    int setDelay(int64_t i_delay)
+    bool setDelay(int64_t i_delay)
     {
-        return libvlc_audio_set_delay(*this, i_delay);
+        return libvlc_audio_set_delay(*this, i_delay) == 0;
     }
 
     /**
@@ -1215,8 +1209,7 @@ public:
     /**
      * Get current video aspect ratio.
      *
-     * \return the video aspect ratio or NULL if unspecified (the result must
-     * be released with free() or libvlc_free() ).
+     * \return the video aspect ratio or an empty string if unspecified.
      */
     std::string aspectRatio()
     {
@@ -1229,7 +1222,7 @@ public:
     /**
      * Set new video aspect ratio.
      *
-     * \param psz_aspect  new video aspect-ratio or NULL to reset to default
+     * \param psz_aspect  new video aspect-ratio or empty string to reset to default
      *
      * \note Invalid aspect ratios are ignored.
      */
@@ -1286,12 +1279,10 @@ public:
      * Set new video subtitle file.
      *
      * \param psz_subtitle  new video subtitle file
-     *
-     * \return the success status (boolean)
      */
-    int setSubtitleFile(const std::string& psz_subtitle)
+    bool setSubtitleFile(const std::string& psz_subtitle)
     {
-        return libvlc_video_set_subtitle_file(*this, psz_subtitle.c_str());
+        return libvlc_video_set_subtitle_file(*this, psz_subtitle.c_str()) != 0;
     }
 
     /**
@@ -1356,7 +1347,7 @@ public:
     /**
      * Get current crop filter geometry.
      *
-     * \return the crop filter geometry or NULL if unset
+     * \return the crop filter geometry or an empty string if unset
      */
     std::string cropGeometry()
     {
@@ -1369,11 +1360,11 @@ public:
     /**
      * Set new crop filter geometry.
      *
-     * \param psz_geometry  new crop filter geometry (NULL to unset)
+     * \param psz_geometry new crop filter geometry (empty string to unset)
      */
-    void setCropGeometry(const std::string& psz_geometry)
+    void setCropGeometry(const std::string& geometry)
     {
-        libvlc_video_set_crop_geometry(*this, psz_geometry.c_str());
+        libvlc_video_set_crop_geometry( *this, geometry.size() > 0 ? geometry.c_str() : nullptr );
     }
 
     /**
@@ -1409,8 +1400,7 @@ public:
     /**
      * Get the description of available video tracks.
      *
-     * \return list with description of available video tracks, or NULL on
-     * error
+     * \return list with description of available video tracks
      */
     std::vector<TrackDescription> videoTrackDescription()
     {
@@ -1449,15 +1439,15 @@ public:
      * \param num  number of video output (typically 0 for the first/only
      * one)
      *
-     * \param psz_filepath  the path where to save the screenshot to
+     * \param filepath  the path where to save the screenshot to
      *
      * \param i_width  the snapshot's width
      *
      * \param i_height  the snapshot's height
      */
-    bool takeSnapshot(unsigned num, const std::string& psz_filepath, unsigned int i_width, unsigned int i_height)
+    bool takeSnapshot(unsigned num, const std::string& filepath, unsigned int i_width, unsigned int i_height)
     {
-        return libvlc_video_take_snapshot(*this, num, psz_filepath.c_str(), i_width, i_height) == 0;
+        return libvlc_video_take_snapshot(*this, num, filepath.c_str(), i_width, i_height) == 0;
     }
 
     /**
@@ -1522,11 +1512,11 @@ public:
      *
      * \see libvlc_video_marquee_string_option_t
      *
-     * \param psz_text  marq option value
+     * \param text  marq option value
      */
-    void setMarqueeString(unsigned option, const std::string& psz_text)
+    void setMarqueeString(unsigned option, const std::string& text)
     {
-        libvlc_video_set_marquee_string(*this, option, psz_text.c_str());
+        libvlc_video_set_marquee_string(*this, option, text.c_str());
     }
 
     /**
@@ -1564,9 +1554,9 @@ public:
      *
      * \param psz_value  logo option value
      */
-    void setLogoString(unsigned option, const std::string& psz_value)
+    void setLogoString(unsigned option, const std::string& value)
     {
-        libvlc_video_set_logo_string(*this, option, psz_value.c_str());
+        libvlc_video_set_logo_string(*this, option, value.c_str());
     }
 
     /**
@@ -1651,4 +1641,3 @@ private:
 } // namespace VLC
 
 #endif
-
