@@ -27,10 +27,10 @@
 #include "Instance.hpp"
 #include "MediaListPlayer.hpp"
 #include "MediaDiscoverer.hpp"
-#include "MediaPlayer.hpp"
 #include "Media.hpp"
-#include "MediaLibrary.hpp"
 #include "MediaList.hpp"
+#include "MediaPlayer.hpp"
+#include "MediaLibrary.hpp"
 #include "EventManager.hpp"
 #include "structures.hpp"
 
