@@ -112,6 +112,11 @@ namespace libVLCX
     {
     }
 
+    Media::Media(VLC::Media&& media)
+        : m_media( std::move( media ) )
+    {
+    }
+
 } // namespace VLC
 
 

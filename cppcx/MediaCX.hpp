@@ -271,6 +271,7 @@ namespace libVLCX
     
     internal:
         Media(const VLC::Media& media);
+        Media(VLC::Media&& media);
         VLC::Media m_media;
 
     private:
