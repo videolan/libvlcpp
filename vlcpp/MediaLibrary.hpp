@@ -36,7 +36,7 @@ public:
     /**
      * Create an new Media Library object
      *
-     * \param p_instance  the libvlc instance
+     * \param instance  the libvlc instance
      */
     MediaLibrary(Instance& instance)
         : Internal{ libvlc_media_library_new( getInternalPtr<libvlc_instance_t>( instance ) ),
@@ -63,12 +63,10 @@ public:
 
     /**
      * Load media library.
-     *
-     * \return 0 on success, -1 on error
      */
-    int load()
+    bool load()
     {
-        return libvlc_media_library_load(*this);
+        return libvlc_media_library_load(*this) == 0;
     }
 };
 
