@@ -118,7 +118,7 @@ public:
     {
         static_assert(signature_match_or_nullptr<ExitCb, void()>::value, "Mismatched exit callback" );
         libvlc_set_exit_handler( *this,
-            CallbackWrapper<(int)CallbackIdx::Exit, void(*)(void*)>::wrap( this, std::forward<ExitCb>( exitCb ) ),
+            CallbackWrapper<(unsigned int)CallbackIdx::Exit, void(*)(void*)>::wrap( this, std::forward<ExitCb>( exitCb ) ),
             static_cast<CallbackOwner<2>*>( this ) );
     }
 
@@ -201,7 +201,7 @@ public:
                     logCb( level, ctx, std::string{ message.get() } );
             }
         };
-        libvlc_log_set( *this, CallbackWrapper<(int)CallbackIdx::Log, libvlc_log_cb>::wrap( this, std::move( wrapper ) ),
+        libvlc_log_set( *this, CallbackWrapper<(unsigned int)CallbackIdx::Log, libvlc_log_cb>::wrap( this, std::move( wrapper ) ),
                         static_cast<CallbackOwner<2>*>( this ) );
     }
 

@@ -701,11 +701,11 @@ public:
         static_assert(signature_match_or_nullptr<DrainCb, void()>::value, "Mismatched drain callback prototype");
 
         libvlc_audio_set_callbacks( *this,
-            CallbackWrapper<(int)CallbackIdx::AudioPlay,   libvlc_audio_play_cb>::wrap(   this, std::forward<PlayCb>( play ) ),
-            CallbackWrapper<(int)CallbackIdx::AudioPause,  libvlc_audio_pause_cb>::wrap(  this, std::forward<PauseCb>( pause ) ),
-            CallbackWrapper<(int)CallbackIdx::AudioResume, libvlc_audio_resume_cb>::wrap( this, std::forward<ResumeCb>( resume ) ),
-            CallbackWrapper<(int)CallbackIdx::AudioFlush,  libvlc_audio_flush_cb>::wrap(  this, std::forward<FlushCb>( flush ) ),
-            CallbackWrapper<(int)CallbackIdx::AudioDrain,  libvlc_audio_drain_cb>::wrap(  this, std::forward<DrainCb>( drain ) ),
+            CallbackWrapper<(unsigned int)CallbackIdx::AudioPlay,   libvlc_audio_play_cb>::wrap(   this, std::forward<PlayCb>( play ) ),
+            CallbackWrapper<(unsigned int)CallbackIdx::AudioPause,  libvlc_audio_pause_cb>::wrap(  this, std::forward<PauseCb>( pause ) ),
+            CallbackWrapper<(unsigned int)CallbackIdx::AudioResume, libvlc_audio_resume_cb>::wrap( this, std::forward<ResumeCb>( resume ) ),
+            CallbackWrapper<(unsigned int)CallbackIdx::AudioFlush,  libvlc_audio_flush_cb>::wrap(  this, std::forward<FlushCb>( flush ) ),
+            CallbackWrapper<(unsigned int)CallbackIdx::AudioDrain,  libvlc_audio_drain_cb>::wrap(  this, std::forward<DrainCb>( drain ) ),
             // We will receive the pointer as a void*, we need to offset the value *now*, otherwise we'd get
             // a shifted value, resulting in an invalid callback array.
             static_cast<CallbackOwner<13>*>( this ) );
@@ -727,7 +727,7 @@ public:
     {
         static_assert(signature_match_or_nullptr<VolumeCb, void(float, bool)>::value, "Mismatched set volume callback");
         libvlc_audio_set_volume_callback(*this,
-            CallbackWrapper<(int)CallbackIdx::AudioVolume, libvlc_audio_set_volume_cb>::wrap( this, std::forward<VolumeCb>( func ) ) );
+            CallbackWrapper<(unsigned int)CallbackIdx::AudioVolume, libvlc_audio_set_volume_cb>::wrap( this, std::forward<VolumeCb>( func ) ) );
     }
 
     /**
@@ -750,8 +750,8 @@ public:
         static_assert(signature_match_or_nullptr<CleanupCb, void()>::value, "Mismatched cleanup callback");
 
         libvlc_audio_set_format_callbacks(*this,
-            CallbackWrapper<(int)CallbackIdx::AudioSetup, libvlc_audio_setup_cb>::wrap( this, std::forward<SetupCb>( setup ) ),
-            CallbackWrapper<(int)CallbackIdx::AudioCleanup, libvlc_audio_cleanup_cb>::wrap( this, std::forward<CleanupCb>( cleanup ) ) );
+            CallbackWrapper<(unsigned int)CallbackIdx::AudioSetup, libvlc_audio_setup_cb>::wrap( this, std::forward<SetupCb>( setup ) ),
+            CallbackWrapper<(unsigned int)CallbackIdx::AudioCleanup, libvlc_audio_cleanup_cb>::wrap( this, std::forward<CleanupCb>( cleanup ) ) );
     }
 
     /**
@@ -1042,9 +1042,9 @@ public:
         static_assert(signature_match_or_nullptr<DisplayCb, void(void*)>::value, "Mismatched lock callback signature");
 
         libvlc_video_set_callbacks(*this,
-                CallbackWrapper<(int)CallbackIdx::VideoLock, libvlc_video_lock_cb>::wrap( this, std::forward<LockCb>( lock ) ),
-                CallbackWrapper<(int)CallbackIdx::VideoUnlock, libvlc_video_unlock_cb>::wrap( this, std::forward<UnlockCb>( unlock ) ),
-                CallbackWrapper<(int)CallbackIdx::VideoDisplay, libvlc_video_display_cb>::wrap( this, std::forward<DisplayCb>( display ) ),
+                CallbackWrapper<(unsigned int)CallbackIdx::VideoLock, libvlc_video_lock_cb>::wrap( this, std::forward<LockCb>( lock ) ),
+                CallbackWrapper<(unsigned int)CallbackIdx::VideoUnlock, libvlc_video_unlock_cb>::wrap( this, std::forward<UnlockCb>( unlock ) ),
+                CallbackWrapper<(unsigned int)CallbackIdx::VideoDisplay, libvlc_video_display_cb>::wrap( this, std::forward<DisplayCb>( display ) ),
                 // We will receive the pointer as a void*, we need to offset the value *now*, otherwise we'd get
                 // a shifted value, resulting in an empty callback array.
                 static_cast<CallbackOwner<13>*>( this ) );
@@ -1096,8 +1096,8 @@ public:
         static_assert(signature_match_or_nullptr<CleanupCb, void()>::value, "Unmatched prototype for cleanup callback");
 
         libvlc_video_set_format_callbacks(*this,
-                CallbackWrapper<(int)CallbackIdx::VideoFormat, libvlc_video_format_cb>::wrap( static_cast<CallbackOwner<13>*>( this ), std::forward<FormatCb>( setup ) ),
-                CallbackWrapper<(int)CallbackIdx::VideoCleanup, libvlc_video_cleanup_cb>::wrap( this, std::forward<CleanupCb>( cleanup ) ) );
+                CallbackWrapper<(unsigned int)CallbackIdx::VideoFormat, libvlc_video_format_cb>::wrap( static_cast<CallbackOwner<13>*>( this ), std::forward<FormatCb>( setup ) ),
+                CallbackWrapper<(unsigned int)CallbackIdx::VideoCleanup, libvlc_video_cleanup_cb>::wrap( this, std::forward<CleanupCb>( cleanup ) ) );
     }
 
     /**
