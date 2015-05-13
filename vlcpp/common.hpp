@@ -99,7 +99,8 @@ namespace VLC
     template <typename Func>
     struct CallbackHandler : public CallbackHandlerBase
     {
-        CallbackHandler(Func&& f) : func( std::forward<Func>( f ) ) {}
+        template <typename FuncFwd>
+        CallbackHandler(FuncFwd&& f) : func( std::forward<Func>( f ) ) {}
         Func func;
     };
 
