@@ -36,8 +36,18 @@ class MediaEventManager;
 class Instance;
 class MediaList;
 
-class Media : public Internal<libvlc_media_t>
+class Media : public Internal<libvlc_media_t>, private CallbackOwner<4>
 {
+private:
+    enum class CallbackIdx : unsigned int
+    {
+        Open,
+        Read,
+        Seek,
+        Close,
+    };
+    static constexpr unsigned int NbEvents = 4;
+
 public:
     ///
     /// \brief The FromType enum is used to drive the media creation.
@@ -143,6 +153,123 @@ public:
                     libvlc_media_release }
     {
     }
+
+#if LIBVLC_VERSION_INT >= LIBVLC_VERSION(3, 0, 0, 0)
+    /**
+     * Callback prototype to open a custom bitstream input media.
+     *
+     * The same media item can be opened multiple times. Each time, this callback
+     * is invoked. It should allocate and initialize any instance-specific
+     * resources, then store them in *datap. The instance resources can be freed
+     * in the @ref libvlc_close_cb callback.
+     *
+     * \param opaque private pointer as passed to libvlc_media_new_callbacks()
+     * \param datap storage space for a private data pointer [OUT]
+     * \param sizep byte length of the bitstream or 0 if unknown [OUT]
+     *
+     * \note For convenience, *datap is initially NULL and *sizep is initially 0.
+     *
+     * \return 0 on success, non-zero on error. In case of failure, the other
+     * callbacks will not be invoked and any value stored in *datap and *sizep is
+     * discarded.
+     */
+    using ExpectedMediaOpenCb = int(void*, void** datap, uint64_t* sizep);
+
+    /**
+     * Callback prototype to read data from a custom bitstream input media.
+     *
+     * \param opaque private pointer as set by the @ref libvlc_media_open_cb
+     *               callback
+     * \param buf start address of the buffer to read data into
+     * \param len bytes length of the buffer
+     *
+     * \return strictly positive number of bytes read, 0 on end-of-stream,
+     *         or -1 on non-recoverable error
+     *
+     * \note If no data is immediately available, then the callback should sleep.
+     * \warning The application is responsible for avoiding deadlock situations.
+     * In particular, the callback should return an error if playback is stopped;
+     * if it does not return, then libvlc_media_player_stop() will never return.
+     */
+    using ExpectedMediaReadCb = ssize_t(void* opaque, unsigned char* buf, size_t len);
+
+    /**
+     * Callback prototype to seek a custom bitstream input media.
+     *
+     * \param opaque private pointer as set by the @ref libvlc_media_open_cb
+     *               callback
+     * \param offset absolute byte offset to seek to
+     * \return 0 on success, -1 on error.
+     */
+    using ExpectedMediaSeekCb = int(void* opaque, uint64_t);
+
+    /**
+     * Callback prototype to close a custom bitstream input media.
+     * \param opaque private pointer as set by the @ref libvlc_media_open_cb
+     *               callback
+     */
+    using ExpectedMediaCloseCb = void(void* opaque);
+
+    /**
+     * Create a media with custom callbacks to read the data from.
+     *
+     * \param instance LibVLC instance
+     * \param open_cb callback to open the custom bitstream input media
+     * \param read_cb callback to read data (must not be nullptr)
+     * \param seek_cb callback to seek, or nullptr if seeking is not supported
+     * \param close_cb callback to close the media, or nullptr if unnecessary
+     *
+     * \return the newly created media.
+     *
+     * \throw std::runtime_error if the media creation fails
+     *
+     * \note If open_cb is NULL, the opaque pointer will be passed to read_cb,
+     * seek_cb and close_cb, and the stream size will be treated as unknown.
+     *
+     * \note The callbacks may be called asynchronously (from another thread).
+     * A single stream instance need not be reentrant. However the open_cb needs to
+     * be reentrant if the media is used by multiple player instances.
+     *
+     * \warning The callbacks may be used until all or any player instances
+     * that were supplied the media item are stopped.
+     *
+     * \see ExpectedMediaOpenCb
+     * \see ExpectedMediaReadCb
+     * \see ExpectedMediaSeekCb
+     * \see ExpectedMediaCloseCb
+     *
+     * \version LibVLC 3.0.0 and later.
+     */
+
+    template <typename OpenCb, typename ReadCb, typename SeekCb, typename CloseCb>
+    Media( Instance& instance, OpenCb&& openCb, ReadCb&& readCb, SeekCb&& seekCb, CloseCb&& closeCb )
+    {
+        static_assert( signature_match_or_nullptr<OpenCb, ExpectedMediaOpenCb>::value, "Mismatched Open callback prototype" );
+        static_assert( signature_match_or_nullptr<SeekCb, ExpectedMediaSeekCb>::value, "Mismatched Seek callback prototype" );
+        static_assert( signature_match_or_nullptr<CloseCb, ExpectedMediaCloseCb>::value, "Mismatched Close callback prototype" );
+        static_assert( signature_match<ReadCb, ExpectedMediaReadCb>::value, "Mismatched Read callback prototype" );
+
+        auto ptr = libvlc_media_new_callbacks( instance,
+            imem::CallbackWrapper<(unsigned int)CallbackIdx::Open, libvlc_media_open_cb>::
+                wrap<imem::GuessBoxingStrategy<OpenCb, imem::BoxingStrategy::Setup>::Strategy>(
+                    this, std::forward<OpenCb>( openCb ) ),
+            imem::CallbackWrapper<(unsigned int)CallbackIdx::Read, libvlc_media_read_cb>::
+                wrap<imem::GuessBoxingStrategy<OpenCb, imem::BoxingStrategy::Unbox>::Strategy>(
+                    this, std::forward<ReadCb>( readCb ) ),
+            imem::CallbackWrapper<(unsigned int)CallbackIdx::Seek, libvlc_media_seek_cb>::
+                wrap<imem::GuessBoxingStrategy<OpenCb, imem::BoxingStrategy::Unbox>::Strategy>(
+                    this, std::forward<SeekCb>( seekCb ) ),
+            imem::CallbackWrapper<(unsigned int)CallbackIdx::Close, libvlc_media_close_cb>::
+                wrap<imem::GuessBoxingStrategy<OpenCb, imem::BoxingStrategy::Cleanup>::Strategy>(
+                    this, std::forward<CloseCb>( closeCb ) ),
+            static_cast<CallbackOwner<NbEvents>*>( this )
+        );
+        if ( ptr == nullptr )
+            throw std::runtime_error( "Failed to create media" );
+        m_obj.reset( ptr, libvlc_media_release );
+    }
+
+#endif
 
     explicit Media( Internal::InternalPtr ptr, bool incrementRefCount)
         : Internal{ ptr, libvlc_media_release }

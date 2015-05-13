@@ -44,8 +44,6 @@ public:
      * \param p_inst  libvlc instance
      *
      * \param psz_name  service name
-     * \warning This is returned as a pointer, as this is not refcounter by VLC, and is
-     *          fairly expensive to instantiate.
      */
     MediaDiscoverer(Instance& inst, const std::string& name)
 #if LIBVLC_VERSION_INT >= LIBVLC_VERSION(3, 0, 0, 0)
