@@ -34,10 +34,10 @@
 namespace VLC
 {
 
-class Instance : public Internal<libvlc_instance_t>, private EventOwner<2>
+class Instance : public Internal<libvlc_instance_t>, private CallbackOwner<2>
 {
 private:
-    enum class EventIdx : unsigned int
+    enum class CallbackIdx : unsigned int
     {
         Exit,
         Log
@@ -118,8 +118,8 @@ public:
     {
         static_assert(signature_match_or_nullptr<ExitCb, void()>::value, "Mismatched exit callback" );
         libvlc_set_exit_handler( *this,
-            CallbackWrapper<(int)EventIdx::Exit, void(*)(void*)>::wrap( this, std::forward<ExitCb>( exitCb ) ),
-            static_cast<EventOwner<2>*>( this ) );
+            CallbackWrapper<(int)CallbackIdx::Exit, void(*)(void*)>::wrap( this, std::forward<ExitCb>( exitCb ) ),
+            static_cast<CallbackOwner<2>*>( this ) );
     }
 
     /**
@@ -201,8 +201,8 @@ public:
                     logCb( level, ctx, std::string{ message.get() } );
             }
         };
-        libvlc_log_set( *this, CallbackWrapper<(int)EventIdx::Log, libvlc_log_cb>::wrap( this, std::move( wrapper ) ),
-                        static_cast<EventOwner<2>*>( this ) );
+        libvlc_log_set( *this, CallbackWrapper<(int)CallbackIdx::Log, libvlc_log_cb>::wrap( this, std::move( wrapper ) ),
+                        static_cast<CallbackOwner<2>*>( this ) );
     }
 
     /**

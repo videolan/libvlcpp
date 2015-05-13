@@ -104,12 +104,12 @@ namespace VLC
     };
 
     template <int NbEvent>
-    struct EventOwner
+    struct CallbackOwner
     {
         std::array<std::shared_ptr<CallbackHandlerBase>, NbEvent> callbacks;
 
     protected:
-        EventOwner() = default;
+        CallbackOwner() = default;
     };
 
     template <int, typename>
@@ -118,18 +118,18 @@ namespace VLC
     template <int NbEvents>
     struct FromOpaque<NbEvents, void*>
     {
-        static EventOwner<NbEvents>* get(void* opaque)
+        static CallbackOwner<NbEvents>* get(void* opaque)
         {
-            return reinterpret_cast<EventOwner<NbEvents>*>( opaque );
+            return reinterpret_cast<CallbackOwner<NbEvents>*>( opaque );
         }
     };
 
     template <int NbEvents>
     struct FromOpaque<NbEvents, void**>
     {
-        static EventOwner<NbEvents>* get(void** opaque)
+        static CallbackOwner<NbEvents>* get(void** opaque)
         {
-            return reinterpret_cast<EventOwner<NbEvents>*>( *opaque );
+            return reinterpret_cast<CallbackOwner<NbEvents>*>( *opaque );
         }
     };
 
@@ -148,7 +148,7 @@ namespace VLC
         using Wrapped = Ret(*)(Opaque, Args...);
 
         template <int NbEvents, typename Func>
-        static Wrapped wrap(EventOwner<NbEvents>* owner, Func&& func)
+        static Wrapped wrap(CallbackOwner<NbEvents>* owner, Func&& func)
         {
             owner->callbacks[Idx] = std::make_shared<CallbackHandler<Func>>( std::forward<Func>( func ) );
             return [](Opaque opaque, Args... args) -> Ret {
@@ -165,7 +165,7 @@ namespace VLC
         // it could be an instance of a function object, which doesn't compare nicely against nullptr.
         // Using the specialization at build time is easier and performs better.
         template <int NbEvents>
-        static std::nullptr_t wrap(EventOwner<NbEvents>*, std::nullptr_t)
+        static std::nullptr_t wrap(CallbackOwner<NbEvents>*, std::nullptr_t)
         {
             return nullptr;
         }
