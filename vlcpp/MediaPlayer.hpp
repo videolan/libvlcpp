@@ -35,10 +35,11 @@ namespace VLC
 {
 
 class AudioOutputDeviceDescription;
-class TrackDescription;
+class Equalizer;
 class Instance;
 class Media;
 class MediaPlayerEventManager;
+class TrackDescription;
 
 ///
 /// \brief The MediaPlayer class exposes libvlc_media_player_t functionnalities
@@ -657,16 +658,25 @@ public:
      * so it is safe for an application to release the equalizer reference
      * any time after this method returns.
      *
-     * \param p_equalizer  opaque equalizer handle, or NULL to disable the
-     * equalizer for this media player
+     * \param equalizer  The equalizer to be used by this media player
      *
-     * \return zero on success, -1 on error
+     * \return true on success, false otherwise
      *
      * \version LibVLC 2.2.0 or later
      */
-    int setEqualizer(libvlc_equalizer_t * p_equalizer)
+    bool setEqualizer(Equalizer& equalizer)
     {
-        return libvlc_media_player_set_equalizer(*this, p_equalizer);
+        return libvlc_media_player_set_equalizer( *this, equalizer ) == 0;
+    }
+
+    ///
+    /// \brief unsetEqualizer disable equalizer for this media player
+    ///
+    /// \return true on success, false otherwise.
+    ///
+    bool unsetEqualizer()
+    {
+        return libvlc_media_player_set_equalizer( *this, nullptr );
     }
 
     /**

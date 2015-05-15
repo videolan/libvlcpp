@@ -25,6 +25,7 @@
 #define LIBVLC_CXX_VLC_H
 
 #include "Instance.hpp"
+#include "Equalizer.hpp"
 #include "MediaListPlayer.hpp"
 #include "MediaDiscoverer.hpp"
 #include "Media.hpp"
