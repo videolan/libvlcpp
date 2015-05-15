@@ -24,6 +24,10 @@
 #ifndef LIBVLC_CXX_COMMON_H
 #define LIBVLC_CXX_COMMON_H
 
+#ifdef _MSC_VER
+using ssize_t = long int;
+#endif
+
 #include <vlc/vlc.h>
 #include <array>
 #include <cassert>
@@ -174,7 +178,7 @@ namespace VLC
 
     struct VaCopy
     {
-        VaCopy(va_list va_) noexcept
+        VaCopy(va_list va_)
         {
             va_copy( va, va_ );
         }
@@ -227,7 +231,11 @@ namespace VLC
         template <typename OpenCb, BoxingStrategy Strategy_>
         struct GuessBoxingStrategy
         {
+#ifndef _MSC_VER
             static constexpr BoxingStrategy Strategy = Strategy_;
+#else
+            static const BoxingStrategy Strategy = Strategy_;
+#endif
         };
 
         // In case the user provides a nullptr open callback, there's nothing
@@ -235,7 +243,11 @@ namespace VLC
         template <BoxingStrategy Strategy_>
         struct GuessBoxingStrategy<std::nullptr_t, Strategy_>
         {
+#ifndef _MSC_VER
             static constexpr BoxingStrategy Strategy = BoxingStrategy::None;
+#else
+            static const BoxingStrategy Strategy = BoxingStrategy::None;
+#endif
         };
 
         template <int NbEvents, BoxingStrategy Strategy>

@@ -46,7 +46,11 @@ private:
         Seek,
         Close,
     };
+#ifndef _MSC_VER
     static constexpr unsigned int NbEvents = 4;
+#else
+    static const unsigned int NbEvents = 4;
+#endif
 
 public:
     ///
