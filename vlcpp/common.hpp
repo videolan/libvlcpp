@@ -231,7 +231,7 @@ namespace VLC
         template <typename OpenCb, BoxingStrategy Strategy_>
         struct GuessBoxingStrategy
         {
-#ifndef _MSC_VER
+#if !defined(_MSC_VER) || _MSC_VER >= 1900
             static constexpr BoxingStrategy Strategy = Strategy_;
 #else
             static const BoxingStrategy Strategy = Strategy_;
@@ -243,7 +243,7 @@ namespace VLC
         template <BoxingStrategy Strategy_>
         struct GuessBoxingStrategy<std::nullptr_t, Strategy_>
         {
-#ifndef _MSC_VER
+#if !defined(_MSC_VER) || _MSC_VER >= 1900
             static constexpr BoxingStrategy Strategy = BoxingStrategy::None;
 #else
             static const BoxingStrategy Strategy = BoxingStrategy::None;

@@ -46,7 +46,7 @@ private:
         Seek,
         Close,
     };
-#ifndef _MSC_VER
+#if !defined(_MSC_VER) || _MSC_VER >= 1900
     static constexpr unsigned int NbEvents = 4;
 #else
     static const unsigned int NbEvents = 4;
