@@ -820,13 +820,14 @@ public:
      */
     std::vector<AudioOutputDeviceDescription> outputDeviceEnum()
     {
-        libvlc_audio_output_device_t* devices = libvlc_audio_output_device_enum(*this);
+        auto devices = libvlc_audio_output_device_enum(*this);
+        if ( devices == nullptr )
+            return {};
         std::vector<AudioOutputDeviceDescription> res;
-        if ( devices == NULL )
-            return res;
+        std::unique_ptr<libvlc_audio_output_device_t, decltype(&libvlc_audio_output_device_list_release)>
+                devicesPtr( devices, libvlc_audio_output_device_list_release);
         for ( auto* p = devices; p != NULL; p = p->p_next )
             res.emplace_back( p );
-        libvlc_audio_output_device_list_release( devices );
         return res;
     }
 
