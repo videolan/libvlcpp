@@ -124,7 +124,9 @@ public:
      */
     MediaPtr media()
     {
-        libvlc_media_t* media = libvlc_media_player_get_media(*this);
+        auto media = libvlc_media_player_get_media(*this);
+        if ( media == nullptr )
+            return nullptr;
         return std::make_shared<Media>( media, true );
     }
 

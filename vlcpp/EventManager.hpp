@@ -724,7 +724,7 @@ class MediaListEventManager : public EventManager
             {
                 auto callback = static_cast<DecayPtr<Func>>( data );
                 auto media = e->u.media_list_will_add_item.item;
-                (*callback)(media != nullptr ? std::make_shared<Media>( media, true ) : nullptr,
+                (*callback)( media != nullptr ? std::make_shared<Media>( media, true ) : nullptr,
                             e->u.media_list_will_add_item.index );
             });
         }

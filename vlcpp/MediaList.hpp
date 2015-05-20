@@ -171,6 +171,8 @@ public:
     MediaPtr itemAtIndex(int i_pos)
     {
         auto ptr = libvlc_media_list_item_at_index(*this,i_pos);
+        if ( ptr == nullptr )
+            return nullptr;
         return std::make_shared<Media>( ptr, false );
     }
 

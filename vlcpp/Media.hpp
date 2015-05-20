@@ -363,6 +363,11 @@ public:
     Media duplicate()
     {
         auto obj = libvlc_media_duplicate(*this);
+        // Assume failure to duplicate is due to VLC_ENOMEM.
+        // libvlc_media_duplicate(nullptr) would also return nullptr, but
+        // we consider the use of an empty libvlcpp instance undefined.
+        if ( obj == nullptr )
+            throw std::bad_alloc();
         return Media( obj, false );
     }
 
