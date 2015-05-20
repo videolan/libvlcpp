@@ -41,11 +41,9 @@ namespace VLC
 /**
  * @brief This class serves as a base for all event managers.
  *
- * Event handlers can be anything which implement the Callable concept
- * (http://en.cppreference.com/w/cpp/concept/Callable)
- * libvlcpp can take ownership (ie. move it to an internal storage) of your handler.
- * If you provide a rvalue, libvlcpp will store a reference to the handler.
- * If you provide a lvalue, libvlcpp will move the handler internaly.
+ * All events can be handled by providing a std::function.
+ * libvlcpp will take ownership (ie. the function will be moved inside an internal list)
+ * If the provided std::function is a lambda, it may capture anything you desire
  */
 class EventManager : public Internal<libvlc_event_manager_t>
 {
@@ -106,7 +104,9 @@ private:
 
     private:
         // Deduced type is Func& in case of lvalue; Func in case of rvalue.
-        Func m_userCallback;
+        // We decay the type to ensure we either copy or take ownership.
+        // Taking a reference would quite likely lead to unexpected behavior
+        typename std::decay<Func>::type m_userCallback;
         // EventManager always outlive EventHandler, no need for smart pointer
         EventManager* m_eventManager;
         Wrapper m_wrapper;
