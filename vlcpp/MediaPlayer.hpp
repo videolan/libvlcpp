@@ -1634,16 +1634,17 @@ public:
 private:
     std::vector<TrackDescription> getTracksDescription( libvlc_track_description_t* tracks ) const
     {
+        if ( tracks == nullptr )
+            return {};
         std::vector<TrackDescription> result;
-        if ( tracks == NULL )
-            return result;
-        libvlc_track_description_t* p = tracks;
-        while ( p != NULL )
+        auto p = tracks;
+        std::unique_ptr<libvlc_track_description_t, decltype(&libvlc_track_description_list_release)>
+                devicePtr( tracks, libvlc_track_description_list_release );
+        while ( p != nullptr )
         {
             result.emplace_back( p );
             p = p->p_next;
         }
-        libvlc_track_description_list_release(tracks);
         return result;
     }
 
