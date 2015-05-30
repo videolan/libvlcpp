@@ -67,7 +67,9 @@ namespace libVLCX
         Season,
         Episode,
         ShowName,
-        Actors
+        Actors,
+        AlbumArtist,
+        DiscNumber
     };
 
     public enum class FromType
