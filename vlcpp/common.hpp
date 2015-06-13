@@ -218,7 +218,7 @@ namespace VLC
         enum class BoxingStrategy
         {
             /// No boxing required.
-            None,
+            NoBoxing,
             /// Used to create the Opaque wrapper and setup pointers
             Setup,
             /// Unbox CallbackOwner/user callback pointers
@@ -244,9 +244,9 @@ namespace VLC
         struct GuessBoxingStrategy<std::nullptr_t, Strategy_>
         {
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
-            static constexpr BoxingStrategy Strategy = BoxingStrategy::None;
+            static constexpr BoxingStrategy Strategy = BoxingStrategy::NoBoxing;
 #else
-            static const BoxingStrategy Strategy = BoxingStrategy::None;
+            static const BoxingStrategy Strategy = BoxingStrategy::NoBoxing;
 #endif
         };
 
@@ -318,7 +318,7 @@ namespace VLC
         // Otherwise, we assume there is no Opaque wrapper, and therefore the
         // pointer we receive already is our CallbackOwner instance.
         template <int NbEvents>
-        struct BoxOpaque<NbEvents, BoxingStrategy::None>
+        struct BoxOpaque<NbEvents, BoxingStrategy::NoBoxing>
         {
             template <typename... Args>
             BoxOpaque(void* ptr, Args...) : m_ptr( reinterpret_cast<CallbackOwner<NbEvents>*>( ptr ) ) {}
