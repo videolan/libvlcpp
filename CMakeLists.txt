@@ -9,6 +9,8 @@ set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake ${CMAKE_MODULE_PATH})
 include_directories("${CMAKE_SOURCE_DIR}")
 find_package(LIBVLC REQUIRED)
 
+include_directories("${LIBVLC_INCLUDE_DIR}")
+
 subdirs(examples)
 subdirs(test)
 
