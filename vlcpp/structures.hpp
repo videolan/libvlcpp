@@ -512,6 +512,48 @@ private:
     bool m_menu;
 };
 
+///
+/// \brief The ChapterDescription class describes a chapter
+///
+class ChapterDescription
+{
+public:
+    ///
+    /// \brief timeoffset The chapter start time in (ms)
+    ///
+    int64_t starttime() const
+    {
+        return m_starttime;
+    }
+
+    ///
+    /// \brief duration The chapter duration in (ms)
+    ///
+    int64_t duration() const
+    {
+        return m_duration;
+    }
+
+    ///
+    /// \brief name The chapter name
+    ///
+    const std::string& name() const
+    {
+        return m_name;
+    }
+
+    explicit ChapterDescription( libvlc_chapter_description_t* c )
+        : m_duration( c->i_duration ), m_starttime( c->i_time_offset )
+    {
+        if ( c->psz_name != nullptr )
+            m_name = c->psz_name;
+    }
+
+private:
+    int64_t m_duration, m_starttime;
+    std::string m_name;
+};
+
 
 } // namespace VLC
 #endif

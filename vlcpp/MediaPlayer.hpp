@@ -1369,14 +1369,34 @@ public:
      *
      * \param i_title  selected title
      *
-     * \return list containing description of available chapter for title
+     * \return list containing description of available chapters for title
      * i_title
      */
+#if LIBVLC_VERSION_INT < LIBVLC_VERSION(3, 0, 0, 0)
     std::vector<TrackDescription> chapterDescription(int i_title)
     {
         libvlc_track_description_t* result = libvlc_video_get_chapter_description( *this, i_title );
         return getTracksDescription( result );
     }
+#else
+    std::vector<ChapterDescription> chapterDescription(int i_title)
+    {
+        libvlc_chapter_description_t **chapters;
+        int nbChapters = libvlc_media_player_get_full_chapter_descriptions( *this, i_title, &chapters );
+        auto cleanupCb = [nbChapters](libvlc_chapter_description_t** cs) {
+            libvlc_chapter_descriptions_release( cs, nbChapters );
+        };
+        std::unique_ptr<libvlc_chapter_description_t*[], decltype(cleanupCb)> ptr( chapters, cleanupCb );
+
+        std::vector<ChapterDescription> res;
+
+        if ( nbChapters < 1 )
+            return res;
+
+        for ( int i = 0; i < nbChapters; ++i )
+            res.emplace_back( ptr[i] );
+    }
+#endif
 
     /**
      * Get current crop filter geometry.
