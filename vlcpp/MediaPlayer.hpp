@@ -1337,11 +1337,32 @@ public:
      *
      * \return list containing description of available titles
      */
+#if LIBVLC_VERSION_INT < LIBVLC_VERSION(3, 0, 0, 0)
     std::vector<TrackDescription> titleDescription()
     {
         libvlc_track_description_t* result = libvlc_video_get_title_description( *this );
         return getTracksDescription( result );
     }
+#else
+    std::vector<TitleDescription> titleDescription()
+    {
+        libvlc_title_description_t **titles;
+        int nbTitles = libvlc_media_player_get_full_title_descriptions( *this, &titles);
+        auto cleanupCb = [nbTitles]( libvlc_title_description_t** ts) {
+            libvlc_title_descriptions_release( ts, nbTitles );
+        };
+
+        std::unique_ptr<libvlc_title_description_t*[], decltype(cleanupCb)> ptr(
+                    titles, cleanupCb);
+        std::vector<TitleDescription> res;
+
+        if ( nbTitles < 1 )
+            return res;
+
+        for ( int i = 0; i < nbTitles; ++i )
+            res.emplace_back( ptr[i] );
+    }
+#endif
 
     /**
      * Get the description of available chapters for specific title.

@@ -468,5 +468,50 @@ private:
     std::string m_name;
 };
 
+///
+/// \brief The TitleDescription class describes a title
+///
+class TitleDescription
+{
+public:
+    ///
+    /// \brief duration The title duration in (ms)
+    ///
+    int64_t duration() const
+    {
+        return m_duration;
+    }
+
+    ///
+    /// \brief name The title name
+    ///
+    const std::string& name() const
+    {
+        return m_name;
+    }
+
+    ///
+    /// \brief name Is the title a menu?
+    ///
+    bool isMenu() const
+    {
+        return m_menu;
+    }
+
+
+    explicit TitleDescription( libvlc_title_description_t* c )
+        : m_duration( c->i_duration ), m_menu( c->b_menu )
+    {
+        if ( c->psz_name != nullptr )
+            m_name = c->psz_name;
+    }
+
+private:
+    int64_t m_duration;
+    std::string m_name;
+    bool m_menu;
+};
+
+
 } // namespace VLC
 #endif
