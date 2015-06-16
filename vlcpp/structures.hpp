@@ -27,6 +27,7 @@
 #include <string>
 
 #include "common.hpp"
+#include <vlc/libvlc_version.h>
 
 //FIXME:
 //Should we make the constructors private again and implement our own vector allocator?
@@ -468,6 +469,7 @@ private:
     std::string m_name;
 };
 
+#if LIBVLC_VERSION_INT >= LIBVLC_VERSION(3, 0, 0, 0)
 ///
 /// \brief The TitleDescription class describes a title
 ///
@@ -553,6 +555,7 @@ private:
     int64_t m_duration, m_starttime;
     std::string m_name;
 };
+#endif
 
 
 } // namespace VLC
