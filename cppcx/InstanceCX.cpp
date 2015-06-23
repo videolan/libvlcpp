@@ -33,7 +33,7 @@ namespace libVLCX
     Instance::Instance(Windows::Foundation::Collections::IVector<Platform::String^>^ argv, SwapChainPanel^ panel)
         : m_chainPanel(panel)
     {
-        int extraArgs = 5;
+        int extraArgs = 4;
         auto c_argv = new char*[argv->Size + extraArgs];
         unsigned int i = 0;
         for (auto arg : argv)
@@ -79,33 +79,28 @@ namespace libVLCX
         sprintf_s(ptr_astring, "--winstore-audioclient=0x%p", audioReg->m_AudioClient);
         argv[nbArgs++] = _strdup(ptr_astring);
 
-        char ptr_d2dstring[40];
-        sprintf_s(ptr_d2dstring, "--winrt-d2dcontext=0x%p", m_dxManager->cp_d2dContext);
-        argv[nbArgs++] = _strdup(ptr_d2dstring);
+        char ptr_d3dstring[40];
+        sprintf_s(ptr_d3dstring, "--winrt-d3ddevice=0x%p", m_dxManager->cp_d3dDevice);
+        argv[nbArgs++] = _strdup(ptr_d3dstring);
+
+        char ptr_d3dcstring[40];
+        sprintf_s(ptr_d3dcstring, "--winrt-d3dcontext=0x%p", m_dxManager->cp_d3dContext);
+        argv[nbArgs++] = _strdup(ptr_d3dcstring);
 
         char ptr_scstring[40];
         sprintf_s(ptr_scstring, "--winrt-swapchain=0x%p", m_dxManager->cp_swapChain);
         argv[nbArgs++] = _strdup(ptr_scstring);
-
-        char widthstring[40];
-        sprintf_s(widthstring, "--winrt-width=0x%p", &m_width);
-        argv[nbArgs++] = _strdup(widthstring);
-
-        char heightstring[40];
-        sprintf_s(heightstring, "--winrt-height=0x%p", &m_height);
-        argv[nbArgs++] = _strdup(heightstring);
     }
+
+    static const GUID SWAPCHAIN_WIDTH  = { 0xf1b59347, 0x1643, 0x411a,{ 0xad, 0x6b, 0xc7, 0x80, 0x17, 0x7a, 0x6, 0xb6 } };
+    static const GUID SWAPCHAIN_HEIGHT = { 0x6ea976a0, 0x9d60, 0x4bb7,{ 0xa5, 0xa9, 0x7d, 0xd1, 0x18, 0x7f, 0xc9, 0xbd } };
 
     void Instance::UpdateSize(float x, float y)
     {
-#if WINAPI_FAMILY == WINAPI_FAMILY_PHONE_APP
-        const float scaleFactor = Windows::Graphics::Display::DisplayInformation::GetForCurrentView()->RawPixelsPerViewPixel;
-#else
-        const float scaleFactor = (float) DisplayProperties::ResolutionScale / 100.f;
-#endif
-
-        m_width = (uint32_t)(x * scaleFactor);
-        m_height = (uint32_t)(y * scaleFactor);
+        m_width  = (uint32_t)x;
+        m_height = (uint32_t)y;
+        m_dxManager->cp_swapChain->SetPrivateData(SWAPCHAIN_WIDTH, sizeof(uint32_t), &m_width);
+        m_dxManager->cp_swapChain->SetPrivateData(SWAPCHAIN_HEIGHT, sizeof(uint32_t), &m_height);
     }
 
     int Instance::addIntf(Platform::String^ name)
