@@ -897,7 +897,7 @@ namespace libVLCX
         *
         * \return list containing description of available titles
         */
-        Windows::Foundation::Collections::IVector<TrackDescription^>^ titleDescription();
+        Windows::Foundation::Collections::IVector<TitleDescription^>^ titleDescription();
 
         /**
         * Get the description of available chapters for specific title.
@@ -907,7 +907,7 @@ namespace libVLCX
         * \return list containing description of available chapter for title
         * i_title
         */
-        Windows::Foundation::Collections::IVector<TrackDescription^>^ chapterDescription(int i_title);
+        Windows::Foundation::Collections::IVector<ChapterDescription^>^ chapterDescription(int i_title);
 
         /**
         * Get current crop filter geometry.

@@ -179,20 +179,76 @@ namespace libVLCX
         m_device = ToPlatformString(desc.device().c_str());
         m_description = ToPlatformString(desc.description().c_str());
     }
-
-
+    // TrackDescription
     int TrackDescription::id()
     {
-        return m_id;
+         return m_id;
     }
+
     Platform::String^ TrackDescription::name()
     {
-        return m_name;
+         return m_name;
     }
 
     TrackDescription::TrackDescription(const VLC::TrackDescription& desc)
     {
-        m_id = desc.id();
-        m_name = ToPlatformString(desc.name().c_str());
+         m_id = desc.id();
+         m_name = ToPlatformString(desc.name().c_str());
+    }
+
+    // TitleDescription
+    int64_t TitleDescription::duration()
+    {
+         return m_duration;
+    }
+
+    int TitleDescription::id()
+    {
+         return m_id;
+    }
+
+    Platform::String^ TitleDescription::name()
+    {
+         return m_name;
+    }
+
+    bool TitleDescription::isMenu()
+    {
+         return m_menu;
+    }
+
+    TitleDescription::TitleDescription(const VLC::TitleDescription& desc)
+    {
+         m_menu = desc.isMenu();
+         m_duration = desc.duration();
+         m_name = ToPlatformString(desc.name().c_str());
+    }
+
+    // Chapter decription
+    int ChapterDescription::id()
+    {
+         return m_id;
+    }
+
+    int64_t ChapterDescription::startTime()
+    {
+         return m_startTime;
+    }
+
+    int64_t ChapterDescription::duration()
+    {
+         return m_duration;
+    }
+
+    Platform::String^ ChapterDescription::name()
+    {
+         return m_name;
+    }
+
+    ChapterDescription::ChapterDescription(const VLC::ChapterDescription& desc)
+    {
+         m_duration = desc.duration();
+         m_startTime = desc.starttime();
+         m_name = ToPlatformString(desc.name().c_str());
     }
 }

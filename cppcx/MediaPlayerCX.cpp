@@ -417,14 +417,14 @@ namespace libVLCX
         return m_mp.setSpuDelay(i_delay);
     }
 
-    Windows::Foundation::Collections::IVector<TrackDescription^>^ MediaPlayer::titleDescription()
+    Windows::Foundation::Collections::IVector<TitleDescription^>^ MediaPlayer::titleDescription()
     {
-        return MarshallVector<TrackDescription, VLC::TrackDescription>(m_mp.titleDescription());
+        return MarshallVector<TitleDescription, VLC::TitleDescription>(m_mp.titleDescription());
     }
 
-    Windows::Foundation::Collections::IVector<TrackDescription^>^ MediaPlayer::chapterDescription(int i_title)
+    Windows::Foundation::Collections::IVector<ChapterDescription^>^ MediaPlayer::chapterDescription(int i_title)
     {
-        return MarshallVector<TrackDescription, VLC::TrackDescription>(m_mp.chapterDescription(i_title));
+        return MarshallVector<ChapterDescription, VLC::ChapterDescription>(m_mp.chapterDescription(i_title));
     }
 
     Platform::String^ MediaPlayer::cropGeometry()

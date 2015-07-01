@@ -150,4 +150,43 @@ namespace libVLCX
         int m_id;
         Platform::String^ m_name;
     };
+
+
+
+
+    public ref class TitleDescription sealed
+    {
+        public:
+            int64_t duration();
+            int id();
+            Platform::String^ name();
+            bool isMenu();
+
+        internal:
+            explicit TitleDescription(const VLC::TitleDescription& desc);
+
+        private:
+            int m_id;
+            Platform::String^ m_name;
+            int64_t m_duration;
+            bool m_menu;
+    };
+
+    public ref class ChapterDescription sealed
+    {
+        public:
+            int id();
+            int64_t startTime();
+            int64_t duration();
+            Platform::String^ name();
+
+        internal:
+            explicit ChapterDescription(const VLC::ChapterDescription& desc);
+
+        private:
+            int m_id;
+            Platform::String^ m_name;
+            int64_t m_duration;
+            int64_t m_startTime;
+    };
 }
