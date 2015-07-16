@@ -1361,6 +1361,7 @@ public:
 
         for ( int i = 0; i < nbTitles; ++i )
             res.emplace_back( ptr[i] );
+        return res;
     }
 #endif
 
@@ -1395,6 +1396,7 @@ public:
 
         for ( int i = 0; i < nbChapters; ++i )
             res.emplace_back( ptr[i] );
+        return res;
     }
 #endif
 
