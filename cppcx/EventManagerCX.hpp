@@ -524,7 +524,7 @@ namespace libVLCX
         MediaPlayerEventManager(VLC::MediaPlayerEventManager& em);
 
     private:
-        VLC::MediaPlayerEventManager m_em;
+        VLC::MediaPlayerEventManager& m_em;
         std::vector<VLC::EventManager::RegisteredEvent> m_events;
     };
 
