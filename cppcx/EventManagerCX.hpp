@@ -54,6 +54,7 @@ namespace libVLCX
     public delegate void ESDeleted(TrackType, int);
     public delegate void ESSelected(TrackType, int);
 
+    public delegate void ParsedChanged(bool);
     ref class EventManager;
 
     public ref class MediaPlayerEventManager sealed
@@ -532,7 +533,30 @@ namespace libVLCX
     {
     internal:
         MediaEventManager(VLC::MediaEventManager& em);
+
     private:
-        VLC::MediaEventManager m_em;
+        VLC::MediaEventManager& m_em;
+        std::vector<VLC::EventManager::RegisteredEvent> m_events;
+
+    public:
+        event ParsedChanged^ OnParsedChanged
+        {
+            Windows::Foundation::EventRegistrationToken add(ParsedChanged^ handler)
+            {
+                auto h = m_em.onParsedChanged([handler](bool b) {
+                    handler(b);
+                });
+                m_events.push_back(h);
+                return Windows::Foundation::EventRegistrationToken{ (int64)h };
+            }
+
+            void remove(Windows::Foundation::EventRegistrationToken token) {
+                auto h = (VLC::EventManager::RegisteredEvent)token.Value;
+                auto it = std::find(begin(m_events), end(m_events), h);
+                assert(it != end(m_events));
+                (*it)->unregister();
+                m_events.erase(it);
+            }
+        }
     };
 }
