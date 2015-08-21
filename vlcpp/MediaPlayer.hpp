@@ -1352,12 +1352,12 @@ public:
             libvlc_title_descriptions_release( ts, nbTitles );
         };
 
-        std::unique_ptr<libvlc_title_description_t*[], decltype(cleanupCb)> ptr(
-                    titles, cleanupCb);
         std::vector<TitleDescription> res;
 
         if ( nbTitles < 1 )
             return res;
+
+        std::unique_ptr<libvlc_title_description_t*[], decltype(cleanupCb)> ptr( titles, cleanupCb );
 
         for ( int i = 0; i < nbTitles; ++i )
             res.emplace_back( ptr[i] );
@@ -1387,12 +1387,13 @@ public:
         auto cleanupCb = [nbChapters](libvlc_chapter_description_t** cs) {
             libvlc_chapter_descriptions_release( cs, nbChapters );
         };
-        std::unique_ptr<libvlc_chapter_description_t*[], decltype(cleanupCb)> ptr( chapters, cleanupCb );
 
         std::vector<ChapterDescription> res;
 
         if ( nbChapters < 1 )
             return res;
+
+        std::unique_ptr<libvlc_chapter_description_t*[], decltype(cleanupCb)> ptr( chapters, cleanupCb );
 
         for ( int i = 0; i < nbChapters; ++i )
             res.emplace_back( ptr[i] );
