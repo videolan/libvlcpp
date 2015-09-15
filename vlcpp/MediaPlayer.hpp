@@ -1008,7 +1008,7 @@ public:
      *
      * \version LibVLC 1.1.1 or later
      */
-    int64_t delay()
+    int64_t audioDelay()
     {
         return libvlc_audio_get_delay(*this);
     }
@@ -1021,7 +1021,7 @@ public:
      *
      * \version LibVLC 1.1.1 or later
      */
-    bool setDelay(int64_t i_delay)
+    bool setAudioDelay(int64_t i_delay)
     {
         return libvlc_audio_set_delay(*this, i_delay) == 0;
     }

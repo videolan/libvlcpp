@@ -326,14 +326,14 @@ namespace libVLCX
         return m_mp.setChannel(channel);
     }
 
-    int64_t MediaPlayer::delay()
+    int64_t MediaPlayer::audioDelay()
     {
-        return m_mp.delay();
+        return m_mp.audioDelay();
     }
 
-    int MediaPlayer::setDelay(int64_t i_delay)
+    int MediaPlayer::setAudioDelay(int64_t i_delay)
     {
-        return m_mp.setDelay(i_delay);
+        return m_mp.setAudioDelay(i_delay);
     }
 
     //void setVideoCallbacks(libvlc_video_lock_cb lock, libvlc_video_unlock_cb unlock, libvlc_video_display_cb display, void * opaque);

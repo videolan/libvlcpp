@@ -653,7 +653,7 @@ namespace libVLCX
         *
         * \version LibVLC 1.1.1 or later
         */
-        int64_t delay();
+        int64_t audioDelay();
 
         /**
         * Set current audio delay. The audio delay will be reset to zero each
@@ -665,7 +665,7 @@ namespace libVLCX
         *
         * \version LibVLC 1.1.1 or later
         */
-        int setDelay(int64_t i_delay);
+        int setAudioDelay(int64_t i_delay);
 
         /**
         * Set callbacks and private data to render decoded video to a custom
