@@ -234,27 +234,6 @@ public:
     }
 
     /**
-     * Set the agl handler where the media player should render its video
-     * output.
-     *
-     * \param drawable  the agl handler
-     */
-    void setAgl(uint32_t drawable)
-    {
-        libvlc_media_player_set_agl(*this, drawable);
-    }
-
-    /**
-     * Get the agl handler previously set with MediaPlayer::setAgl() .
-     *
-     * \return the agl handler or 0 if none where set
-     */
-    uint32_t agl()
-    {
-        return libvlc_media_player_get_agl(*this);
-    }
-
-    /**
      * Set an X Window System drawable where the media player should render
      * its video output. If LibVLC was built without X11 output support, then
      * this has no effects.
