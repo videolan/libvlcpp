@@ -197,8 +197,8 @@ public:
             int len = vsnprintf(nullptr, 0, format, vaCopy.va);
             if (len > 0)
             {
-                std::unique_ptr<char[]> message{ new char[len] };
-                if (vsnprintf(message.get(), len, format, va) != -1)
+                std::unique_ptr<char[]> message{ new char[len + 1] };
+                if (vsnprintf(message.get(), len + 1, format, va) != -1)
                     logCb(level, ctx, std::string{ message.get() });
             }
 #else
