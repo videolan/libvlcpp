@@ -118,6 +118,25 @@ namespace libVLCX
         m_instance.setAppId(VLCString(id), VLCString(version), VLCString(icon));
     }
 
+    void Instance::logUnset()
+    {
+        m_instance.logUnset();
+    }
+
+    void Instance::logSet(LogCallback^ logCb)
+    {
+        m_instance.logSet([logCb](int logLevel, const libvlc_log_t* Log, std::string msgStr)
+        {
+            size_t len = MultiByteToWideChar(CP_UTF8, 0, msgStr.c_str(), -1, nullptr, 0);
+            if (len == 0)
+                return;
+            wchar_t *out = new wchar_t[len];
+            std::unique_ptr<wchar_t[]> out_u(out);
+            MultiByteToWideChar(CP_UTF8, 0, msgStr.c_str(), -1, out, len);
+            logCb(logLevel, ref new Platform::String(out));
+        });
+    }
+
     Windows::Foundation::Collections::IVector<ModuleDescription^>^ Instance::audioFilterList()
     {
         return MarshallVector<ModuleDescription, VLC::ModuleDescription>(m_instance.audioFilterList());

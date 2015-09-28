@@ -32,6 +32,7 @@
 
 namespace libVLCX
 {
+    public delegate void LogCallback(int, Platform::String^);
     public ref class Instance sealed
     {
     public:
@@ -99,6 +100,35 @@ namespace libVLCX
         * \version LibVLC 2.1.0 or later.
         */
         void setAppId(Platform::String^ id, Platform::String^ version, Platform::String^ icon);
+
+        /**
+        * Unsets the logging callback for a LibVLC instance. This is rarely
+        * needed: the callback is implicitly unset when the instance is
+        * destroyed. This function will wait for any pending callbacks
+        * invocation to complete (causing a deadlock if called from within the
+        * callback).
+        *
+        * \version LibVLC 2.1.0 or later
+        */
+        void logUnset();
+
+        /**
+        * Sets the logging callback for a LibVLC instance. This function is
+        * thread-safe: it will wait for any pending callbacks invocation to
+        * complete.
+        *
+        * \note Some log messages (especially debug) are emitted by LibVLC while
+        * is being initialized. These messages cannot be captured with this
+        * interface.
+        *
+        * \param logCb A delegate of the form void(int logLevel, String message)
+        *
+        * \warning A deadlock may occur if this function is called from the
+        * callback.
+        *
+        * \version LibVLC 2.1.0 or later
+        */
+        void logSet(LogCallback^ logCb);
 
         /**
         * Returns a list of audio filters that are available.

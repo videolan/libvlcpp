@@ -192,17 +192,24 @@ public:
         static_assert(signature_match<LogCb, void(int, const libvlc_log_t*, std::string)>::value,
                       "Mismatched log callback" );
         auto wrapper = [logCb](int level, const libvlc_log_t* ctx, const char* format, va_list va) {
-            VaCopy vaCopy( va );
-            int len = vsnprintf( nullptr, 0, format, vaCopy.va );
-            if ( len > 0 )
+#ifndef _MSC_VER
+            VaCopy vaCopy(va);
+            int len = vsnprintf(nullptr, 0, format, vaCopy.va);
+            if (len > 0)
             {
                 std::unique_ptr<char[]> message{ new char[len] };
-                if ( vsnprintf( message.get(), len, format, va ) != -1 )
-                    logCb( level, ctx, std::string{ message.get() } );
+                if (vsnprintf(message.get(), len, format, va) != -1)
+                    logCb(level, ctx, std::string{ message.get() });
             }
+#else
+            //MSVC treats passing nullptr as 1st vsnprintf(_s) as an error
+            char buff[512];
+            vsnprintf(buff, sizeof(buff) - 1, format, va);
+            logCb(level, ctx, std::string{ buff });
+#endif
         };
-        libvlc_log_set( *this, CallbackWrapper<(unsigned int)CallbackIdx::Log, libvlc_log_cb>::wrap( this, std::move( wrapper ) ),
-                        static_cast<CallbackOwner<2>*>( this ) );
+        libvlc_log_set(*this, CallbackWrapper<(unsigned int)CallbackIdx::Log, libvlc_log_cb>::wrap(this, std::move(wrapper)),
+            static_cast<CallbackOwner<2>*>(this));
     }
 
     /**
