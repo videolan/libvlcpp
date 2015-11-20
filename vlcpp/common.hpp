@@ -109,7 +109,7 @@ namespace VLC
     };
 
     template <size_t NbEvent>
-    using CallbackArray = std::array<std::shared_ptr<CallbackHandlerBase>, NbEvent>;
+    using CallbackArray = std::array<std::unique_ptr<CallbackHandlerBase>, NbEvent>;
 
     ///
     /// Utility class that contains a shared pointer to a callback array.
@@ -166,7 +166,7 @@ namespace VLC
         template <size_t NbEvents, typename Func>
         static Wrapped wrap(CallbackArray<NbEvents>& callbacks, Func&& func)
         {
-            callbacks[Idx] = std::make_shared<CallbackHandler<Func>>( std::forward<Func>( func ) );
+            callbacks[Idx] = std::unique_ptr<CallbackHandler<Func>>( new CallbackHandler<Func>( std::forward<Func>( func ) ) );
             return [](Opaque opaque, Args... args) -> Ret {
                 auto& callbacks = FromOpaque<NbEvents, Opaque>::get( opaque );
                 assert(callbacks[Idx] != nullptr);
@@ -363,7 +363,7 @@ namespace VLC
             template <BoxingStrategy Strategy, size_t NbEvents, typename Func>
             static Wrapped wrap(CallbackArray<NbEvents>& callbacks, Func&& func)
             {
-                callbacks[Idx] = std::make_shared<CallbackHandler<Func>>( std::forward<Func>( func ) );
+                callbacks[Idx] = std::unique_ptr<CallbackHandler<Func>>( new CallbackHandler<Func>( std::forward<Func>( func ) ) );
                 return [](void* opaque, Args... args) -> Ret {
                     auto boxed = BoxOpaque<NbEvents, Strategy>( opaque, std::forward<Args>( args )... );
                     assert(boxed.callbacks()[Idx] != nullptr );
