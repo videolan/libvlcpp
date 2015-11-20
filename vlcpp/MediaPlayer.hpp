@@ -478,6 +478,7 @@ public:
         return libvlc_media_player_get_state(*this);
     }
 
+#if LIBVLC_VERSION_INT < LIBVLC_VERSION(3, 0, 0, 0)
     /**
      * Get movie fps rate
      *
@@ -488,6 +489,7 @@ public:
     {
         return libvlc_media_player_get_fps(*this);
     }
+#endif
 
     /**
      * Get the amount of video outputs this media player has?
