@@ -36,7 +36,7 @@ class MediaEventManager;
 class Instance;
 class MediaList;
 
-class Media : public Internal<libvlc_media_t>, private CallbackOwner<4>
+class Media : protected CallbackOwner<4>, public Internal<libvlc_media_t>
 {
 private:
     enum class CallbackIdx : unsigned int
@@ -256,17 +256,17 @@ public:
         auto ptr = libvlc_media_new_callbacks( instance,
             imem::CallbackWrapper<(unsigned int)CallbackIdx::Open, libvlc_media_open_cb>::
                 wrap<imem::GuessBoxingStrategy<OpenCb, imem::BoxingStrategy::Setup>::Strategy>(
-                    this, std::forward<OpenCb>( openCb ) ),
+                    *m_callbacks, std::forward<OpenCb>( openCb ) ),
             imem::CallbackWrapper<(unsigned int)CallbackIdx::Read, libvlc_media_read_cb>::
                 wrap<imem::GuessBoxingStrategy<OpenCb, imem::BoxingStrategy::Unbox>::Strategy>(
-                    this, std::forward<ReadCb>( readCb ) ),
+                    *m_callbacks, std::forward<ReadCb>( readCb ) ),
             imem::CallbackWrapper<(unsigned int)CallbackIdx::Seek, libvlc_media_seek_cb>::
                 wrap<imem::GuessBoxingStrategy<OpenCb, imem::BoxingStrategy::Unbox>::Strategy>(
-                    this, std::forward<SeekCb>( seekCb ) ),
+                    *m_callbacks, std::forward<SeekCb>( seekCb ) ),
             imem::CallbackWrapper<(unsigned int)CallbackIdx::Close, libvlc_media_close_cb>::
                 wrap<imem::GuessBoxingStrategy<OpenCb, imem::BoxingStrategy::Cleanup>::Strategy>(
-                    this, std::forward<CloseCb>( closeCb ) ),
-            static_cast<CallbackOwner<NbEvents>*>( this )
+                    *m_callbacks, std::forward<CloseCb>( closeCb ) ),
+            m_callbacks.get()
         );
         if ( ptr == nullptr )
             throw std::runtime_error( "Failed to create media" );

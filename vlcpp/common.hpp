@@ -108,37 +108,48 @@ namespace VLC
         Func func;
     };
 
-    template <int NbEvent>
-    struct CallbackOwner
-    {
-        std::array<std::shared_ptr<CallbackHandlerBase>, NbEvent> callbacks;
+    template <size_t NbEvent>
+    using CallbackArray = std::array<std::shared_ptr<CallbackHandlerBase>, NbEvent>;
 
+    ///
+    /// Utility class that contains a shared pointer to a callback array.
+    /// We use a shared_ptr to allow multiple instances to share the same callback array
+    /// This must be inherited before the Internal<T> type, to ensure it gets deleted
+    /// after the wrapped libvlc object.
+    ///
+    template <size_t NbEvent>
+    class CallbackOwner
+    {
     protected:
-        CallbackOwner() = default;
+        CallbackOwner()
+            : m_callbacks( std::make_shared<CallbackArray<NbEvent>>() )
+        {
+        }
+        std::shared_ptr<CallbackArray<NbEvent>> m_callbacks;
     };
 
-    template <int, typename>
+    template <size_t, typename>
     struct FromOpaque;
 
-    template <int NbEvents>
+    template <size_t NbEvents>
     struct FromOpaque<NbEvents, void*>
     {
-        static CallbackOwner<NbEvents>* get(void* opaque)
+        static CallbackArray<NbEvents>& get( void* opaque )
         {
-            return reinterpret_cast<CallbackOwner<NbEvents>*>( opaque );
+            return *reinterpret_cast<CallbackArray<NbEvents>*>( opaque );
         }
     };
 
-    template <int NbEvents>
+    template <size_t NbEvents>
     struct FromOpaque<NbEvents, void**>
     {
-        static CallbackOwner<NbEvents>* get(void** opaque)
+        static CallbackArray<NbEvents>& get(void** opaque)
         {
-            return reinterpret_cast<CallbackOwner<NbEvents>*>( *opaque );
+            return *reinterpret_cast<CallbackArray<NbEvents>*>( *opaque );
         }
     };
 
-    template <int Idx, typename... Args>
+    template <size_t Idx, typename... Args>
     struct CallbackWrapper;
 
     // We assume that any callback will take a void*/void** opaque as its first parameter.
@@ -147,19 +158,19 @@ namespace VLC
     // parameters.
     // Using partial specialization also allows us to get the list of the expected
     // callback parameters automatically, rather than having to specify them.
-    template <int Idx, typename Ret, typename Opaque, typename... Args>
+    template <size_t Idx, typename Ret, typename Opaque, typename... Args>
     struct CallbackWrapper<Idx, Ret(*)(Opaque, Args...)>
     {
         using Wrapped = Ret(*)(Opaque, Args...);
 
-        template <int NbEvents, typename Func>
-        static Wrapped wrap(CallbackOwner<NbEvents>* owner, Func&& func)
+        template <size_t NbEvents, typename Func>
+        static Wrapped wrap(CallbackArray<NbEvents>& callbacks, Func&& func)
         {
-            owner->callbacks[Idx] = std::make_shared<CallbackHandler<Func>>( std::forward<Func>( func ) );
+            callbacks[Idx] = std::make_shared<CallbackHandler<Func>>( std::forward<Func>( func ) );
             return [](Opaque opaque, Args... args) -> Ret {
-                auto self = FromOpaque<NbEvents, Opaque>::get( opaque );
-                assert(self->callbacks[Idx] != nullptr);
-                auto cbHandler = static_cast<CallbackHandler<Func>*>( self->callbacks[Idx].get() );
+                auto& callbacks = FromOpaque<NbEvents, Opaque>::get( opaque );
+                assert(callbacks[Idx] != nullptr);
+                auto cbHandler = static_cast<CallbackHandler<Func>*>( callbacks[Idx].get() );
                 return cbHandler->func( std::forward<Args>(args)... );
             };
         }
@@ -169,8 +180,8 @@ namespace VLC
         // since Func is a template type, which roughly has to satisfy the "Callable" concept,
         // it could be an instance of a function object, which doesn't compare nicely against nullptr.
         // Using the specialization at build time is easier and performs better.
-        template <int NbEvents>
-        static std::nullptr_t wrap(CallbackOwner<NbEvents>*, std::nullptr_t)
+        template <size_t NbEvents>
+        static std::nullptr_t wrap(CallbackArray<NbEvents>&, std::nullptr_t)
         {
             return nullptr;
         }
@@ -202,7 +213,7 @@ namespace VLC
         // Instead of always receiving the initialy provided void* opaque, the open
         // callback is responsible for creating another opaque value, that will be
         // passed to read/seek/close.
-        // Since we use the opaque value to pass a CallbackOwner instance, we need
+        // Since we use the opaque value to pass a CallbackArray instance, we need
         // a way to keep the user's opaque value, and replace it by our own.
         // The Opaque type is a small boxing helper, that will be used for this purpose.
         // In case the OpenCallback is a nullptr, there is no need for boxing, since
@@ -211,7 +222,7 @@ namespace VLC
         template <int NbEvent>
         struct Opaque
         {
-            CallbackOwner<NbEvent>* owner;
+            CallbackArray<NbEvent>* callbacks;
             void* userOpaque;
         };
 
@@ -221,7 +232,7 @@ namespace VLC
             NoBoxing,
             /// Used to create the Opaque wrapper and setup pointers
             Setup,
-            /// Unbox CallbackOwner/user callback pointers
+            /// Unbox CallbackArray/user callback pointers
             Unbox,
             /// Releases the Opaque, created during Setup
             Cleanup,
@@ -239,7 +250,7 @@ namespace VLC
         };
 
         // In case the user provides a nullptr open callback, there's nothing
-        // to box, as we get the original opaque (which is our CallbackOwner*)
+        // to box, as we get the original opaque (which is our CallbackArray*)
         template <BoxingStrategy Strategy_>
         struct GuessBoxingStrategy<std::nullptr_t, Strategy_>
         {
@@ -250,12 +261,12 @@ namespace VLC
 #endif
         };
 
-        template <int NbEvents, BoxingStrategy Strategy>
+        template <size_t NbEvents, BoxingStrategy Strategy>
         struct BoxOpaque;
 
         // This specialization is our base case. It unboxes an Opaque pointer
-        // to a CallbackOwner, of a user provided opaque.
-        template <int NbEvents>
+        // to a CallbackArray, of a user provided opaque.
+        template <size_t NbEvents>
         struct BoxOpaque<NbEvents, BoxingStrategy::Unbox>
         {
             template <typename... Args>
@@ -263,9 +274,7 @@ namespace VLC
             // Assume the cast operator will be used when calling the callback.
             // In this case, decay the boxed type to the user provided value
             operator void*() { return m_ptr->userOpaque; }
-            // Assume the dereferencing operator to be used by our wrappers. In
-            // this case, we only care about our types
-            CallbackOwner<NbEvents>* operator ->() { return m_ptr->owner; }
+            CallbackArray<NbEvents>& callbacks() { return *(m_ptr->callbacks); }
             Opaque<NbEvents>* m_ptr;
         };
 
@@ -277,7 +286,7 @@ namespace VLC
         // This makes us receive all parameters so we can extract the void** param.
         // As a drawback, all other overloads have to receive those parameters, and
         // ignore them.
-        template <int NbEvents>
+        template <size_t NbEvents>
         struct BoxOpaque<NbEvents, BoxingStrategy::Setup>
                 : public BoxOpaque<NbEvents, BoxingStrategy::Unbox>
         {
@@ -287,7 +296,7 @@ namespace VLC
                 : Base( new Opaque<NbEvents> )
                 , m_userOpaque( userOpaque )
             {
-                Base::m_ptr->owner = reinterpret_cast<CallbackOwner<NbEvents>*>( ptr );
+                Base::m_ptr->callbacks = reinterpret_cast<CallbackArray<NbEvents>*>( ptr );
             }
             operator void*() { return Base::m_ptr; }
 
@@ -304,7 +313,7 @@ namespace VLC
 
         // This is a special case which is only used to delete the Opaque type,
         // created by the BoxingStrategy::Setup specialization
-        template <int NbEvents>
+        template <size_t NbEvents>
         struct BoxOpaque<NbEvents, BoxingStrategy::Cleanup>
                 : public BoxOpaque<NbEvents, BoxingStrategy::Unbox>
         {
@@ -317,18 +326,18 @@ namespace VLC
         // When no boxing is required, enfore the user provided callback as a nullptr.
         // Otherwise, we assume there is no Opaque wrapper, and therefore the
         // pointer we receive already is our CallbackOwner instance.
-        template <int NbEvents>
+        template <size_t NbEvents>
         struct BoxOpaque<NbEvents, BoxingStrategy::NoBoxing>
         {
             template <typename... Args>
-            BoxOpaque(void* ptr, Args...) : m_ptr( reinterpret_cast<CallbackOwner<NbEvents>*>( ptr ) ) {}
+            BoxOpaque(void* ptr, Args...) : m_ptr( reinterpret_cast<CallbackArray<NbEvents>*>( ptr ) ) {}
             operator void*() { return nullptr; }
-            CallbackOwner<NbEvents>* operator->(){ return m_ptr; }
+            CallbackArray<NbEvents>& callbacks() { return *m_ptr; }
 
-            CallbackOwner<NbEvents>* m_ptr;
+            CallbackArray<NbEvents>* m_ptr;
         };
 
-        template <int Idx, typename... Args>
+        template <size_t Idx, typename... Args>
         struct CallbackWrapper;
 
         // Reimplement the general case CallbackWrapper for imem specific purpose.
@@ -346,25 +355,25 @@ namespace VLC
         // with lambdas, as we would lose the ability to detect when nullptr is provided,
         // so we'd have VLC call a no-op function, while the nullptr wrap() specialization
         // takes care of this.
-        template <int Idx, typename Ret, typename... Args>
+        template <size_t Idx, typename Ret, typename... Args>
         struct CallbackWrapper<Idx, Ret(*)(void*, Args...)>
         {
             using Wrapped = Ret(*)(void*, Args...);
 
-            template <BoxingStrategy Strategy, int NbEvents, typename Func>
-            static Wrapped wrap(CallbackOwner<NbEvents>* owner, Func&& func)
+            template <BoxingStrategy Strategy, size_t NbEvents, typename Func>
+            static Wrapped wrap(CallbackArray<NbEvents>& callbacks, Func&& func)
             {
-                owner->callbacks[Idx] = std::make_shared<CallbackHandler<Func>>( std::forward<Func>( func ) );
+                callbacks[Idx] = std::make_shared<CallbackHandler<Func>>( std::forward<Func>( func ) );
                 return [](void* opaque, Args... args) -> Ret {
                     auto boxed = BoxOpaque<NbEvents, Strategy>( opaque, std::forward<Args>( args )... );
-                    assert(boxed->callbacks[Idx] != nullptr );
-                    auto cbHandler = static_cast<CallbackHandler<Func>*>( boxed->callbacks[Idx].get() );
+                    assert(boxed.callbacks()[Idx] != nullptr );
+                    auto cbHandler = static_cast<CallbackHandler<Func>*>( boxed.callbacks()[Idx].get() );
                     return cbHandler->func( boxed, std::forward<Args>(args)... );
                 };
             }
 
-            template <BoxingStrategy Strategy, int NbEvents>
-            static std::nullptr_t wrap(CallbackOwner<NbEvents>*, std::nullptr_t)
+            template <BoxingStrategy Strategy, size_t NbEvents>
+            static std::nullptr_t wrap(CallbackArray<NbEvents>&, std::nullptr_t)
             {
                 return nullptr;
             }
