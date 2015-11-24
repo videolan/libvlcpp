@@ -69,7 +69,7 @@ namespace libVLCX
 
     void MediaPlayer::setPause(int do_pause)
     {
-        m_mp.setPause(do_pause);
+        m_mp.setPause((bool)do_pause);
     }
 
     void MediaPlayer::pause()
