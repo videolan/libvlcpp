@@ -273,14 +273,6 @@ namespace libVLCX
         MediaState state();
 
         /**
-        * Get movie fps rate
-        *
-        * \return frames per second (fps) for this playing movie, or 0 if
-        * unspecified
-        */
-        float fps();
-
-        /**
         * end bug How many video outputs does this media player have?
         *
         * \return the number of video outputs

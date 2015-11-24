@@ -181,11 +181,6 @@ namespace libVLCX
         return (MediaState)m_mp.state();
     }
 
-    float MediaPlayer::fps()
-    {
-        return m_mp.fps();
-    }
-
     unsigned MediaPlayer::hasVout()
     {
         return m_mp.hasVout();
