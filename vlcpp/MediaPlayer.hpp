@@ -659,7 +659,7 @@ public:
     ///
     bool unsetEqualizer()
     {
-        return libvlc_media_player_set_equalizer( *this, nullptr );
+        return libvlc_media_player_set_equalizer( *this, nullptr ) == 0;
     }
 
     /**
