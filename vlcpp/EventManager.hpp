@@ -565,6 +565,26 @@ class MediaPlayerEventManager : public EventManager
             });
         }
 
+#if LIBVLC_VERSION_INT >= LIBVLC_VERSION(3, 0, 0, 0)
+        /**
+         * \brief onChapterChanged Registers an event called when the current chapter changes
+         * \param f A std::function<void(int)> (or an equivalent Callable type)
+         *          The provided integer is the new current chapter identifier.
+         *          Please note that this has nothing to do with a text chapter (the name of
+         *          the video being played, for instance)
+         */
+        template <typename Func>
+        RegisteredEvent onChapterChanged( Func&& f )
+        {
+            EXPECT_SIGNATURE(void(int));
+            return handle( libvlc_MediaPlayerChapterChanged, std::forward<Func>( f ), [](const libvlc_event_t* e, void* data)
+            {
+                auto callback = static_cast<DecayPtr<Func>>( data );
+                (*callback)( e->u.media_player_chapter_changed.new_chapter );
+            });
+        }
+#endif
+
         /**
          * \brief onSnapshotTaken Registers an event called when a snapshot gets taken
          * \param f A std::function<void(std::string)> (or an equivalent Callable type)
