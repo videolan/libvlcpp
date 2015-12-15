@@ -700,6 +700,80 @@ class MediaPlayerEventManager : public EventManager
                 (*callback)( e->u.media_player_es_changed.i_type, e->u.media_player_es_changed.i_id );
             });
         }
+
+        /**
+         * \brief onAudioDevice Registers an event called when the current audio output device changes
+         * \param f A std::function<void(std::string)> (or an equivalent Callable type)
+         *          The provided string is the new current volume.
+         */
+        template <typename Func>
+        RegisteredEvent onAudioDevice( Func&& f )
+        {
+            EXPECT_SIGNATURE(void(std::string));
+            return handle( libvlc_MediaPlayerAudioDevice, std::forward<Func>( f ), [](const libvlc_event_t* e, void* data)
+            {
+                auto callback = static_cast<DecayPtr<Func>>( data );
+                (*callback)( e->u.media_player_audio_device.device );
+            });
+        }
+#endif
+
+#if LIBVLC_VERSION_INT >= LIBVLC_VERSION(2, 2, 2, 0)
+        /**
+         * \brief onCorked Registers an event called when the playback is paused automatically for a higher priority audio stream
+         * \param f A std::function<void(void)> (or an equivalent Callable type)
+         */
+        template <typename Func>
+        RegisteredEvent onCorked( Func&& f )
+        {
+            return handle( libvlc_MediaPlayerCorked, std::forward<Func>( f ) );
+        }
+
+        /**
+         * \brief onUncorked Registers an event called when the playback is unpaused automatically after a higher priority audio stream ends
+         * \param f A std::function<void(void)> (or an equivalent Callable type)
+         */
+        template <typename Func>
+        RegisteredEvent onUncorked( Func&& f )
+        {
+            return handle( libvlc_MediaPlayerUncorked, std::forward<Func>( f ) );
+        }
+
+        /**
+         * \brief onMuted Registers an event called when the audio is muted
+         * \param f A std::function<void(void)> (or an equivalent Callable type)
+         */
+        template <typename Func>
+        RegisteredEvent onMuted( Func&& f )
+        {
+            return handle( libvlc_MediaPlayerMuted, std::forward<Func>( f ) );
+        }
+
+        /**
+         * \brief onUnmuted Registers an event called when the audio is unmuted
+         * \param f A std::function<void(void)> (or an equivalent Callable type)
+         */
+        template <typename Func>
+        RegisteredEvent onUnmuted( Func&& f )
+        {
+            return handle( libvlc_MediaPlayerUnmuted, std::forward<Func>( f ) );
+        }
+
+        /**
+         * \brief onAudioVolume Registers an event called when the current audio volume changes
+         * \param f A std::function<void(float)> (or an equivalent Callable type)
+         *          The provided float is the new current audio volume percentage.
+         */
+        template <typename Func>
+        RegisteredEvent onAudioVolume( Func&& f )
+        {
+            EXPECT_SIGNATURE(void(float));
+            return handle( libvlc_MediaPlayerAudioVolume, std::forward<Func>( f ), [](const libvlc_event_t* e, void* data)
+            {
+                auto callback = static_cast<DecayPtr<Func>>( data );
+                (*callback)( e->u.media_player_audio_volume.volume );
+            });
+        }
 #endif
 };
 
