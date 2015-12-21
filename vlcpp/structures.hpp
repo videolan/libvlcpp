@@ -500,6 +500,10 @@ public:
         return ( m_flags & libvlc_title_menu ) != 0;
     }
 
+    bool isInteractive() const
+    {
+        return ( m_flags & libvlc_title_interactive ) != 0;
+    }
 
     explicit TitleDescription( libvlc_title_description_t* c )
         : m_duration( c->i_duration ), m_flags( c->i_flags )
