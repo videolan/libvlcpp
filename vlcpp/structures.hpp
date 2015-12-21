@@ -497,12 +497,12 @@ public:
     ///
     bool isMenu() const
     {
-        return m_menu;
+        return ( m_flags & libvlc_title_menu ) != 0;
     }
 
 
     explicit TitleDescription( libvlc_title_description_t* c )
-        : m_duration( c->i_duration ), m_menu( c->b_menu )
+        : m_duration( c->i_duration ), m_flags( c->i_flags )
     {
         if ( c->psz_name != nullptr )
             m_name = c->psz_name;
@@ -511,7 +511,7 @@ public:
 private:
     int64_t m_duration;
     std::string m_name;
-    bool m_menu;
+    int m_flags;
 };
 
 ///
