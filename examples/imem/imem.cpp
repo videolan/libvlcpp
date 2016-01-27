@@ -10,6 +10,7 @@ struct ImemOpaque
     std::string path;
 };
 
+#if LIBVLC_VERSION_INT >= LIBVLC_VERSION(3, 0, 0, 0)
 int main(int ac, char**av)
 {
     if (ac < 3)
@@ -84,3 +85,6 @@ int main(int ac, char**av)
     fclose(opaque2->file);
     delete opaque2;
 }
+#else
+int main(){}
+#endif
