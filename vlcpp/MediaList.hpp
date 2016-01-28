@@ -95,6 +95,11 @@ public:
     {
     }
 
+    MediaList( Internal::InternalPtr mediaList )
+        : Internal{ mediaList, libvlc_media_list_release }
+    {
+    }
+
     /**
      * Create an empty VLC MediaList instance.
      *
