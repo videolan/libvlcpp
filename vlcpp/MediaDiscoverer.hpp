@@ -102,7 +102,7 @@ public:
      */
     MediaDiscovererEventManager& eventManager()
     {
-        if ( m_eventManager )
+        if ( m_eventManager == nullptr )
         {
             libvlc_event_manager_t* obj = libvlc_media_discoverer_event_manager( *this );
             m_eventManager = std::make_shared<MediaDiscovererEventManager>( obj );
