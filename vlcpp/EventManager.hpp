@@ -704,7 +704,7 @@ class MediaPlayerEventManager : public EventManager
         /**
          * \brief onAudioDevice Registers an event called when the current audio output device changes
          * \param f A std::function<void(std::string)> (or an equivalent Callable type)
-         *          The provided string is the new current volume.
+         *          The provided string is the new current audio device.
          */
         template <typename Func>
         RegisteredEvent onAudioDevice( Func&& f )
