@@ -192,21 +192,31 @@ public:
         static_assert(signature_match<LogCb, void(int, const libvlc_log_t*, std::string)>::value,
                       "Mismatched log callback" );
         auto wrapper = [logCb](int level, const libvlc_log_t* ctx, const char* format, va_list va) {
+            const char* psz_module;
+            const char* psz_file;
+            unsigned int i_line;
+            libvlc_log_get_context( ctx, &psz_module, &psz_file, &i_line );
+
 #ifndef _MSC_VER
             VaCopy vaCopy(va);
             int len = vsnprintf(nullptr, 0, format, vaCopy.va);
-            if (len > 0)
-            {
-                std::unique_ptr<char[]> message{ new char[len + 1] };
-                if (vsnprintf(message.get(), len + 1, format, va) != -1)
-                    logCb(level, ctx, std::string{ message.get() });
-            }
+            if (len < 0)
+                return;
+            std::unique_ptr<char[]> message{ new char[len + 1] };
+            char* psz_msg = message.get();
+            if (vsnprintf(psz_msg, len + 1, format, va) < 0 )
+                return;
 #else
             //MSVC treats passing nullptr as 1st vsnprintf(_s) as an error
-            char buff[512];
-            vsnprintf(buff, sizeof(buff) - 1, format, va);
-            logCb(level, ctx, std::string{ buff });
+            char psz_msg[512];
+            if ( vsnprintf(psz_msg, sizeof(psz_msg) - 1, format, va) < 0 )
+                return;
 #endif
+            char* psz_ctx;
+            if ( asprintf( &psz_ctx, "[%s] (%s:%d) %s", psz_module, psz_file, i_line, psz_msg ) < 0 )
+                return;
+            std::unique_ptr<char, void(*)(void*)> ctxPtr( psz_ctx, &free );
+            logCb( level, ctx, std::string{ psz_ctx } );
         };
         libvlc_log_set(*this, CallbackWrapper<(unsigned int)CallbackIdx::Log, libvlc_log_cb>::wrap( *m_callbacks, std::move(wrapper)),
             m_callbacks.get() );
