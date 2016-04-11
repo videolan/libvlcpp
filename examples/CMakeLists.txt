@@ -1,2 +1,0 @@
-subdirs(helloworld)
-subdirs(imem)

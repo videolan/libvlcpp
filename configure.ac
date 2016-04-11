@@ -1,0 +1,27 @@
+m4_define([VLCPP_MAJOR], [0])
+m4_define([VLCPP_MINOR], [1])
+m4_define([VLCPP_MICRO], [0])
+
+AC_COPYRIGHT([Copyright 2014-2016 VideoLAN - VideoLabs])
+
+AC_INIT([medialibrary], [VLCPP_MAJOR.VLCPP_MINOR.VLCPP_MICRO])
+
+AM_INIT_AUTOMAKE([foreign subdir-objects])
+m4_ifdef([AM_SILENT_RULES], [
+  AM_SILENT_RULES([yes])
+])
+
+AC_CONFIG_MACRO_DIR([m4])
+AC_PROG_CXX
+AX_CXX_COMPILE_STDCXX_11([noext])
+
+AC_ARG_ENABLE(examples, [build examples programs],[have_examples="yes"])
+AS_IF([test "${have_examples}" = "yes"], [PKG_CHECK_MODULES(vlc, libvlc)])
+AM_CONDITIONAL([HAVE_EXAMPLES], [test "${have_examples}" = "yes"])
+
+AC_CONFIG_FILES([
+Makefile
+libvlcpp.pc
+])
+
+AC_OUTPUT
