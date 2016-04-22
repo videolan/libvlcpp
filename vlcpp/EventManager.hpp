@@ -860,6 +860,12 @@ class MediaListEventManager : public EventManager
                              e->u.media_list_will_delete_item.index );
             });
         }
+
+        template <typename Func>
+        RegisteredEvent onEndReached( Func&& f )
+        {
+            return handle( libvlc_MediaListEndReached, std::forward<Func>( f ) );
+        }
 };
 
 /**
