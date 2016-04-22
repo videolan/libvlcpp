@@ -92,14 +92,14 @@ namespace libVLCX
         m_media.parse();
     }
 
-    void Media::parseAsync()
+    void Media::parseWithOptions(ParseFlags flags)
     {
-        m_media.parseAsync();
+        m_media.parseWithOptions(static_cast<VLC::Media::ParseFlags>( flags ) );
     }
 
     bool Media::isParsed()
     {
-        return m_media.isParsed();
+        return m_media.parseStatus() == VLC::Media::ParseStatus::Done;
     }
 
     Windows::Foundation::Collections::IVector<MediaTrack^>^ Media::tracks()

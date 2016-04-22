@@ -72,6 +72,32 @@ namespace libVLCX
         DiscNumber
     };
 
+    public enum class ParseFlags
+    {
+        /**
+        * Parse media if it's a local file
+        */
+        Local = 0x00,
+        /**
+        * Parse media even if it's a network file
+        */
+        Network = 0x01,
+        /**
+        * Fetch meta and covert art using local resources
+        */
+        FetchLocal = 0x02,
+        /**
+        * Fetch meta and covert art using network resources
+        */
+        FetchNetwork = 0x04,
+        /**
+        * Interact with the user (via libvlc_dialog_cbs) when preparsing this item
+        * (and not its sub items). Set this flag in order to receive a callback
+        * when the input is asking for credentials.
+        */
+        Interact = 0x08,
+    };
+
     public enum class FromType
     {
         FromPath,
@@ -243,16 +269,8 @@ namespace libVLCX
         *
         * \see Media::tracks()
         */
-        void parseAsync();
+        void Media::parseWithOptions(ParseFlags flags);
 
-        /**
-        * Get Parsed status for media descriptor object.
-        *
-        * \see libvlc_MediaParsedChanged
-        *
-        * \return true if media object has been parsed otherwise it returns
-        * false
-        */
         bool isParsed();
 
         /**
