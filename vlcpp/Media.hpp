@@ -578,6 +578,14 @@ public:
         return res;
     }
 
+    std::shared_ptr<MediaList> subitems()
+    {
+        auto p = libvlc_media_subitems( *this );
+        if ( p == nullptr )
+            return nullptr;
+        return std::make_shared<MediaList>( p );
+    }
+
 private:
 
     /**
