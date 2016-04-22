@@ -89,6 +89,40 @@ public:
     static const FromType AsNode = FromType::AsNode;
 #endif
 
+    enum class ParseFlags
+    {
+        /**
+         * Parse media if it's a local file
+         */
+        Local = libvlc_media_parse_local,
+        /**
+         * Parse media even if it's a network file
+         */
+        Network = libvlc_media_parse_network,
+        /**
+         * Fetch meta and covert art using local resources
+         */
+        FetchLocal = libvlc_media_fetch_local,
+        /**
+         * Fetch meta and covert art using network resources
+         */
+        FetchNetwork = libvlc_media_fetch_network,
+        /**
+         * Interact with the user (via libvlc_dialog_cbs) when preparsing this item
+         * (and not its sub items). Set this flag in order to receive a callback
+         * when the input is asking for credentials.
+         */
+        Interact = libvlc_media_do_interact,
+    };
+
+    enum class ParseStatus
+    {
+        Init = libvlc_media_parse_init,
+        Skipped = libvlc_media_parse_skipped,
+        Failed = libvlc_media_parse_failed,
+        Done = libvlc_media_parse_done,
+    };
+
     /**
      * @brief Media Constructs a libvlc Media instance
      * @param instance  A libvlc instance
@@ -494,6 +528,7 @@ public:
         libvlc_media_parse(*this);
     }
 
+#if LIBVLC_VERSION_INT < LIBVLC_VERSION(3, 0, 0, 0)
     /**
      * Parse a media.
      *
@@ -529,6 +564,40 @@ public:
     {
         return libvlc_media_is_parsed(*this) != 0;
     }
+#else
+    /**
+     * Parse the media asynchronously with options.
+     *
+     * This fetches (local or network) art, meta data and/or tracks information.
+     * This method is the extended version of libvlc_media_parse_async().
+     *
+     * To track when this is over you can listen to libvlc_MediaParsedStatus
+     * event. However if this functions returns an error, you will not receive any
+     * events.
+     *
+     * It uses a flag to specify parse options (see libvlc_media_parse_flag_t). All
+     * these flags can be combined. By default, media is parsed if it's a local
+     * file.
+     *
+     * \see ParsedStatus
+     * \see meta()
+     * \see tracks()
+     * \see parsedStatus
+     * \see ParseFlag
+     *
+     * \return true on success, false otherwise
+     * \version LibVLC 3.0.0 or later
+     */
+    bool parseWithOptions( ParseFlags flags )
+    {
+        return libvlc_media_parse_with_options( *this, static_cast<libvlc_media_parse_flag_t>( flags ) );
+    }
+
+    ParseStatus parseStatus()
+    {
+        return static_cast<ParseStatus>( libvlc_media_get_parsed_status( *this ) );
+    }
+#endif
 
     /**
      * Sets media descriptor's user_data. user_data is specialized data
@@ -603,6 +672,12 @@ private:
 private:
     std::shared_ptr<MediaEventManager> m_eventManager;
 };
+
+inline VLC::Media::ParseFlags operator|(Media::ParseFlags l, Media::ParseFlags r)
+{
+    using T = typename std::underlying_type<Media::ParseFlags>::type;
+    return static_cast<Media::ParseFlags>( static_cast<T>( l ) | static_cast<T>( r ) );
+}
 
 } // namespace VLC
 
