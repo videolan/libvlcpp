@@ -75,19 +75,19 @@ namespace libVLCX
             return;
         }
 
-        char ptr_astring[40];
+        char ptr_astring[64];
         sprintf_s(ptr_astring, "--winstore-audioclient=0x%p", audioReg->m_AudioClient);
         argv[nbArgs++] = _strdup(ptr_astring);
 
-        char ptr_d3dstring[40];
+        char ptr_d3dstring[64];
         sprintf_s(ptr_d3dstring, "--winrt-d3ddevice=0x%p", m_dxManager->cp_d3dDevice);
         argv[nbArgs++] = _strdup(ptr_d3dstring);
 
-        char ptr_d3dcstring[40];
+        char ptr_d3dcstring[64];
         sprintf_s(ptr_d3dcstring, "--winrt-d3dcontext=0x%p", m_dxManager->cp_d3dContext);
         argv[nbArgs++] = _strdup(ptr_d3dcstring);
 
-        char ptr_scstring[40];
+        char ptr_scstring[64];
         sprintf_s(ptr_scstring, "--winrt-swapchain=0x%p", m_dxManager->cp_swapChain);
         argv[nbArgs++] = _strdup(ptr_scstring);
     }
