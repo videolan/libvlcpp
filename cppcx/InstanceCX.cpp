@@ -127,13 +127,7 @@ namespace libVLCX
     {
         m_instance.logSet([logCb](int logLevel, const libvlc_log_t* Log, std::string msgStr)
         {
-            size_t len = MultiByteToWideChar(CP_UTF8, 0, msgStr.c_str(), -1, nullptr, 0);
-            if (len == 0)
-                return;
-            wchar_t *out = new wchar_t[len];
-            std::unique_ptr<wchar_t[]> out_u(out);
-            MultiByteToWideChar(CP_UTF8, 0, msgStr.c_str(), -1, out, len);
-            logCb(logLevel, ref new Platform::String(out));
+            logCb(logLevel, ToPlatformString(msgStr));
         });
     }
 
