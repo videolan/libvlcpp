@@ -131,6 +131,34 @@ namespace libVLCX
         });
     }
 
+    void Instance::setDialogHandlers(DialogCallback::Error ^ error, DialogCallback::Login ^ login, DialogCallback::Question ^ question, DialogCallback::DisplayProgress ^ dspProgress, DialogCallback::Cancel ^ cancel, DialogCallback::UpdateProgress ^ updtProgress)
+    {
+        m_instance.setDialogHandlers(
+        [error](std::string &&title, std::string &&txt) {
+            error(ToPlatformString(title), ToPlatformString(txt));
+        },
+        [login](VLC::Dialog&& dialog, std::string &&title, std::string &&text, std::string &&defaultUserName, bool askToStore) {
+            login(ref new Dialog(std::move(dialog)), ToPlatformString(std::move(title)), ToPlatformString(std::move(text)), ToPlatformString(std::move(defaultUserName)), askToStore);
+        },
+        [question](VLC::Dialog &&dialog, std::string &&title, std::string &&text, VLC::Question qType, std::string &&cancel, std::string &&action1, std::string &&action2) {
+            question(ref new Dialog(std::move(dialog)), ToPlatformString(std::move(title)), ToPlatformString(std::move(text)), (unsigned)qType, ToPlatformString(std::move(cancel)), ToPlatformString(std::move(action1)), ToPlatformString(std::move(action2)));
+        },
+        [dspProgress](VLC::Dialog &&dialog, std::string &&title, std::string &&text, bool intermediate, float position, std::string &&cancel) {
+            dspProgress(ref new Dialog(std::move(dialog)), ToPlatformString(std::move(title)), ToPlatformString(std::move(text)), intermediate, position, ToPlatformString(std::move(cancel)));
+        },
+        [cancel](VLC::Dialog &&dialog) {
+            cancel(ref new Dialog(std::move(dialog)));
+        },
+        [updtProgress](VLC::Dialog &&dialog, float position, std::string &&text) {
+            updtProgress(ref new Dialog(std::move(dialog)), position, ToPlatformString(std::move(text)));
+        });
+    }
+
+    void Instance::unsetDialogHandlers()
+    {
+        m_instance.unsetDialogHandlers();
+    }
+
     Windows::Foundation::Collections::IVector<ModuleDescription^>^ Instance::audioFilterList()
     {
         return MarshallVector<ModuleDescription, VLC::ModuleDescription>(m_instance.audioFilterList());

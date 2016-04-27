@@ -25,6 +25,7 @@
 #include "StructuresCX.hpp"
 #include <collection.h>
 #include <vlcpp/vlc.hpp>
+#include "DialogCX.hpp"
 
 //<ugly>
 #include "DirectXManager.h"
@@ -33,6 +34,101 @@
 namespace libVLCX
 {
     public delegate void LogCallback(int, Platform::String^);
+
+    /**
+    * Use unsigned to replace the VLC::Question type because enum type are
+    * forbiden in delegate's argument list
+    */
+    using Question = unsigned;
+
+    using DialogType = VLC::DialogType;
+        
+    namespace DialogCallback
+    {
+        /**
+        * Called when an error message needs to be displayed.
+        *
+        * \param title title of the dialog
+        * \param text text of the dialog
+        */
+        public delegate void Error(Platform::String^ title, Platform::String^ text);
+
+        /**
+        *Called when a login dialog needs to be displayed.
+        *
+        *You can interact with this dialog by using the postLogin method on dialog to post an answer or the dismiss method to cancel this dialog.
+        *
+        *\note to receive this callack, CancelCb should not be NULL.
+        *\param dialog used to interact with the dialog
+        *\param title title of the dialog
+        *\param text text of the dialog
+        *\param defaultUserName user name that should be set on the user form
+        *\param askToStore if true, ask the user if he wants to save the credentials
+        */
+        public delegate void Login(Dialog^ dialog, Platform::String^ title, Platform::String^ text, Platform::String^ defaultUserName, bool askToStore);
+
+        /**
+        * Called when a question dialog needs to be displayed
+        *
+        * You can interact with this dialog by using the postAction method on dialog
+        * to post an answer or dismiss method to cancel this dialog.
+        *
+        * \note to receive this callack, CancelCb should not be
+        * NULL.
+        *
+        * \param dialog used to interact with the dialog
+        * \param title title of the diaog
+        * \param text text of the dialog
+        * \param qtype question type (or severity) of the dialog (\see DialogType)
+        * \param cancel text of the cancel button
+        * \param action1 text of the first button, if NULL, don't display this
+        * button
+        * \param action2 text of the second button, if NULL, don't display
+        * this button
+        */
+        public delegate void Question(Dialog^ dialog, Platform::String^ title, Platform::String^ text, libVLCX::Question qType, Platform::String^ cancel, Platform::String^ action1, Platform::String^ action2);
+
+        /**
+        * Called when a progress dialog needs to be displayed
+        *
+        * If cancellable (cancel != NULL), you can cancel this dialog by
+        * calling the dismiss method on dialog
+        *
+        * \note to receive this callack, CancelCb and
+        * UpdtProgressCb should not be NULL.
+        *
+        * \param dialog used to interact with the dialog
+        * \param title title of the diaog
+        * \param text text of the dialog
+        * \param indeterminate true if the progress dialog is indeterminate
+        * \param position initial position of the progress bar (between 0.0 and
+        * 1.0)
+        * \param cancel text of the cancel button, if NULL the dialog is not
+        * cancellable
+        */
+        public delegate void DisplayProgress(Dialog^ dialog, Platform::String^ title, Platform::String^ text, bool intermediate, float position, Platform::String^ cancel);
+
+        /**
+        * Called when a displayed dialog needs to be cancelled
+        *
+        * The implementation must call the method dismiss on dialog to really release
+        * the dialog.
+        *
+        * \param dialog used to interact with the dialog
+        */
+        public delegate void Cancel(Dialog^ dialog);
+
+        /**
+        * Called when a progress dialog needs to be updated
+        *
+        * \param dialog used to interact with the dialog
+        * \param position osition of the progress bar (between 0.0 and 1.0)
+        * \param text new text of the progress dialog
+        */
+        public delegate void UpdateProgress(Dialog^ dialog, float position, Platform::String^ text);
+    }
+
+
     public ref class Instance sealed
     {
     public:
@@ -129,6 +225,23 @@ namespace libVLCX
         * \version LibVLC 2.1.0 or later
         */
         void logSet(LogCallback^ logCb);
+
+        /**
+        * Replaces all the dialog callbacks for this Instance instance
+        *
+        * \param error  callback that will get called when an error message needs to be displayed.     \see DialogCallback::Error
+        * \param login   callback that will get called when a login dialog needs to be displayed. \see DialogCallback::Login
+        * \param question   callback that will get called when a question dialog needs to be displayed. \see DialogCallback::Question
+        * \param dspProgress   callback that will get called when a progress dialog needs to be displayed. \see DialogCallback::DisplayProgress
+        * \param cancel   callback that will get called when a displayed dialog needs to be cancelled. \see DialogCallback::Cancel
+        * \param updtProgress   callback that will get called when a progress dialog needs to be updated. \see DialogCallback::UpdateProgress
+        */
+        void setDialogHandlers(DialogCallback::Error^ error, DialogCallback::Login^ login, DialogCallback::Question^ question, DialogCallback::DisplayProgress^ dspProgress, DialogCallback::Cancel^ cancel, DialogCallback::UpdateProgress^ updtProgress);
+
+        /**
+        * Unset all dialog callbacks
+        */
+        void unsetDialogHandlers();
 
         /**
         * Returns a list of audio filters that are available.
