@@ -454,14 +454,15 @@ public:
         static_assert(signature_match_or_nullptr<Cancel, CancelCb>::value, "Mismatched cancel callback prototype");
         static_assert(signature_match_or_nullptr<UpdtProgress, UpdtProgressCb>::value, "Mismatched update progress callback prototype");
 
-        m_callbacks_pointers = std::make_shared<libvlc_dialog_cbs>((libvlc_dialog_cbs){
-                        CallbackWrapper<(unsigned)CallbackIdx::ErrorDisplay, decltype(libvlc_dialog_cbs::pf_display_error)>::wrap(*m_callbacks, std::forward<Error>(error)),
-                        CallbackWrapper<(unsigned)CallbackIdx::LoginDisplay, decltype(libvlc_dialog_cbs::pf_display_login)>::wrap(*m_callbacks, std::forward<Login>(login)),
-                        CallbackWrapper<(unsigned)CallbackIdx::QuestionDisplay, decltype(libvlc_dialog_cbs::pf_display_question)>::wrap(*m_callbacks, std::forward<Question>(question)),
-                        CallbackWrapper<(unsigned)CallbackIdx::ProgressDisplay, decltype(libvlc_dialog_cbs::pf_display_progress)>::wrap(*m_callbacks, std::forward<DspProgress>(dspProgress)),
-                        CallbackWrapper<(unsigned)CallbackIdx::CancelDialog, decltype(libvlc_dialog_cbs::pf_cancel)>::wrap(*m_callbacks, std::forward<Cancel>(cancel)),
-                        CallbackWrapper<(unsigned)CallbackIdx::ProgressUpdate, decltype(libvlc_dialog_cbs::pf_update_progress)>::wrap(*m_callbacks, std::forward<UpdtProgress>(updtProgress))
-                            });
+        libvlc_dialog_cbs tmp = {
+            CallbackWrapper<(unsigned)CallbackIdx::ErrorDisplay, decltype(libvlc_dialog_cbs::pf_display_error)>::wrap(*m_callbacks, std::forward<Error>(error)),
+            CallbackWrapper<(unsigned)CallbackIdx::LoginDisplay, decltype(libvlc_dialog_cbs::pf_display_login)>::wrap(*m_callbacks, std::forward<Login>(login)),
+            CallbackWrapper<(unsigned)CallbackIdx::QuestionDisplay, decltype(libvlc_dialog_cbs::pf_display_question)>::wrap(*m_callbacks, std::forward<Question>(question)),
+            CallbackWrapper<(unsigned)CallbackIdx::ProgressDisplay, decltype(libvlc_dialog_cbs::pf_display_progress)>::wrap(*m_callbacks, std::forward<DspProgress>(dspProgress)),
+            CallbackWrapper<(unsigned)CallbackIdx::CancelDialog, decltype(libvlc_dialog_cbs::pf_cancel)>::wrap(*m_callbacks, std::forward<Cancel>(cancel)),
+            CallbackWrapper<(unsigned)CallbackIdx::ProgressUpdate, decltype(libvlc_dialog_cbs::pf_update_progress)>::wrap(*m_callbacks, std::forward<UpdtProgress>(updtProgress))
+        };
+        m_callbacks_pointers = std::make_shared<libvlc_dialog_cbs>(tmp);
         libvlc_dialog_set_callbacks(*this, m_callbacks_pointers.get(), m_callbacks.get());
     }
 
