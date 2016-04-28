@@ -27,6 +27,7 @@
 
 #include "common.hpp"
 #include "Internal.hpp"
+#include "Media.hpp"
 
 #include <algorithm>
 #include <functional>
@@ -304,6 +305,17 @@ class MediaEventManager : public EventManager
             {
                 auto callback = static_cast<DecayPtr<Func>>(data);
                 (*callback)( e->u.media_parsed_changed.new_status );
+            });
+        }
+
+        template <typename Func>
+        RegisteredEvent onParsedStatus( Func&& f )
+        {
+            EXPECT_SIGNATURE( void(Media::ParseStatus) );
+            return handle(libvlc_MediaParsedStatus, std::forward<Func>( f ), [](const libvlc_event_t* e, void* data)
+            {
+                auto callback = static_cast<DecayPtr<Func>>(data);
+                (*callback)( static_cast<Media::ParseStatus>( e->u.media_parsed_status.new_status ) );
             });
         }
 
