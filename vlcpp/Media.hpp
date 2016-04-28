@@ -590,7 +590,7 @@ public:
      */
     bool parseWithOptions( ParseFlags flags )
     {
-        return libvlc_media_parse_with_options( *this, static_cast<libvlc_media_parse_flag_t>( flags ) );
+        return libvlc_media_parse_with_options( *this, static_cast<libvlc_media_parse_flag_t>( flags ) ) == 0;
     }
 
     ParseStatus parseStatus()
