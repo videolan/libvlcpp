@@ -41,7 +41,7 @@ namespace libVLCX
     */
     using Question = unsigned;
 
-    using DialogType = VLC::DialogType;
+    namespace DialogType = VLC::DialogType;
         
     namespace DialogCallback
     {
