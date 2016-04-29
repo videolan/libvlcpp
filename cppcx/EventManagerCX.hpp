@@ -54,6 +54,11 @@ namespace libVLCX
     public delegate void ESDeleted(TrackType, int);
     public delegate void ESSelected(TrackType, int);
 
+    public delegate void MediaListItemAdded(Media^, int);
+    public delegate void MediaListWillAddItem(Media^, int);
+    public delegate void MediaListItemDeleted(Media^, int);
+    public delegate void MediaListWillDeleteItem(Media^, int);
+
     public delegate void ParsedChanged(bool);
     ref class EventManager;
 
@@ -469,6 +474,84 @@ namespace libVLCX
             }
 
             void remove(Windows::Foundation::EventRegistrationToken token) {
+                removeToken(token);
+            }
+        }
+    };
+
+    public ref class MediaListEventManager sealed : EventManagerBase
+    {
+    internal:
+        MediaListEventManager(VLC::MediaListEventManager& em);
+
+    private:
+        VLC::MediaListEventManager& m_em;
+
+    public:
+        event MediaListItemAdded^ onItemAdded
+        {
+            Windows::Foundation::EventRegistrationToken add(MediaListItemAdded^ handler)
+            {
+                auto h = m_em.onItemAdded([handler](VLC::MediaPtr native, int val) {
+                    handler(ref new Media(*native), val);
+                });
+                m_events.push_back(h);
+                return Windows::Foundation::EventRegistrationToken{ (int64)h };
+            }
+
+            void remove(Windows::Foundation::EventRegistrationToken token)
+            {
+                removeToken(token);
+            }
+        }
+
+        event MediaListWillAddItem^ onWillAddItem
+        {
+            Windows::Foundation::EventRegistrationToken add(MediaListWillAddItem^ handler)
+            {
+                auto h = m_em.onWillAddItem([handler](VLC::MediaPtr native, int val) {
+                    handler(ref new Media(*native), val);
+                });
+                m_events.push_back(h);
+                return Windows::Foundation::EventRegistrationToken{ (int64)h };
+            }
+
+            void remove(Windows::Foundation::EventRegistrationToken token)
+            {
+                removeToken(token);
+            }
+        }
+
+        event MediaListItemDeleted^ onItemDeleted
+        {
+            Windows::Foundation::EventRegistrationToken add(MediaListItemDeleted^ handler)
+            {
+                auto h = m_em.onItemDeleted([handler](VLC::MediaPtr native, int val) {
+                    handler(ref new Media(*native), val);
+                });
+                m_events.push_back(h);
+                return Windows::Foundation::EventRegistrationToken{ (int64)h };
+            }
+
+            void remove(Windows::Foundation::EventRegistrationToken token)
+            {
+                removeToken(token);
+            }
+        }
+
+        event MediaListWillDeleteItem^ onWillDeleteItem
+        {
+            Windows::Foundation::EventRegistrationToken add(MediaListWillDeleteItem^ handler)
+            {
+                auto h = m_em.onWillDeleteItem([handler](VLC::MediaPtr native, int val) {
+                    handler(ref new Media(*native), val);
+                });
+                m_events.push_back(h);
+                return Windows::Foundation::EventRegistrationToken{ (int64)h };
+            }
+
+            void remove(Windows::Foundation::EventRegistrationToken token)
+            {
                 removeToken(token);
             }
         }

@@ -1,9 +1,10 @@
 /*****************************************************************************
-* EventManagerCX.cpp: EventManager API
+* MediaDiscovererCX.cpp: MediaDiscoverer API
 *****************************************************************************
-* Copyright © 2014 the VideoLAN team
+* Copyright © 2015 libvlcpp authors & VideoLAN
 *
-* Authors: Hugo Beauzée-Luyssen <hugo@beauzee.fr>
+* Authors: Alexey Sokolov <alexey+vlc@asokolov.org>
+*          Hugo Beauzée-Luyssen <hugo@beauzee.fr>
 *
 * This program is free software; you can redistribute it and/or modify
 * it under the terms of the GNU Lesser General Public License as published by
@@ -20,33 +21,40 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
 *****************************************************************************/
 
-#include "EventManagerCX.hpp"
-#include "MediaCX.hpp"
-#include <vlcpp/vlc.hpp>
+#include "InstanceCX.hpp"
+#include "MediaDiscovererCX.hpp"
 
 namespace libVLCX
 {
-    MediaPlayerEventManager::MediaPlayerEventManager(VLC::MediaPlayerEventManager& em)
-        : m_em(em)
+    MediaDiscoverer::MediaDiscoverer(Instance^ inst, Platform::String^ name) :
+        m_discoverer(inst->m_instance, FromPlatformString(name))
     {
     }
 
-
-    MediaEventManager::MediaEventManager(VLC::MediaEventManager& em)
-        : m_em(em)
+    bool MediaDiscoverer::start()
     {
+        return m_discoverer.start();
     }
 
-    MediaListEventManager::MediaListEventManager(VLC::MediaListEventManager& em)
-        : m_em(em)
+    void MediaDiscoverer::stop()
     {
+        m_discoverer.stop();
     }
 
-    void EventManagerBase::removeToken(Windows::Foundation::EventRegistrationToken token) {
-        auto h = (VLC::EventManager::RegisteredEvent)token.Value;
-        auto it = std::find(begin(m_events), end(m_events), h);
-        assert(it != end(m_events));
-        (*it)->unregister();
-        m_events.erase(it);
+    Platform::String^ MediaDiscoverer::localizedName()
+    {
+        return ToPlatformString(m_discoverer.localizedName());
+    }
+
+    bool  MediaDiscoverer::isRunning()
+    {
+        return m_discoverer.isRunning();
+    }
+
+    MediaList^ MediaDiscoverer::mediaList()
+    {
+        if (m_media_list == nullptr)
+            m_media_list = ref new MediaList(m_discoverer);
+        return m_media_list;
     }
 }
