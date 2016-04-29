@@ -1,5 +1,5 @@
 /*****************************************************************************
-* MediaCX.hpp: Media API
+* EventManagerCX.cpp: EventManager API
 *****************************************************************************
 * Copyright © 2014 the VideoLAN team
 *
@@ -35,5 +35,13 @@ namespace libVLCX
     MediaEventManager::MediaEventManager(VLC::MediaEventManager& em)
         : m_em(em)
     {
+    }
+
+    void EventManagerBase::removeToken(Windows::Foundation::EventRegistrationToken token) {
+        auto h = (VLC::EventManager::RegisteredEvent)token.Value;
+        auto it = std::find(begin(m_events), end(m_events), h);
+        assert(it != end(m_events));
+        (*it)->unregister();
+        m_events.erase(it);
     }
 }

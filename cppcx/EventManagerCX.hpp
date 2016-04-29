@@ -1,5 +1,5 @@
 /*****************************************************************************
-* MediaCX.hpp: Media API
+* EventManagerCX.hpp: EventManager API
 *****************************************************************************
 * Copyright © 2014 the VideoLAN team
 *
@@ -57,7 +57,15 @@ namespace libVLCX
     public delegate void ParsedChanged(bool);
     ref class EventManager;
 
-    public ref class MediaPlayerEventManager sealed
+    public ref class EventManagerBase : public Windows::UI::Xaml::DependencyObject
+    {
+    protected private:
+        std::vector<VLC::EventManager::RegisteredEvent> m_events;
+
+        void removeToken(Windows::Foundation::EventRegistrationToken token);
+    };
+
+    public ref class MediaPlayerEventManager sealed : EventManagerBase
     {
     public:
         event MediaChanged^ OnMediaChanged
@@ -72,11 +80,7 @@ namespace libVLCX
             }
             void remove(Windows::Foundation::EventRegistrationToken token)
             {
-                auto h = (VLC::EventManager::RegisteredEvent)token.Value;
-                auto it = std::find(begin(m_events), end(m_events), h);
-                assert(it != end(m_events));
-                (*it)->unregister();
-                m_events.erase(it);
+                removeToken(token);
             }
         }
 
@@ -93,11 +97,7 @@ namespace libVLCX
 
             void remove(Windows::Foundation::EventRegistrationToken token)
             {
-                auto h = (VLC::EventManager::RegisteredEvent)token.Value;
-                auto it = std::find(begin(m_events), end(m_events), h);
-                assert(it != end(m_events));
-                (*it)->unregister();
-                m_events.erase(it);
+                removeToken(token);
             }
         }
 
@@ -114,11 +114,7 @@ namespace libVLCX
             
             void remove(Windows::Foundation::EventRegistrationToken token)
             {
-                auto h = (VLC::EventManager::RegisteredEvent)token.Value;
-                auto it = std::find(begin(m_events), end(m_events), h);
-                assert(it != end(m_events));
-                (*it)->unregister();
-                m_events.erase(it);
+                removeToken(token);
             }
         }
 
@@ -135,11 +131,7 @@ namespace libVLCX
 
             void remove(Windows::Foundation::EventRegistrationToken token)
             {
-                auto h = (VLC::EventManager::RegisteredEvent)token.Value;
-                auto it = std::find(begin(m_events), end(m_events), h);
-                assert(it != end(m_events));
-                (*it)->unregister();
-                m_events.erase(it);
+                removeToken(token);
             }
         }
 
@@ -156,11 +148,7 @@ namespace libVLCX
 
             void remove(Windows::Foundation::EventRegistrationToken token)
             {
-                auto h = (VLC::EventManager::RegisteredEvent)token.Value;
-                auto it = std::find(begin(m_events), end(m_events), h);
-                assert(it != end(m_events));
-                (*it)->unregister();
-                m_events.erase(it);
+                removeToken(token);
             }
         }
 
@@ -177,11 +165,7 @@ namespace libVLCX
 
             void remove(Windows::Foundation::EventRegistrationToken token)
             {
-                auto h = (VLC::EventManager::RegisteredEvent)token.Value;
-                auto it = std::find(begin(m_events), end(m_events), h);
-                assert(it != end(m_events));
-                (*it)->unregister();
-                m_events.erase(it);
+                removeToken(token);
             }
         }
 
@@ -198,11 +182,7 @@ namespace libVLCX
 
             void remove(Windows::Foundation::EventRegistrationToken token)
             {
-                auto h = (VLC::EventManager::RegisteredEvent)token.Value;
-                auto it = std::find(begin(m_events), end(m_events), h);
-                assert(it != end(m_events));
-                (*it)->unregister();
-                m_events.erase(it);
+                removeToken(token);
             }
         }
 
@@ -219,11 +199,7 @@ namespace libVLCX
 
             void remove(Windows::Foundation::EventRegistrationToken token)
             {
-                auto h = (VLC::EventManager::RegisteredEvent)token.Value;
-                auto it = std::find(begin(m_events), end(m_events), h);
-                assert(it != end(m_events));
-                (*it)->unregister();
-                m_events.erase(it);
+                removeToken(token);
             }
         }
 
@@ -240,11 +216,7 @@ namespace libVLCX
             
             void remove(Windows::Foundation::EventRegistrationToken token)
             {
-                auto h = (VLC::EventManager::RegisteredEvent)token.Value;
-                auto it = std::find(begin(m_events), end(m_events), h);
-                assert(it != end(m_events));
-                (*it)->unregister();
-                m_events.erase(it);
+                removeToken(token);
             }
         }
 
@@ -261,11 +233,7 @@ namespace libVLCX
 
             void remove(Windows::Foundation::EventRegistrationToken token)
             {
-                auto h = (VLC::EventManager::RegisteredEvent)token.Value;
-                auto it = std::find(begin(m_events), end(m_events), h);
-                assert(it != end(m_events));
-                (*it)->unregister();
-                m_events.erase(it);
+                removeToken(token);
             }
         }
 
@@ -282,11 +250,7 @@ namespace libVLCX
 
             void remove(Windows::Foundation::EventRegistrationToken token)
             {
-                auto h = (VLC::EventManager::RegisteredEvent)token.Value;
-                auto it = std::find(begin(m_events), end(m_events), h);
-                assert(it != end(m_events));
-                (*it)->unregister();
-                m_events.erase(it);
+                removeToken(token);
             }
         }
 
@@ -303,11 +267,7 @@ namespace libVLCX
 
             void remove(Windows::Foundation::EventRegistrationToken token)
             {
-                auto h = (VLC::EventManager::RegisteredEvent)token.Value;
-                auto it = std::find(begin(m_events), end(m_events), h);
-                assert(it != end(m_events));
-                (*it)->unregister();
-                m_events.erase(it);
+                removeToken(token);
             }
         }
 
@@ -324,11 +284,7 @@ namespace libVLCX
 
             void remove(Windows::Foundation::EventRegistrationToken token)
             {
-                auto h = (VLC::EventManager::RegisteredEvent)token.Value;
-                auto it = std::find(begin(m_events), end(m_events), h);
-                assert(it != end(m_events));
-                (*it)->unregister();
-                m_events.erase(it);
+                removeToken(token);
             }
         }
 
@@ -345,11 +301,7 @@ namespace libVLCX
 
             void remove(Windows::Foundation::EventRegistrationToken token)
             {
-                auto h = (VLC::EventManager::RegisteredEvent)token.Value;
-                auto it = std::find(begin(m_events), end(m_events), h);
-                assert(it != end(m_events));
-                (*it)->unregister();
-                m_events.erase(it);
+                removeToken(token);
             }
         }
 
@@ -366,11 +318,7 @@ namespace libVLCX
 
             void remove(Windows::Foundation::EventRegistrationToken token)
             {
-                auto h = (VLC::EventManager::RegisteredEvent)token.Value;
-                auto it = std::find(begin(m_events), end(m_events), h);
-                assert(it != end(m_events));
-                (*it)->unregister();
-                m_events.erase(it);
+                removeToken(token);
             }
         }
 
@@ -387,11 +335,7 @@ namespace libVLCX
 
             void remove(Windows::Foundation::EventRegistrationToken token)
             {
-                auto h = (VLC::EventManager::RegisteredEvent)token.Value;
-                auto it = std::find(begin(m_events), end(m_events), h);
-                assert(it != end(m_events));
-                (*it)->unregister();
-                m_events.erase(it);
+                removeToken(token);
             }
         }
 
@@ -408,11 +352,7 @@ namespace libVLCX
 
             void remove(Windows::Foundation::EventRegistrationToken token)
             {
-                auto h = (VLC::EventManager::RegisteredEvent)token.Value;
-                auto it = std::find(begin(m_events), end(m_events), h);
-                assert(it != end(m_events));
-                (*it)->unregister();
-                m_events.erase(it);
+                removeToken(token);
             }
         }
 
@@ -429,11 +369,7 @@ namespace libVLCX
 
             void remove(Windows::Foundation::EventRegistrationToken token)
             {
-                auto h = (VLC::EventManager::RegisteredEvent)token.Value;
-                auto it = std::find(begin(m_events), end(m_events), h);
-                assert(it != end(m_events));
-                (*it)->unregister();
-                m_events.erase(it);
+                removeToken(token);
             }
         }
 
@@ -450,11 +386,7 @@ namespace libVLCX
 
             void remove(Windows::Foundation::EventRegistrationToken token)
             {
-                auto h = (VLC::EventManager::RegisteredEvent)token.Value;
-                auto it = std::find(begin(m_events), end(m_events), h);
-                assert(it != end(m_events));
-                (*it)->unregister();
-                m_events.erase(it);
+                removeToken(token);
             }
         }
 
@@ -471,11 +403,7 @@ namespace libVLCX
 
             void remove(Windows::Foundation::EventRegistrationToken token)
             {
-                auto h = (VLC::EventManager::RegisteredEvent)token.Value;
-                auto it = std::find(begin(m_events), end(m_events), h);
-                assert(it != end(m_events));
-                (*it)->unregister();
-                m_events.erase(it);
+                removeToken(token);
             }
         }
 
@@ -492,11 +420,7 @@ namespace libVLCX
 
             void remove(Windows::Foundation::EventRegistrationToken token)
             {
-                auto h = (VLC::EventManager::RegisteredEvent)token.Value;
-                auto it = std::find(begin(m_events), end(m_events), h);
-                assert(it != end(m_events));
-                (*it)->unregister();
-                m_events.erase(it);
+                removeToken(token);
             }
         }
 
@@ -513,11 +437,7 @@ namespace libVLCX
 
             void remove(Windows::Foundation::EventRegistrationToken token)
             {
-                auto h = (VLC::EventManager::RegisteredEvent)token.Value;
-                auto it = std::find(begin(m_events), end(m_events), h);
-                assert(it != end(m_events));
-                (*it)->unregister();
-                m_events.erase(it);
+                removeToken(token);
             }
         }
 
@@ -526,17 +446,15 @@ namespace libVLCX
 
     private:
         VLC::MediaPlayerEventManager& m_em;
-        std::vector<VLC::EventManager::RegisteredEvent> m_events;
     };
 
-    public ref class MediaEventManager sealed
+    public ref class MediaEventManager sealed : EventManagerBase
     {
     internal:
         MediaEventManager(VLC::MediaEventManager& em);
 
     private:
         VLC::MediaEventManager& m_em;
-        std::vector<VLC::EventManager::RegisteredEvent> m_events;
 
     public:
         event ParsedChanged^ OnParsedChanged
@@ -551,11 +469,7 @@ namespace libVLCX
             }
 
             void remove(Windows::Foundation::EventRegistrationToken token) {
-                auto h = (VLC::EventManager::RegisteredEvent)token.Value;
-                auto it = std::find(begin(m_events), end(m_events), h);
-                assert(it != end(m_events));
-                (*it)->unregister();
-                m_events.erase(it);
+                removeToken(token);
             }
         }
     };
