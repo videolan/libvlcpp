@@ -24,6 +24,7 @@
 #include "MediaCX.hpp"
 #include "InstanceCX.hpp"
 #include "EventManagerCX.hpp"
+#include "EqualizerCX.hpp"
 
 #include "Helpers.h"
 
@@ -236,10 +237,15 @@ namespace libVLCX
         m_mp.toggleTeletext();
     }
 
-    /*int MediaPlayer::setEqualizer(libvlc_equalizer_t * p_equalizer)
+    int MediaPlayer::setEqualizer(Equalizer^ eq)
     {
-    m_mp.setEqualizer(p_equalizer);
-    }*/
+        return m_mp.setEqualizer(eq->m_eq);
+    }
+
+    bool MediaPlayer::unsetEqualizer()
+    {
+        return m_mp.unsetEqualizer();
+    }
 
     //void setAudioCallbacks(libvlc_audio_play_cb play, libvlc_audio_pause_cb pause, libvlc_audio_resume_cb resume, libvlc_audio_flush_cb flush, libvlc_audio_drain_cb drain, void * opaque);
 

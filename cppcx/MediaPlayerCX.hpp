@@ -34,6 +34,7 @@ namespace libVLCX
     ref class TrackDescription;
     ref class Instance;
     ref class Media;
+    ref class Equalizer;
 
     public enum class TitlePosition
     {
@@ -389,14 +390,21 @@ namespace libVLCX
         * so it is safe for an application to release the equalizer reference
         * any time after this method returns.
         *
-        * \param p_equalizer  opaque equalizer handle, or NULL to disable the
+        * \param equalizer  opaque equalizer handle, or NULL to disable the
         * equalizer for this media player
         *
         * \return zero on success, -1 on error
         *
         * \version LibVLC 2.2.0 or later
         */
-        //int setEqualizer(libvlc_equalizer_t * p_equalizer);
+        int setEqualizer(Equalizer^ equalizer);
+
+        ///
+        /// \brief unsetEqualizer disable equalizer for this media player
+        ///
+        /// \return true on success, false otherwise.
+        ///
+        bool unsetEqualizer();
 
         /**
         * Set callbacks and private data for decoded audio. Use
