@@ -5,7 +5,7 @@
  *
  * Authors: Alexey Sokolov <alexey+vlc@asokolov.org>
  *          Hugo Beauzée-Luyssen <hugo@beauzee.fr>
- *          Bastien Penavayre <bastien.penavayre@epitech.eu>
+ *          Bastien Penavayre <bastienpenava@gmail.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
