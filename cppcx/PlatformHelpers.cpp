@@ -1,10 +1,10 @@
 /*****************************************************************************
 * PlatformHelpers.cpp
 *****************************************************************************
-* Copyright © 2014 the VideoLAN team
+* Copyright Â© 2014 the VideoLAN team
 *
 * Authors: Jean-Baptiste Kempf <jb@videolan.org>
-*          Hugo Beauzée-Luyssen <hugo@beauzee.fr>
+*          Hugo BeauzÃ©e-Luyssen <hugo@beauzee.fr>
 *
 * This program is free software; you can redistribute it and/or modify
 * it under the terms of the GNU Lesser General Public License as published by

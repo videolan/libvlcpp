@@ -1,10 +1,10 @@
 /*****************************************************************************
 * MediaDiscovererCX.cpp: MediaDiscoverer API
 *****************************************************************************
-* Copyright © 2015 libvlcpp authors & VideoLAN
+* Copyright Â© 2015 libvlcpp authors & VideoLAN
 *
 * Authors: Alexey Sokolov <alexey+vlc@asokolov.org>
-*          Hugo Beauzée-Luyssen <hugo@beauzee.fr>
+*          Hugo BeauzÃ©e-Luyssen <hugo@beauzee.fr>
 *
 * This program is free software; you can redistribute it and/or modify
 * it under the terms of the GNU Lesser General Public License as published by

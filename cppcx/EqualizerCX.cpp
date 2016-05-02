@@ -1,9 +1,9 @@
 /*****************************************************************************
 * EqualizerCX.cpp: Equalizer API
 *****************************************************************************
-* Copyright © 2015 libvlcpp authors & VideoLAN
+* Copyright Â© 2015 libvlcpp authors & VideoLAN
 *
-* Authors: Hugo Beauzée-Luyssen <hugo@beauzee.fr>
+* Authors: Hugo BeauzÃ©e-Luyssen <hugo@beauzee.fr>
 *          Bastien Penavayre <bastien.penavayre@epitech.eu>
 *
 * This program is free software; you can redistribute it and/or modify
