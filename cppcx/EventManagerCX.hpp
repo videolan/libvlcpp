@@ -62,16 +62,17 @@ namespace libVLCX
     public delegate void ParsedChanged(bool);
     ref class EventManager;
 
-    public ref class EventManagerBase : public Windows::UI::Xaml::DependencyObject
+    private ref class EventRemover sealed
     {
-    protected private:
-        std::vector<VLC::EventManager::RegisteredEvent> m_events;
-
-        void removeToken(Windows::Foundation::EventRegistrationToken token);
+    internal:
+        static void removeToken(std::vector<VLC::EventManager::RegisteredEvent>& events, Windows::Foundation::EventRegistrationToken token);
     };
+    
 
-    public ref class MediaPlayerEventManager sealed : EventManagerBase
+    public ref class MediaPlayerEventManager sealed
     {
+    private:
+        std::vector<VLC::EventManager::RegisteredEvent> m_events;
     public:
         event MediaChanged^ OnMediaChanged
         {
@@ -85,7 +86,7 @@ namespace libVLCX
             }
             void remove(Windows::Foundation::EventRegistrationToken token)
             {
-                removeToken(token);
+                EventRemover::removeToken(m_events, token);
             }
         }
 
@@ -102,7 +103,7 @@ namespace libVLCX
 
             void remove(Windows::Foundation::EventRegistrationToken token)
             {
-                removeToken(token);
+                EventRemover::removeToken(m_events, token);
             }
         }
 
@@ -119,7 +120,7 @@ namespace libVLCX
             
             void remove(Windows::Foundation::EventRegistrationToken token)
             {
-                removeToken(token);
+                EventRemover::removeToken(m_events, token);
             }
         }
 
@@ -136,7 +137,7 @@ namespace libVLCX
 
             void remove(Windows::Foundation::EventRegistrationToken token)
             {
-                removeToken(token);
+                EventRemover::removeToken(m_events, token);
             }
         }
 
@@ -153,7 +154,7 @@ namespace libVLCX
 
             void remove(Windows::Foundation::EventRegistrationToken token)
             {
-                removeToken(token);
+                EventRemover::removeToken(m_events, token);
             }
         }
 
@@ -170,7 +171,7 @@ namespace libVLCX
 
             void remove(Windows::Foundation::EventRegistrationToken token)
             {
-                removeToken(token);
+                EventRemover::removeToken(m_events, token);
             }
         }
 
@@ -187,7 +188,7 @@ namespace libVLCX
 
             void remove(Windows::Foundation::EventRegistrationToken token)
             {
-                removeToken(token);
+                EventRemover::removeToken(m_events, token);
             }
         }
 
@@ -204,7 +205,7 @@ namespace libVLCX
 
             void remove(Windows::Foundation::EventRegistrationToken token)
             {
-                removeToken(token);
+                EventRemover::removeToken(m_events, token);
             }
         }
 
@@ -221,7 +222,7 @@ namespace libVLCX
             
             void remove(Windows::Foundation::EventRegistrationToken token)
             {
-                removeToken(token);
+                EventRemover::removeToken(m_events, token);
             }
         }
 
@@ -238,7 +239,7 @@ namespace libVLCX
 
             void remove(Windows::Foundation::EventRegistrationToken token)
             {
-                removeToken(token);
+                EventRemover::removeToken(m_events, token);
             }
         }
 
@@ -255,7 +256,7 @@ namespace libVLCX
 
             void remove(Windows::Foundation::EventRegistrationToken token)
             {
-                removeToken(token);
+                EventRemover::removeToken(m_events, token);
             }
         }
 
@@ -272,7 +273,7 @@ namespace libVLCX
 
             void remove(Windows::Foundation::EventRegistrationToken token)
             {
-                removeToken(token);
+                EventRemover::removeToken(m_events, token);
             }
         }
 
@@ -289,7 +290,7 @@ namespace libVLCX
 
             void remove(Windows::Foundation::EventRegistrationToken token)
             {
-                removeToken(token);
+                EventRemover::removeToken(m_events, token);
             }
         }
 
@@ -306,7 +307,7 @@ namespace libVLCX
 
             void remove(Windows::Foundation::EventRegistrationToken token)
             {
-                removeToken(token);
+                EventRemover::removeToken(m_events, token);
             }
         }
 
@@ -323,7 +324,7 @@ namespace libVLCX
 
             void remove(Windows::Foundation::EventRegistrationToken token)
             {
-                removeToken(token);
+                EventRemover::removeToken(m_events, token);
             }
         }
 
@@ -340,7 +341,7 @@ namespace libVLCX
 
             void remove(Windows::Foundation::EventRegistrationToken token)
             {
-                removeToken(token);
+                EventRemover::removeToken(m_events, token);
             }
         }
 
@@ -357,7 +358,7 @@ namespace libVLCX
 
             void remove(Windows::Foundation::EventRegistrationToken token)
             {
-                removeToken(token);
+                EventRemover::removeToken(m_events, token);
             }
         }
 
@@ -374,7 +375,7 @@ namespace libVLCX
 
             void remove(Windows::Foundation::EventRegistrationToken token)
             {
-                removeToken(token);
+                EventRemover::removeToken(m_events, token);
             }
         }
 
@@ -391,7 +392,7 @@ namespace libVLCX
 
             void remove(Windows::Foundation::EventRegistrationToken token)
             {
-                removeToken(token);
+                EventRemover::removeToken(m_events, token);
             }
         }
 
@@ -408,7 +409,7 @@ namespace libVLCX
 
             void remove(Windows::Foundation::EventRegistrationToken token)
             {
-                removeToken(token);
+                EventRemover::removeToken(m_events, token);
             }
         }
 
@@ -425,7 +426,7 @@ namespace libVLCX
 
             void remove(Windows::Foundation::EventRegistrationToken token)
             {
-                removeToken(token);
+                EventRemover::removeToken(m_events, token);
             }
         }
 
@@ -442,7 +443,7 @@ namespace libVLCX
 
             void remove(Windows::Foundation::EventRegistrationToken token)
             {
-                removeToken(token);
+                EventRemover::removeToken(m_events, token);
             }
         }
 
@@ -453,8 +454,10 @@ namespace libVLCX
         VLC::MediaPlayerEventManager& m_em;
     };
 
-    public ref class MediaEventManager sealed : EventManagerBase
+    public ref class MediaEventManager sealed
     {
+    private:
+        std::vector<VLC::EventManager::RegisteredEvent> m_events;
     internal:
         MediaEventManager(VLC::MediaEventManager& em);
 
@@ -474,13 +477,15 @@ namespace libVLCX
             }
 
             void remove(Windows::Foundation::EventRegistrationToken token) {
-                removeToken(token);
+                EventRemover::removeToken(m_events, token);
             }
         }
     };
 
-    public ref class MediaListEventManager sealed : EventManagerBase
+    public ref class MediaListEventManager sealed
     {
+    private:
+        std::vector<VLC::EventManager::RegisteredEvent> m_events;
     internal:
         MediaListEventManager(VLC::MediaListEventManager& em);
 
@@ -501,7 +506,7 @@ namespace libVLCX
 
             void remove(Windows::Foundation::EventRegistrationToken token)
             {
-                removeToken(token);
+                EventRemover::removeToken(m_events, token);
             }
         }
 
@@ -518,7 +523,7 @@ namespace libVLCX
 
             void remove(Windows::Foundation::EventRegistrationToken token)
             {
-                removeToken(token);
+                EventRemover::removeToken(m_events, token);
             }
         }
 
@@ -535,7 +540,7 @@ namespace libVLCX
 
             void remove(Windows::Foundation::EventRegistrationToken token)
             {
-                removeToken(token);
+                EventRemover::removeToken(m_events, token);
             }
         }
 
@@ -552,7 +557,7 @@ namespace libVLCX
 
             void remove(Windows::Foundation::EventRegistrationToken token)
             {
-                removeToken(token);
+                EventRemover::removeToken(m_events, token);
             }
         }
     };

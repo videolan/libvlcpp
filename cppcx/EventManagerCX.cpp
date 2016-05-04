@@ -42,11 +42,12 @@ namespace libVLCX
     {
     }
 
-    void EventManagerBase::removeToken(Windows::Foundation::EventRegistrationToken token) {
+    void EventRemover::removeToken(std::vector<VLC::EventManager::RegisteredEvent>& events, Windows::Foundation::EventRegistrationToken token)
+    {
         auto h = (VLC::EventManager::RegisteredEvent)token.Value;
-        auto it = std::find(begin(m_events), end(m_events), h);
-        assert(it != end(m_events));
+        auto it = std::find(begin(events), end(events), h);
+        assert(it != end(events));
         (*it)->unregister();
-        m_events.erase(it);
+        events.erase(it);
     }
 }
