@@ -30,6 +30,7 @@ namespace libVLCX
 {
     ref class MediaEventManager;
     ref class Instance;
+    ref class MediaList;
 
     public enum class MediaState
     {
@@ -285,6 +286,8 @@ namespace libVLCX
         * \return a vector containing all tracks
         */
         Windows::Foundation::Collections::IVector<MediaTrack^>^ tracks();
+
+        MediaList^ subItems();
 
     private:
         ~Media(){}

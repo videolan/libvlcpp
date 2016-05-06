@@ -24,6 +24,7 @@
 #include "InstanceCX.hpp"
 #include "EventManagerCX.hpp"
 #include "MediaCX.hpp"
+#include "MediaListCX.hpp"
 #include <collection.h>
 
 namespace libVLCX
@@ -105,6 +106,11 @@ namespace libVLCX
     Windows::Foundation::Collections::IVector<MediaTrack^>^ Media::tracks()
     {
         return MarshallVector<MediaTrack, VLC::MediaTrack>(m_media.tracks());
+    }
+
+    MediaList^ Media::subItems()
+    {
+        return ref new MediaList(*m_media.subitems());
     }
 
     Media::Media(const VLC::Media& media)
