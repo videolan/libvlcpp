@@ -35,13 +35,12 @@ namespace libVLCX
 {
     public delegate void LogCallback(int, Platform::String^);
 
-    /**
-    * Use unsigned to replace the VLC::Question type because enum type are
-    * forbiden in delegate's argument list
-    */
-    using Question = unsigned;
-
-    namespace DialogType = VLC::DialogType;
+    public enum class Question
+    {
+        normal = VLC::DialogType::normal,
+        warning = VLC::DialogType::warning,
+        critical = VLC::DialogType::critical
+    };
         
     namespace DialogCallback
     {
@@ -79,7 +78,7 @@ namespace libVLCX
         * \param dialog used to interact with the dialog
         * \param title title of the diaog
         * \param text text of the dialog
-        * \param qtype question type (or severity) of the dialog (\see DialogType)
+        * \param qtype question type (or severity) of the dialog (\see Question)
         * \param cancel text of the cancel button
         * \param action1 text of the first button, if NULL, don't display this
         * button

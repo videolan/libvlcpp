@@ -141,7 +141,7 @@ namespace libVLCX
             login(ref new Dialog(std::move(dialog)), ToPlatformString(std::move(title)), ToPlatformString(std::move(text)), ToPlatformString(std::move(defaultUserName)), askToStore);
         },
         [question](VLC::Dialog &&dialog, std::string &&title, std::string &&text, VLC::Question qType, std::string &&cancel, std::string &&action1, std::string &&action2) {
-            question(ref new Dialog(std::move(dialog)), ToPlatformString(std::move(title)), ToPlatformString(std::move(text)), (unsigned)qType, ToPlatformString(std::move(cancel)), ToPlatformString(std::move(action1)), ToPlatformString(std::move(action2)));
+            question(ref new Dialog(std::move(dialog)), ToPlatformString(std::move(title)), ToPlatformString(std::move(text)), (libVLCX::Question)qType, ToPlatformString(std::move(cancel)), ToPlatformString(std::move(action1)), ToPlatformString(std::move(action2)));
         },
         [dspProgress](VLC::Dialog &&dialog, std::string &&title, std::string &&text, bool intermediate, float position, std::string &&cancel) {
             dspProgress(ref new Dialog(std::move(dialog)), ToPlatformString(std::move(title)), ToPlatformString(std::move(text)), intermediate, position, ToPlatformString(std::move(cancel)));
