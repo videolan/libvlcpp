@@ -99,6 +99,14 @@ namespace libVLCX
         Interact = 0x08,
     };
 
+	public enum class ParseStatus
+	{
+		Init = VLC::Media::ParseStatus::Init,
+		Skipped = VLC::Media::ParseStatus::Skipped,
+		Failed = VLC::Media::ParseStatus::Failed,
+		Done = VLC::Media::ParseStatus::Done,
+	};
+
     public enum class FromType
     {
         FromPath,
@@ -272,7 +280,7 @@ namespace libVLCX
         */
         void Media::parseWithOptions(ParseFlags flags);
 
-        bool isParsed();
+        ParseStatus parseStatus();
 
         /**
         * Get media descriptor's elementary streams description
