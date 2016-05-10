@@ -123,6 +123,16 @@ public:
         Done = libvlc_media_parse_done,
     };
 
+    enum class Type
+    {
+        Unknown = libvlc_media_type_unknown,
+        File = libvlc_media_type_file,
+        Directory = libvlc_media_type_directory,
+        Disc = libvlc_media_type_disc,
+        Stream = libvlc_media_type_stream,
+        Playlist = libvlc_media_type_playlist,
+    };
+
     /**
      * @brief Media Constructs a libvlc Media instance
      * @param instance  A libvlc instance
@@ -653,6 +663,11 @@ public:
         if ( p == nullptr )
             return nullptr;
         return std::make_shared<MediaList>( p );
+    }
+
+    Type type()
+    {
+        return static_cast<Type>( libvlc_media_get_type( *this ) );
     }
 
 private:
