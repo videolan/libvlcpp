@@ -135,21 +135,27 @@ namespace libVLCX
     {
         m_instance.setDialogHandlers(
         [error](std::string &&title, std::string &&txt) {
+            if (error)
             error(ToPlatformString(title), ToPlatformString(txt));
         },
         [login](VLC::Dialog&& dialog, std::string &&title, std::string &&text, std::string &&defaultUserName, bool askToStore) {
+            if (login)
             login(ref new Dialog(std::move(dialog)), ToPlatformString(std::move(title)), ToPlatformString(std::move(text)), ToPlatformString(std::move(defaultUserName)), askToStore);
         },
         [question](VLC::Dialog &&dialog, std::string &&title, std::string &&text, VLC::Question qType, std::string &&cancel, std::string &&action1, std::string &&action2) {
+            if (question)
             question(ref new Dialog(std::move(dialog)), ToPlatformString(std::move(title)), ToPlatformString(std::move(text)), (libVLCX::Question)qType, ToPlatformString(std::move(cancel)), ToPlatformString(std::move(action1)), ToPlatformString(std::move(action2)));
         },
         [dspProgress](VLC::Dialog &&dialog, std::string &&title, std::string &&text, bool intermediate, float position, std::string &&cancel) {
+            if (dspProgress)
             dspProgress(ref new Dialog(std::move(dialog)), ToPlatformString(std::move(title)), ToPlatformString(std::move(text)), intermediate, position, ToPlatformString(std::move(cancel)));
         },
         [cancel](VLC::Dialog &&dialog) {
+            if (cancel)
             cancel(ref new Dialog(std::move(dialog)));
         },
         [updtProgress](VLC::Dialog &&dialog, float position, std::string &&text) {
+            if (updtProgress)
             updtProgress(ref new Dialog(std::move(dialog)), position, ToPlatformString(std::move(text)));
         });
     }
