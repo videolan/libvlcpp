@@ -114,6 +114,16 @@ namespace libVLCX
         AsNode,
     };
 
+    public enum class MediaType
+    {
+        Unknown = VLC::Media::Type::Unknown,
+        File = VLC::Media::Type::File,
+        Directory = VLC::Media::Type::Directory,
+        Disc = VLC::Media::Type::Disc,
+        Stream = VLC::Media::Type::Stream,
+        Playlist = VLC::Media::Type::Playlist,
+    };
+
     public ref class Media sealed
     {
     public:
@@ -296,6 +306,8 @@ namespace libVLCX
         Windows::Foundation::Collections::IVector<MediaTrack^>^ tracks();
 
         MediaList^ subItems();
+
+        MediaType type();
 
     private:
         ~Media(){}

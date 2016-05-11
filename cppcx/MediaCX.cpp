@@ -113,6 +113,11 @@ namespace libVLCX
         return ref new MediaList(*m_media.subitems());
     }
 
+    MediaType Media::type()
+    {
+        return static_cast<MediaType>(m_media.type());
+    }
+
     Media::Media(const VLC::Media& media)
         : m_media(media)
     {
