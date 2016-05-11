@@ -35,6 +35,8 @@ char *FromPlatformString(Platform::String^ str)
 
 Platform::String^
 ToPlatformString(const char *str) {
+    if (str == NULL)
+        return ref new Platform::String();
     size_t len = MultiByteToWideChar(CP_UTF8, 0, str, -1, NULL, 0);
     if (len == 0)
         return nullptr;
@@ -46,5 +48,5 @@ ToPlatformString(const char *str) {
 Platform::String^
 ToPlatformString(const std::string& str)
 {
-    return ToPlatformString(str.c_str());
+    return ToPlatformString(str.c_str() == NULL ? "" : str.c_str());
 }
