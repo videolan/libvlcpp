@@ -149,6 +149,21 @@ namespace VLC
         }
     };
 
+    namespace detail
+    {
+        template <typename ArgType>
+        ArgType &&converterForNullToString(ArgType &&arg)
+        {
+            return std::forward<ArgType>(arg);
+        }
+
+        template <>
+        inline const char * &&converterForNullToString(const char * &&str)
+        {
+            return std::forward<const char *>(str == nullptr ? "" : str);
+        }
+    }
+
     template <size_t Idx, typename... Args>
     struct CallbackWrapper;
 
@@ -171,7 +186,7 @@ namespace VLC
                 auto& callbacks = FromOpaque<NbEvents, Opaque>::get( opaque );
                 assert(callbacks[Idx] != nullptr);
                 auto cbHandler = static_cast<CallbackHandler<Func>*>( callbacks[Idx].get() );
-                return cbHandler->func( std::forward<Args>(args)... );
+                return cbHandler->func( detail::converterForNullToString<Args>(std::forward<Args>(args))... );
             };
         }
 
