@@ -251,4 +251,25 @@ namespace libVLCX
          m_startTime = desc.starttime();
          m_name = ToPlatformString(desc.name().c_str());
     }
+
+    MediaSlave::MediaSlave(const VLC::MediaSlave& slave) :
+        m_obj(slave)
+    {
+        m_uri = ToPlatformString(m_obj.uri());
+    }
+
+    Type MediaSlave::type() const
+    {
+        return (Type)m_obj.type();
+    }
+
+    unsigned MediaSlave::priority() const
+    {
+        return m_obj.priority();
+    }
+
+    Platform::String^ MediaSlave::uri() const
+    {
+        return m_uri;
+    }
 }

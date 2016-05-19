@@ -189,4 +189,28 @@ namespace libVLCX
             int64_t m_duration;
             int64_t m_startTime;
     };
+
+    public ref class MediaSlave sealed
+    {
+    private:
+        VLC::MediaSlave m_obj;
+        Platform::String ^m_uri;
+
+    internal:
+        explicit MediaSlave(const VLC::MediaSlave& slave);
+
+    public:
+
+        public enum class Type
+        {
+            Subtitle = VLC::MediaSlave::Subtitle,
+            Audio = VLC::MediaSlave::Audio
+        }
+
+        Type type() const;
+
+        unsigned priority() const;
+
+        Platform::String^ uri() const;
+    };
 }

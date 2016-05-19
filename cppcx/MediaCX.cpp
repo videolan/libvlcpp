@@ -128,6 +128,21 @@ namespace libVLCX
     {
     }
 
+    bool addSlave(MediaSlave::Type type, unsigned priority, Platform::String^ uri)
+    {
+        m_media.addSlave(type, priority, FromPlatformString(uri));
+    }
+
+    void slavesClear()
+    {
+        m_media.slavesClear();
+    }
+
+    Platform::Foundation::Collections::IVector<MediaSlave^>^ slaves() const
+    {
+        return MarshallVector<MediaSlave, VLC::MediaSlave>(m_media.slaves());
+    }
+
 } // namespace VLC
 
 
