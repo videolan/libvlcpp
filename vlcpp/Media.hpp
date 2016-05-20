@@ -670,6 +670,69 @@ public:
         return static_cast<Type>( libvlc_media_get_type( *this ) );
     }
 
+    /**
+     * Add a slave to the current media.
+     *
+     * A slave is an external input source that may contains an additional subtitle
+     * track (like a .srt) or an additional audio track (like a .ac3).
+     *
+     * \note This function must be called before the media is parsed (via parseWithOptions())
+     *  or before the media is played (via MediaPlayer::play())
+     *
+     * \version LibVLC 3.0.0 and later.
+     *
+     * \param uri Uri of the slave (should contain a valid scheme).
+     * \param type subtitle or audio
+     * \param priority from 0 (low priority) to 4 (high priority)
+     *
+     * \return true on success, false on error.
+     */
+    bool addSlave(MediaSlave::Type type, unsigned priority, std::string const &uri)
+    {
+        return libvlc_media_slaves_add(*this, (libvlc_media_slave_type_t)type, priority, uri.c_str()) == 0;
+    }
+
+    /**
+     * Clear all slaves previously added by addSlave() or
+     * internally.
+     *
+     * \version LibVLC 3.0.0 and later.
+     */
+    void slavesClear()
+    {
+        libvlc_media_slaves_clear(*this);
+    }
+
+    /**
+     * Get a media descriptor's slaves in a vector
+     *
+     * The list will contain slaves parsed by VLC or previously added by
+     * addSlave(). The typical use case of this function is to save
+     * a list of slave in a database for a later use.
+     *
+     * \version LibVLC 3.0.0 and later.
+     *
+     * \see addSlave()
+     *
+     * \return a vector of MediaSlave
+     */
+    std::vector<MediaSlave> slaves() const
+    {
+        libvlc_media_slave_t **list = nullptr;
+        int length(0);
+        auto deletor = [&list, &length](void *) {
+            if (length != 0)
+                libvlc_media_slaves_release(list, length);
+        };
+        std::unique_ptr<void, decltype(deletor)> scope_gard(nullptr, deletor);
+
+        length = libvlc_media_slaves_get(*this, &list);
+        if (length == 0)
+            return {};
+        std::vector<MediaSlave> res(list, list + length);
+        return res;
+    }
+
 private:
 
     /**

@@ -561,6 +561,42 @@ private:
 };
 #endif
 
+///
+/// \brief C++ Type wrapper for libvlc_media_slave_t
+///
+class MediaSlave : private libvlc_media_slave_t
+{
+public:
+    ///
+    /// Type of a media slave: subtitle or audio.
+    ///
+    enum Type
+    {
+        Subtitle = libvlc_media_slave_type_subtitle,
+        Audio = libvlc_media_slave_type_audio
+    };
+
+    MediaSlave(libvlc_media_slave_t *other) :
+        libvlc_media_slave_t(*other)
+    {
+    }
+
+public:
+    Type type() const
+    {
+        return (Type)i_type;
+    }
+
+    unsigned priority() const
+    {
+        return i_priority;
+    }
+
+    std::string uri() const
+    {
+        return psz_uri;
+    }
+};
 
 } // namespace VLC
 #endif
