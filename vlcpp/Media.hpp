@@ -719,16 +719,14 @@ public:
     std::vector<MediaSlave> slaves() const
     {
         libvlc_media_slave_t **list = nullptr;
-        int length(0);
-        auto deletor = [&list, &length](void *) {
-            if (length != 0)
-                libvlc_media_slaves_release(list, length);
-        };
-        std::unique_ptr<void, decltype(deletor)> scope_gard(nullptr, deletor);
 
-        length = libvlc_media_slaves_get(*this, &list);
+        auto length = libvlc_media_slaves_get(*this, &list);
         if (length == 0)
             return {};
+        auto deletor = [length](libvlc_media_slave_t **p_list) {
+            libvlc_media_slaves_release(p_list, length);
+        };
+        std::unique_ptr<libvlc_media_slave_t*, decltype(deletor)> scope_gard(list, deletor);
         std::vector<MediaSlave> res(list, list + length);
         return res;
     }
