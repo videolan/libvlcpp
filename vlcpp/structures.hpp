@@ -570,7 +570,7 @@ public:
     ///
     /// Type of a media slave: subtitle or audio.
     ///
-    enum Type
+    enum class Type
     {
         Subtitle = libvlc_media_slave_type_subtitle,
         Audio = libvlc_media_slave_type_audio
