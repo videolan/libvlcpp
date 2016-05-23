@@ -128,17 +128,17 @@ namespace libVLCX
     {
     }
 
-    bool addSlave(MediaSlave::Type type, unsigned priority, Platform::String^ uri)
+    bool Media::addSlave(SlaveType type, unsigned priority, Platform::String^ uri)
     {
-        m_media.addSlave(type, priority, FromPlatformString(uri));
+        return m_media.addSlave((VLC::MediaSlave::Type)type, priority, FromPlatformString(uri));
     }
 
-    void slavesClear()
+    void Media::slavesClear()
     {
         m_media.slavesClear();
     }
 
-    Platform::Foundation::Collections::IVector<MediaSlave^>^ slaves() const
+    Windows::Foundation::Collections::IVector<MediaSlave^>^ Media::slaves()
     {
         return MarshallVector<MediaSlave, VLC::MediaSlave>(m_media.slaves());
     }

@@ -326,7 +326,7 @@ namespace libVLCX
          *
          * \return true on success, false on error.
          */
-        bool addSlave(MediaSlave::Type type, unsigned priority, Platform::String^ uri);
+        bool addSlave(SlaveType type, unsigned priority, Platform::String^ uri);
 
         /**
          * Clear all slaves previously added by addSlave() or
@@ -349,7 +349,7 @@ namespace libVLCX
          *
          * \return a vector of MediaSlave
          */
-        Platform::Foundation::Collections::IVector<MediaSlave^>^ slaves() const;
+        Windows::Foundation::Collections::IVector<MediaSlave^>^ slaves();
 
     private:
         ~Media(){}

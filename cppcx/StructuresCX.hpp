@@ -190,6 +190,12 @@ namespace libVLCX
             int64_t m_startTime;
     };
 
+    public enum class SlaveType
+    {
+        Subtitle = VLC::MediaSlave::Type::Subtitle,
+        Audio = VLC::MediaSlave::Type::Audio,
+    };
+
     public ref class MediaSlave sealed
     {
     private:
@@ -200,17 +206,8 @@ namespace libVLCX
         explicit MediaSlave(const VLC::MediaSlave& slave);
 
     public:
-
-        public enum class Type
-        {
-            Subtitle = VLC::MediaSlave::Subtitle,
-            Audio = VLC::MediaSlave::Audio
-        }
-
-        Type type() const;
-
-        unsigned priority() const;
-
-        Platform::String^ uri() const;
+        SlaveType type();
+        unsigned priority();
+        Platform::String^ uri();
     };
 }

@@ -258,17 +258,17 @@ namespace libVLCX
         m_uri = ToPlatformString(m_obj.uri());
     }
 
-    Type MediaSlave::type() const
+    SlaveType MediaSlave::type()
     {
-        return (Type)m_obj.type();
+        return (SlaveType)m_obj.type();
     }
 
-    unsigned MediaSlave::priority() const
+    unsigned MediaSlave::priority()
     {
         return m_obj.priority();
     }
 
-    Platform::String^ MediaSlave::uri() const
+    Platform::String^ MediaSlave::uri()
     {
         return m_uri;
     }
