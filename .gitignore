@@ -7,5 +7,7 @@ Makefile
 Makefile.in
 aclocal.m4
 *.cache
-
+depcomp
+install-sh
+missing
 build*
