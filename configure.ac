@@ -15,9 +15,9 @@ AC_CONFIG_MACRO_DIR([m4])
 AC_PROG_CXX
 AX_CXX_COMPILE_STDCXX_11([noext])
 
-AC_ARG_ENABLE(examples, [build examples programs],[have_examples="yes"])
-AS_IF([test "${have_examples}" = "yes"], [PKG_CHECK_MODULES(vlc, libvlc)])
-AM_CONDITIONAL([HAVE_EXAMPLES], [test "${have_examples}" = "yes"])
+AC_ARG_ENABLE(examples, AC_HELP_STRING([--enable-examples], [build examples programs]))
+AM_CONDITIONAL([HAVE_EXAMPLES], [test "${enable_examples}" = "yes"])
+AS_IF([test "${enable_examples}" = "yes"], [PKG_CHECK_MODULES(vlc, libvlc)])
 
 AC_CONFIG_FILES([
 Makefile
