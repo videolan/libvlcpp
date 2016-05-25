@@ -98,9 +98,9 @@ namespace libVLCX
         m_media.parseWithOptions(static_cast<VLC::Media::ParseFlags>( flags ) );
     }
 
-    ParseStatus Media::parseStatus()
+    ParsedStatus Media::parsedStatus()
     {
-        return (ParseStatus)m_media.parseStatus();
+        return (ParsedStatus)m_media.parsedStatus();
     }
 
     Windows::Foundation::Collections::IVector<MediaTrack^>^ Media::tracks()

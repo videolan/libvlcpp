@@ -61,7 +61,7 @@ namespace libVLCX
     public delegate void MediaListItemDeleted(Media^, int);
     public delegate void MediaListWillDeleteItem(Media^, int);
 
-	public delegate void ParsedStatus(ParseStatus);
+	public delegate void ParsedChanged(ParsedStatus);
     ref class EventManager;
 
     private ref class EventRemover sealed
@@ -467,12 +467,12 @@ namespace libVLCX
         VLC::MediaEventManager& m_em;
 
     public:
-        event ParsedStatus^ OnParsedStatus
+        event ParsedChanged^ OnParsedChanged
         {
-            Windows::Foundation::EventRegistrationToken add(ParsedStatus^ handler)
+            Windows::Foundation::EventRegistrationToken add(ParsedChanged^ handler)
             {
-                auto h = m_em.onParsedStatus([handler](VLC::Media::ParseStatus s) {
-                    handler((ParseStatus)s);
+                auto h = m_em.onParsedChanged([handler](VLC::Media::ParsedStatus s) {
+                    handler((ParsedStatus)s);
                 });
                 m_events.push_back(h);
                 return Windows::Foundation::EventRegistrationToken{ (int64)h };
