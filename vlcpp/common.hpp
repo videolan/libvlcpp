@@ -160,7 +160,8 @@ namespace VLC
         template <>
         inline const char * &&converterForNullToString(const char * &&str)
         {
-            return std::forward<const char *>(str == nullptr ? "" : str);
+            static const char* empty = "";
+            return std::forward<const char *>(str == nullptr ? empty : str);
         }
     }
 
