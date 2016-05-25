@@ -115,12 +115,12 @@ public:
         Interact = libvlc_media_do_interact,
     };
 
-    enum class ParseStatus
+    enum class ParsedStatus
     {
-        Init = libvlc_media_parse_init,
-        Skipped = libvlc_media_parse_skipped,
-        Failed = libvlc_media_parse_failed,
-        Done = libvlc_media_parse_done,
+        Init = libvlc_media_parsed_status_init,
+        Skipped = libvlc_media_parsed_status_skipped,
+        Failed = libvlc_media_parsed_status_failed,
+        Done = libvlc_media_parsed_status_done,
     };
 
     enum class Type
@@ -603,9 +603,9 @@ public:
         return libvlc_media_parse_with_options( *this, static_cast<libvlc_media_parse_flag_t>( flags ) ) == 0;
     }
 
-    ParseStatus parseStatus()
+    ParsedStatus parsedStatus()
     {
-        return static_cast<ParseStatus>( libvlc_media_get_parsed_status( *this ) );
+        return static_cast<ParsedStatus>( libvlc_media_get_parsed_status( *this ) );
     }
 #endif
 
