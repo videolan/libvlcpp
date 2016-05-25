@@ -40,7 +40,7 @@ namespace VLC
         Dialog &operator=(const Dialog &) = delete;
 
         template <size_t, typename ...>
-        friend class CallbackWrapper;
+        friend struct CallbackWrapper;
 
         /**
          * The standard constructor.
