@@ -871,11 +871,13 @@ class MediaListEventManager : public EventManager
             });
         }
 
+#if LIBVLC_VERSION_INT >= LIBVLC_VERSION(3, 0, 0, 0)
         template <typename Func>
         RegisteredEvent onEndReached( Func&& f )
         {
             return handle( libvlc_MediaListEndReached, std::forward<Func>( f ) );
         }
+#endif
 };
 
 /**
