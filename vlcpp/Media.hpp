@@ -667,6 +667,7 @@ public:
         return std::make_shared<MediaList>( p );
     }
 
+#if LIBVLC_VERSION_INT >= LIBVLC_VERSION(3, 0, 0, 0)
     Type type()
     {
         return static_cast<Type>( libvlc_media_get_type( *this ) );
@@ -732,6 +733,7 @@ public:
         std::vector<MediaSlave> res(list, list + length);
         return res;
     }
+#endif
 
 private:
 
