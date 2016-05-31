@@ -37,6 +37,8 @@
 
 namespace VLC
 {
+
+#if LIBVLC_VERSION_INT >= LIBVLC_VERSION(3, 0, 0, 0)
 using Question = libvlc_dialog_question_type;
 
 namespace DialogType
@@ -45,8 +47,13 @@ namespace DialogType
     static constexpr Question warning = LIBVLC_DIALOG_QUESTION_WARNING;
     static constexpr Question critical = LIBVLC_DIALOG_QUESTION_CRITICAL;
 }
+#endif
 
+#if LIBVLC_VERSION_INT >= LIBVLC_VERSION(3, 0, 0, 0)
 class Instance : protected CallbackOwner<8>, public Internal<libvlc_instance_t>
+#else
+class Instance : protected CallbackOwner<5>, public Internal<libvlc_instance_t>
+#endif
 {
 private:
     enum class CallbackIdx : unsigned int
@@ -54,14 +61,18 @@ private:
         Exit = 0,
         Log,
         ErrorDisplay,
+#if LIBVLC_VERSION_INT >= LIBVLC_VERSION(3, 0, 0, 0)
         LoginDisplay,
         QuestionDisplay,
         ProgressDisplay,
         CancelDialog,
         ProgressUpdate
+#endif
     };
 
+#if LIBVLC_VERSION_INT >= LIBVLC_VERSION(3, 0, 0, 0)
     std::shared_ptr<libvlc_dialog_cbs> m_callbacks_pointers;
+#endif
 public:
     /**
      * Create and initialize a libvlc instance. This functions accept a list
@@ -86,8 +97,10 @@ public:
      * \param argv  list of arguments (should be NULL)
      */
     Instance(int argc, const char *const * argv)
-        : Internal{ libvlc_new( argc, argv ), libvlc_release },
-          m_callbacks_pointers { std::make_shared<libvlc_dialog_cbs>() }
+        : Internal{ libvlc_new( argc, argv ), libvlc_release }
+#if LIBVLC_VERSION_INT >= LIBVLC_VERSION(3, 0, 0, 0)
+          , m_callbacks_pointers { std::make_shared<libvlc_dialog_cbs>() }
+#endif
     {
     }
 
@@ -365,6 +378,7 @@ public:
      * \param text text of the dialog
      */
     using ErrorCb = void(std::string &&title, std::string &&text);
+#if LIBVLC_VERSION_INT >= LIBVLC_VERSION(3, 0, 0, 0)
     /**
      *Called when a login dialog needs to be displayed.
      *
@@ -476,6 +490,7 @@ public:
         std::fill(m_callbacks->begin() + 2, m_callbacks->end(), nullptr);
         libvlc_dialog_set_callbacks(*this, nullptr, nullptr);
     }
+#endif
 };
 
 } // namespace VLC
