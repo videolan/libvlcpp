@@ -89,6 +89,7 @@ public:
     static const FromType AsNode = FromType::AsNode;
 #endif
 
+#if LIBVLC_VERSION_INT >= LIBVLC_VERSION(3, 0, 0, 0)
     enum class ParseFlags
     {
         /**
@@ -132,6 +133,7 @@ public:
         Stream = libvlc_media_type_stream,
         Playlist = libvlc_media_type_playlist,
     };
+#endif
 
     /**
      * @brief Media Constructs a libvlc Media instance
@@ -749,11 +751,13 @@ private:
     std::shared_ptr<MediaEventManager> m_eventManager;
 };
 
+#if LIBVLC_VERSION_INT >= LIBVLC_VERSION(3, 0, 0, 0)
 inline VLC::Media::ParseFlags operator|(Media::ParseFlags l, Media::ParseFlags r)
 {
     using T = typename std::underlying_type<Media::ParseFlags>::type;
     return static_cast<Media::ParseFlags>( static_cast<T>( l ) | static_cast<T>( r ) );
 }
+#endif
 
 } // namespace VLC
 

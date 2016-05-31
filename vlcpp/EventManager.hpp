@@ -300,12 +300,21 @@ class MediaEventManager : public EventManager
         template <typename Func>
         RegisteredEvent onParsedChanged( Func&& f )
         {
+#if LIBVLC_VERSION_INT >= LIBVLC_VERSION(3, 0, 0, 0)
             EXPECT_SIGNATURE( void(Media::ParsedStatus) );
             return handle(libvlc_MediaParsedChanged, std::forward<Func>( f ), [](const libvlc_event_t* e, void* data)
             {
                 auto callback = static_cast<DecayPtr<Func>>(data);
                 (*callback)( static_cast<Media::ParsedStatus>( e->u.media_parsed_changed.new_status ) );
             });
+#else
+            EXPECT_SIGNATURE( void(bool) );
+            return handle(libvlc_MediaParsedChanged, std::forward<Func>( f ), [](const libvlc_event_t* e, void* data)
+            {
+                auto callback = static_cast<DecayPtr<Func>>(data);
+                (*callback)( bool( e->u.media_parsed_changed.new_status ) );
+            });
+#endif
         }
 
         /**
