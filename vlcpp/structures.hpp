@@ -561,6 +561,7 @@ private:
 };
 #endif
 
+#if LIBVLC_VERSION_INT >= LIBVLC_VERSION(3, 0, 0, 0)
 ///
 /// \brief C++ Type wrapper for libvlc_media_slave_t
 ///
@@ -597,6 +598,7 @@ public:
         return psz_uri;
     }
 };
+#endif
 
 } // namespace VLC
 #endif
