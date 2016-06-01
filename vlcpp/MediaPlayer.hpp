@@ -1269,6 +1269,7 @@ public:
         return libvlc_video_set_spu(*this, i_spu);
     }
 
+#if LIBVLC_VERSION_INT < LIBVLC_VERSION(3, 0, 0, 0)
     /**
      * Set new video subtitle file.
      *
@@ -1278,6 +1279,7 @@ public:
     {
         return libvlc_video_set_subtitle_file(*this, psz_subtitle.c_str()) != 0;
     }
+#endif
 
     /**
      * Get the current subtitle delay. Positive values means subtitles are
@@ -1655,6 +1657,30 @@ public:
     {
         libvlc_video_set_adjust_float(*this, option, value);
     }
+
+#if LIBVLC_VERSION_INT >= LIBVLC_VERSION(3, 0, 0, 0)
+    /**
+     * Add a slave to the current media player.
+     *
+     * \note If the player is playing, the slave will be added directly. This call
+     * will also update the slave list of the attached VLC::Media.
+     *
+     * \version LibVLC 3.0.0 and later.
+     *
+     * \see Media::addSlave
+     *
+     * \param type subtitle or audio
+     * \param uri Uri of the slave (should contain a valid scheme).
+     *
+     * \return true on success, false on error.
+     */
+    bool addSlave( MediaSlave::Type type, const std::string& uri )
+    {
+        return libvlc_media_player_add_slave( *this,
+                        static_cast<libvlc_media_slave_type_t>( type ), uri.c_str() ) == 0;
+    }
+
+#endif
 
 private:
     std::vector<TrackDescription> getTracksDescription( libvlc_track_description_t* tracks ) const
