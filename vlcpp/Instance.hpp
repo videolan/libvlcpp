@@ -372,6 +372,7 @@ public:
         return res;
     }
 
+#if LIBVLC_VERSION_INT >= LIBVLC_VERSION(3, 0, 0, 0)
     /**
      * Called when an error message needs to be displayed.
      *
@@ -379,7 +380,6 @@ public:
      * \param text text of the dialog
      */
     using ErrorCb = void(std::string &&title, std::string &&text);
-#if LIBVLC_VERSION_INT >= LIBVLC_VERSION(3, 0, 0, 0)
     /**
      *Called when a login dialog needs to be displayed.
      *
