@@ -36,6 +36,10 @@ int main(int ac, char** av)
     const char* vlcArgs = "-vv";
     auto instance = VLC::Instance(1, &vlcArgs);
 
+    auto sds = instance.mediaDiscoverers( VLC::MediaDiscoverer::Category::Lan );
+    for ( const auto& sd : sds )
+        std::cout << "Found SD: " << sd.name() << "(" << sd.longName() << ")" << std::endl;
+
     instance.setExitHandler([] {
         std::cout << "Libvlc is exiting" << std::endl;
     });

@@ -39,6 +39,45 @@ class MediaList;
 class MediaDiscoverer : public Internal<libvlc_media_discoverer_t>
 {
 public:
+    enum class Category
+    {
+        Devices = libvlc_media_discoverer_devices,
+        Lan = libvlc_media_discoverer_lan,
+        Podcasts = libvlc_media_discoverer_podcasts,
+        Localdirs = libvlc_media_discoverer_localdirs,
+    };
+
+    class Description
+    {
+    public:
+        explicit Description( const std::string& name, const std::string& longName, libvlc_media_discoverer_category cat )
+            : m_name( name )
+            , m_longName( longName )
+            , m_category( static_cast<Category>( cat ) )
+        {
+        }
+
+        const std::string& name() const
+        {
+            return m_name;
+        }
+
+        const std::string& longName() const
+        {
+            return m_longName;
+        }
+
+        Category category() const
+        {
+            return m_category;
+        }
+
+    private:
+        std::string m_name;
+        std::string m_longName;
+        Category m_category;
+    };
+
     /**
      * Discover media service by name.
      *

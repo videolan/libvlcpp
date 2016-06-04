@@ -29,6 +29,7 @@
 #include "Internal.hpp"
 #include "structures.hpp"
 #include "Dialog.hpp"
+#include "MediaDiscoverer.hpp"
 
 #include <string>
 #include <vector>
@@ -490,6 +491,34 @@ public:
         std::fill(m_callbacks->begin() + 2, m_callbacks->end(), nullptr);
         libvlc_dialog_set_callbacks(*this, nullptr, nullptr);
     }
+
+    /**
+     * Get media discoverer services by category
+     *
+     * \version LibVLC 3.0.0 and later.
+     *
+     * \param category  The category of services to fetch
+     *
+     * \return A vector containing the available media discoverers
+     */
+    std::vector<MediaDiscoverer::Description> mediaDiscoverers(MediaDiscoverer::Category category)
+    {
+        libvlc_media_discoverer_description** pp_descs;
+        auto nbSd = libvlc_media_discoverer_list_get( *this, static_cast<libvlc_media_discoverer_category>( category ),
+                                                      &pp_descs );
+        if ( nbSd == 0 )
+            return {};
+        auto releaser = [nbSd](libvlc_media_discoverer_description** ptr) {
+            libvlc_media_discoverer_list_release( ptr, nbSd );
+        };
+        std::unique_ptr<libvlc_media_discoverer_description*, decltype(releaser)> descPtr( pp_descs, releaser );
+        std::vector<MediaDiscoverer::Description> res;
+        res.reserve( nbSd );
+        for ( auto i = 0u; i < nbSd; ++i )
+            res.emplace_back( pp_descs[i]->psz_name, pp_descs[i]->psz_longname, pp_descs[i]->i_cat );
+        return res;
+    }
+
 #endif
 };
 
