@@ -118,10 +118,10 @@ public:
 
     enum class ParsedStatus
     {
-        Init = libvlc_media_parsed_status_init,
         Skipped = libvlc_media_parsed_status_skipped,
         Failed = libvlc_media_parsed_status_failed,
         Done = libvlc_media_parsed_status_done,
+        Timeout = libvlc_media_parsed_status_timeout,
     };
 
     enum class Type
@@ -598,11 +598,15 @@ public:
      * \see ParseFlag
      *
      * \return true on success, false otherwise
+     * \param flags parse options
+     * \param timeout maximum time allowed to preparse the media. If -1, the
+     *      default "preparse-timeout" option will be used as a timeout. If 0, it will
+     *      wait indefinitely. If > 0, the timeout will be used (in milliseconds).
      * \version LibVLC 3.0.0 or later
      */
-    bool parseWithOptions( ParseFlags flags )
+    bool parseWithOptions( ParseFlags flags, int timeout )
     {
-        return libvlc_media_parse_with_options( *this, static_cast<libvlc_media_parse_flag_t>( flags ) ) == 0;
+        return libvlc_media_parse_with_options( *this, static_cast<libvlc_media_parse_flag_t>( flags ), timeout ) == 0;
     }
 
     ParsedStatus parsedStatus()
