@@ -39,6 +39,7 @@ class MediaList;
 class MediaDiscoverer : public Internal<libvlc_media_discoverer_t>
 {
 public:
+#if LIBVLC_VERSION_INT >= LIBVLC_VERSION(3, 0, 0, 0)
     enum class Category
     {
         Devices = libvlc_media_discoverer_devices,
@@ -77,7 +78,7 @@ public:
         std::string m_longName;
         Category m_category;
     };
-
+#endif
     /**
      * Discover media service by name.
      *

@@ -492,6 +492,7 @@ public:
         libvlc_dialog_set_callbacks(*this, nullptr, nullptr);
     }
 
+#if LIBVLC_VERSION_INT >= LIBVLC_VERSION(3, 0, 0, 0)
     /**
      * Get media discoverer services by category
      *
@@ -518,6 +519,7 @@ public:
             res.emplace_back( pp_descs[i]->psz_name, pp_descs[i]->psz_longname, pp_descs[i]->i_cat );
         return res;
     }
+#endif
 
 #endif
 };
