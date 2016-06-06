@@ -101,10 +101,10 @@ namespace libVLCX
 
 	public enum class ParsedStatus
 	{
-		Init = VLC::Media::ParsedStatus::Init,
 		Skipped = VLC::Media::ParsedStatus::Skipped,
 		Failed = VLC::Media::ParsedStatus::Failed,
 		Done = VLC::Media::ParsedStatus::Done,
+        Timeout = VLC::Media::ParsedStatus::Timeout,
 	};
 
     public enum class FromType
@@ -288,7 +288,7 @@ namespace libVLCX
         *
         * \see Media::tracks()
         */
-        void Media::parseWithOptions(ParseFlags flags);
+        void Media::parseWithOptions(ParseFlags flags, int timeoutMs);
 
         ParsedStatus parsedStatus();
 

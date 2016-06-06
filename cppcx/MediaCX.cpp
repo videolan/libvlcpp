@@ -93,9 +93,9 @@ namespace libVLCX
         m_media.parse();
     }
 
-    void Media::parseWithOptions(ParseFlags flags)
+    void Media::parseWithOptions(ParseFlags flags, int timeoutMs)
     {
-        m_media.parseWithOptions(static_cast<VLC::Media::ParseFlags>( flags ) );
+        m_media.parseWithOptions(static_cast<VLC::Media::ParseFlags>( flags ), timeoutMs);
     }
 
     ParsedStatus Media::parsedStatus()
