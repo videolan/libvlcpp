@@ -855,14 +855,7 @@ namespace libVLCX
         */
         int setSpu(int i_spu);
 
-        /**
-        * Set new video subtitle file.
-        *
-        * \param psz_subtitle  new video subtitle file
-        *
-        * \return the success status (boolean)
-        */
-        int setSubtitleFile(Platform::String^ psz_subtitle);
+        bool addSlave(SlaveType type, Platform::String^ uri);
 
         /**
         * Get the current subtitle delay. Positive values means subtitles are

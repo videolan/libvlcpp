@@ -403,9 +403,9 @@ namespace libVLCX
         return m_mp.setSpu(i_spu);
     }
 
-    int MediaPlayer::setSubtitleFile(Platform::String^ psz_subtitle)
+    bool MediaPlayer::addSlave(SlaveType type, Platform::String^ uri)
     {
-        return m_mp.setSubtitleFile(VLCString(psz_subtitle));
+        return m_mp.addSlave(static_cast<VLC::MediaSlave::Type>(type), VLCString(uri));
     }
 
     int64_t MediaPlayer::spuDelay()
