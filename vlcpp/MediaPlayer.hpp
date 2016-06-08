@@ -1671,13 +1671,14 @@ public:
      *
      * \param type subtitle or audio
      * \param uri Uri of the slave (should contain a valid scheme).
+     * \param select True if this slave should be selected when it's loaded
      *
      * \return true on success, false on error.
      */
-    bool addSlave( MediaSlave::Type type, const std::string& uri )
+    bool addSlave( MediaSlave::Type type, const std::string& uri, bool select )
     {
         return libvlc_media_player_add_slave( *this,
-                        static_cast<libvlc_media_slave_type_t>( type ), uri.c_str() ) == 0;
+                        static_cast<libvlc_media_slave_type_t>( type ), uri.c_str(), select ) == 0;
     }
 
 #endif
