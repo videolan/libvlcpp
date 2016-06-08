@@ -403,9 +403,9 @@ namespace libVLCX
         return m_mp.setSpu(i_spu);
     }
 
-    bool MediaPlayer::addSlave(SlaveType type, Platform::String^ uri)
+    bool MediaPlayer::addSlave(SlaveType type, Platform::String^ uri, bool select)
     {
-        return m_mp.addSlave(static_cast<VLC::MediaSlave::Type>(type), VLCString(uri));
+        return m_mp.addSlave(static_cast<VLC::MediaSlave::Type>(type), VLCString(uri), select);
     }
 
     int64_t MediaPlayer::spuDelay()

@@ -855,7 +855,7 @@ namespace libVLCX
         */
         int setSpu(int i_spu);
 
-        bool addSlave(SlaveType type, Platform::String^ uri);
+        bool addSlave(SlaveType type, Platform::String^ uri, bool select);
 
         /**
         * Get the current subtitle delay. Positive values means subtitles are
