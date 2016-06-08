@@ -210,4 +210,27 @@ namespace libVLCX
         unsigned priority();
         Platform::String^ uri();
     };
+
+    public enum class MediaDiscovererCategory
+    {
+        Devices = VLC::MediaDiscoverer::Category::Devices,
+        Lan = VLC::MediaDiscoverer::Category::Lan,
+        Podcasts = VLC::MediaDiscoverer::Category::Podcasts,
+        Localdirs = VLC::MediaDiscoverer::Category::Localdirs,
+    };
+
+    public ref class MediaDiscovererDescription sealed
+    {
+    public:
+        Platform::String^ name();
+        Platform::String^ longName();
+        MediaDiscovererCategory category();
+    internal:
+        explicit MediaDiscovererDescription(const VLC::MediaDiscoverer::Description& desc);
+
+    private:
+        Platform::String^ m_name;
+        Platform::String^ m_longName;
+        MediaDiscovererCategory m_category;
+    };
 }

@@ -303,6 +303,8 @@ namespace libVLCX
         */
         Windows::Foundation::Collections::IVector<AudioOutputDeviceDescription^>^ audioOutputDeviceList(Platform::String^ aout);
 
+        Windows::Foundation::Collections::IVector<MediaDiscovererDescription^>^ mediaDiscoverers(MediaDiscovererCategory category);
+
     private:
         void InitializeHack(char** argv, unsigned int nbArgs);
 

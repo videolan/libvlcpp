@@ -185,6 +185,11 @@ namespace libVLCX
         return MarshallVector<AudioOutputDeviceDescription, VLC::AudioOutputDeviceDescription>(m_instance.audioOutputDeviceList(VLCString(aout)));
     }
 
+    Windows::Foundation::Collections::IVector<MediaDiscovererDescription^>^ Instance::mediaDiscoverers(MediaDiscovererCategory category)
+    {
+        return MarshallVector<MediaDiscovererDescription, VLC::MediaDiscoverer::Description>(m_instance.mediaDiscoverers(static_cast<VLC::MediaDiscoverer::Category>(category)));
+    }
+
     Instance::~Instance()
     {
     }
