@@ -33,8 +33,10 @@ namespace VLC
 {
 
 class Instance;
-class MediaDiscovererEventManager;
 class MediaList;
+#if LIBVLC_VERSION_INT < LIBVLC_VERSION(3, 0, 0, 0)
+class MediaDiscovererEventManager;
+#endif
 
 class MediaDiscoverer : public Internal<libvlc_media_discoverer_t>
 {
@@ -123,6 +125,7 @@ public:
     }
 #endif
 
+#if LIBVLC_VERSION_INT < LIBVLC_VERSION(3, 0, 0, 0)
     /**
      * Get media service discover object its localized name.
      *
@@ -150,6 +153,7 @@ public:
         }
         return *m_eventManager;
     }
+#endif
 
     /**
      * Query if media service discover object is running.
@@ -174,7 +178,9 @@ public:
     }
 
 private:
+#if LIBVLC_VERSION_INT < LIBVLC_VERSION(3, 0, 0, 0)
     std::shared_ptr<MediaDiscovererEventManager> m_eventManager;
+#endif
     std::shared_ptr<MediaList> m_mediaList;
 };
 

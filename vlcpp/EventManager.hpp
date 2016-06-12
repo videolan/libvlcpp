@@ -914,6 +914,7 @@ class MediaListPlayerEventManager : public EventManager
         }
 };
 
+#if LIBVLC_VERSION_INT < LIBVLC_VERSION(3, 0, 0, 0)
 /**
  * @brief The MediaDiscovererEventManager class allows one to register MediaDiscoverer related events
  */
@@ -942,6 +943,7 @@ class MediaDiscovererEventManager : public EventManager
             return handle(libvlc_MediaDiscovererEnded, std::forward<Func>( f ) );
         }
 };
+#endif
 
 /**
  * @brief The VLMEventManager class allows one to register VLM related events
