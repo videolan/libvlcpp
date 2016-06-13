@@ -41,11 +41,6 @@ namespace libVLCX
         m_discoverer.stop();
     }
 
-    Platform::String^ MediaDiscoverer::localizedName()
-    {
-        return ToPlatformString(m_discoverer.localizedName());
-    }
-
     bool  MediaDiscoverer::isRunning()
     {
         return m_discoverer.isRunning();

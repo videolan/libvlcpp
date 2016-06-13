@@ -67,13 +67,6 @@ namespace libVLCX
         void stop();
 
         /**
-        * Get media service discover object its localized name.
-        *
-        * \return localized name
-        */
-        Platform::String^ localizedName();
-
-        /**
         * Query if media service discover object is running.
         *
         * \return true if running, false if not
