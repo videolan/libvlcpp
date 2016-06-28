@@ -44,9 +44,15 @@ using Question = libvlc_dialog_question_type;
 
 namespace DialogType
 {
+#if !defined(_MSC_VER) || _MSC_VER >= 1900
     static constexpr Question normal = LIBVLC_DIALOG_QUESTION_NORMAL;
     static constexpr Question warning = LIBVLC_DIALOG_QUESTION_WARNING;
     static constexpr Question critical = LIBVLC_DIALOG_QUESTION_CRITICAL;
+#else
+    static const Question normal = LIBVLC_DIALOG_QUESTION_NORMAL;
+    static const Question warning = LIBVLC_DIALOG_QUESTION_WARNING;
+    static const Question critical = LIBVLC_DIALOG_QUESTION_CRITICAL;
+#endif
 }
 #endif
 
@@ -373,6 +379,7 @@ public:
     }
 
 #if LIBVLC_VERSION_INT >= LIBVLC_VERSION(3, 0, 0, 0)
+#if !defined(_MSC_VER) || _MSC_VER >= 1900
     /**
      * Called when an error message needs to be displayed.
      *
@@ -449,7 +456,14 @@ public:
      * \param text new text of the progress dialog
      */
     using UpdtProgressCb = void(Dialog &&dialog, float position, std::string &&text);
-
+#else
+    typedef void (*ErrorCb)(std::string &&title, std::string &&text);
+    typedef void (*LoginCb)(Dialog &&dialog, std::string &&title, std::string &&text, std::string &&defaultUserName, bool askToStore);
+    typedef void (*QuestionCb)(Dialog &&dialog, std::string &&title, std::string &&text, Question qType, std::string &&cancel, std::string &&action1, std::string &&action2);
+    typedef void (*DspProgressCb)(Dialog &&dialog, std::string &&title, std::string &&text, bool intermediate, float position, std::string &&cancel);
+    typedef void (*CancelCb)(Dialog &&dialog);
+    typedef void (*UpdtProgressCb)(Dialog &&dialog, float position, std::string &&text);
+#endif
     /**
      * Replaces all the dialog callbacks for this Instance instance
      *
@@ -463,13 +477,14 @@ public:
     template <class Error, class Login, class Question, class DspProgress, class Cancel, class UpdtProgress>
     void setDialogHandlers(Error&& error, Login&& login, Question&& question, DspProgress&& dspProgress, Cancel &&cancel, UpdtProgress &&updtProgress)
     {
+#if !defined(_MSC_VER) || _MSC_VER >= 1900
         static_assert(signature_match_or_nullptr<Error, ErrorCb>::value, "Mismatched error display callback prototype");
         static_assert(signature_match_or_nullptr<Login, LoginCb>::value, "Mismatched login display callback prototype");
         static_assert(signature_match_or_nullptr<Question, QuestionCb>::value, "Mismatched question display callback prototype");
         static_assert(signature_match_or_nullptr<DspProgress, DspProgressCb>::value, "Mismatched progress display callback prototype");
         static_assert(signature_match_or_nullptr<Cancel, CancelCb>::value, "Mismatched cancel callback prototype");
         static_assert(signature_match_or_nullptr<UpdtProgress, UpdtProgressCb>::value, "Mismatched update progress callback prototype");
-
+#endif
         libvlc_dialog_cbs tmp = {
             CallbackWrapper<(unsigned)CallbackIdx::ErrorDisplay, decltype(libvlc_dialog_cbs::pf_display_error)>::wrap(*m_callbacks, std::forward<Error>(error)),
             CallbackWrapper<(unsigned)CallbackIdx::LoginDisplay, decltype(libvlc_dialog_cbs::pf_display_login)>::wrap(*m_callbacks, std::forward<Login>(login)),

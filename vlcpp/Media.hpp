@@ -760,7 +760,11 @@ private:
 #if LIBVLC_VERSION_INT >= LIBVLC_VERSION(3, 0, 0, 0)
 inline VLC::Media::ParseFlags operator|(Media::ParseFlags l, Media::ParseFlags r)
 {
+#if !defined(_MSC_VER) || _MSC_VER >= 1900
     using T = typename std::underlying_type<Media::ParseFlags>::type;
+#else
+    using T = std::underlying_type<Media::ParseFlags>::type;
+#endif
     return static_cast<Media::ParseFlags>( static_cast<T>( l ) | static_cast<T>( r ) );
 }
 #endif
