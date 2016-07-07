@@ -4,7 +4,7 @@ m4_define([VLCPP_MICRO], [0])
 
 AC_COPYRIGHT([Copyright 2014-2016 VideoLAN - VideoLabs])
 
-AC_INIT([medialibrary], [VLCPP_MAJOR.VLCPP_MINOR.VLCPP_MICRO])
+AC_INIT([libvlcpp], [VLCPP_MAJOR.VLCPP_MINOR.VLCPP_MICRO])
 
 AM_INIT_AUTOMAKE([foreign subdir-objects])
 m4_ifdef([AM_SILENT_RULES], [
