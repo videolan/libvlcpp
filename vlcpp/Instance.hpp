@@ -522,7 +522,7 @@ public:
         libvlc_media_discoverer_description_t** pp_descs;
         auto nbSd = libvlc_media_discoverer_list_get( *this, static_cast<libvlc_media_discoverer_category_t>( category ),
                                                       &pp_descs );
-        if ( nbSd == 0 )
+        if ( nbSd <= 0 )
             return {};
         auto releaser = [nbSd](libvlc_media_discoverer_description_t** ptr) {
             libvlc_media_discoverer_list_release( ptr, nbSd );
