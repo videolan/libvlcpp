@@ -53,7 +53,7 @@ public:
     class Description
     {
     public:
-        explicit Description( const std::string& name, const std::string& longName, libvlc_media_discoverer_category cat )
+        explicit Description( const std::string& name, const std::string& longName, libvlc_media_discoverer_category_t cat )
             : m_name( name )
             , m_longName( longName )
             , m_category( static_cast<Category>( cat ) )
