@@ -19,6 +19,9 @@ AC_ARG_ENABLE(examples, AC_HELP_STRING([--enable-examples], [build examples prog
 AM_CONDITIONAL([HAVE_EXAMPLES], [test "${enable_examples}" = "yes"])
 AS_IF([test "${enable_examples}" = "yes"], [PKG_CHECK_MODULES(vlc, libvlc)])
 
+AC_ARG_ENABLE(werror, AC_HELP_STRING([--enable-werror], [build examples with -Werror]))
+AM_CONDITIONAL([HAVE_WERROR], [test "${enable_werror}" = "yes"])
+
 AC_CONFIG_FILES([
 Makefile
 libvlcpp.pc
