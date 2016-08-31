@@ -27,7 +27,7 @@ pkgconfig_DATA = libvlcpp.pc
 if HAVE_EXAMPLES
 noinst_PROGRAMS = helloworld tests imem
 
-AM_CPPFLAGS = $(vlc_CFLAGS)
+AM_CPPFLAGS = $(vlc_CFLAGS) -Wextra -Wall
 AM_LDFLAGS = $(vlc_LIBS)
 
 helloworld_SOURCES = examples/helloworld/main.cpp
