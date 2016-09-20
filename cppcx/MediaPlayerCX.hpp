@@ -542,7 +542,7 @@ namespace libVLCX
         *
         * \return Nothing. Errors are ignored (this is a design bug).
         */
-        void outputDeviceSet(Platform::String^ module, Platform::String^ device_id);
+        void outputDeviceSet(Platform::String^ device_id);
 
         /**
         * Toggle mute status.

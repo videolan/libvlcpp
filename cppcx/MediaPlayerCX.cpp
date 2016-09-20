@@ -266,9 +266,9 @@ namespace libVLCX
         return MarshallVector<AudioOutputDeviceDescription, VLC::AudioOutputDeviceDescription>(m_mp.outputDeviceEnum());
     }
 
-    void MediaPlayer::outputDeviceSet(Platform::String^ module, Platform::String^ device_id)
+    void MediaPlayer::outputDeviceSet(Platform::String^ device_id)
     {
-        m_mp.outputDeviceSet(VLCString(module), VLCString(device_id));
+        m_mp.outputDeviceSet(VLCString(device_id));
     }
 
     void MediaPlayer::toggleMute()
