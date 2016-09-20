@@ -855,6 +855,11 @@ public:
         libvlc_audio_output_device_set(*this, module.c_str(), device_id.c_str());
     }
 
+    void outputDeviceSet(const std::string& device_id)
+    {
+        libvlc_audio_output_device_set(*this, nullptr, device_id.c_str());
+    }
+
     /**
      * Toggle mute status.
      *
