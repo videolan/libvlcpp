@@ -26,6 +26,9 @@
 #include <collection.h>
 #include <vlcpp/vlc.hpp>
 
+#include <ppltasks.h>
+using namespace Windows::Foundation;
+
 namespace libVLCX
 {
     ref class MediaEventManager;
@@ -260,20 +263,6 @@ namespace libVLCX
         * Parse a media.
         *
         * This fetches (local) meta data and tracks information. The method is
-        * synchronous.
-        *
-        * \see Media::parseAsync()
-        *
-        * \see Media::meta()
-        *
-        * \see Media::tracksInfo()
-        */
-        void parse();
-
-        /**
-        * Parse a media.
-        *
-        * This fetches (local) meta data and tracks information. The method is
         * the asynchronous of Media::parse() .
         *
         * To track when this is over you can listen to libvlc_MediaParsedChanged
@@ -289,6 +278,8 @@ namespace libVLCX
         * \see Media::tracks()
         */
         void Media::parseWithOptions(ParseFlags flags, int timeoutMs);
+
+        IAsyncOperation<ParsedStatus>^ parseWithOptionsAsync(ParseFlags flags, int timeoutMs);
 
         ParsedStatus parsedStatus();
 

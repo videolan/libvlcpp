@@ -88,14 +88,22 @@ namespace libVLCX
         return m_media.duration();
     }
 
-    void Media::parse()
-    {
-        m_media.parse();
-    }
-
     void Media::parseWithOptions(ParseFlags flags, int timeoutMs)
     {
         m_media.parseWithOptions(static_cast<VLC::Media::ParseFlags>( flags ), timeoutMs);
+    }
+
+    IAsyncOperation<ParsedStatus>^ Media::parseWithOptionsAsync(ParseFlags flags, int timeoutMs)
+    {
+        return concurrency::create_async([=](concurrency::cancellation_token ct) {
+            auto res = std::make_shared<Concurrency::task_completion_event<ParsedStatus>>();
+            m_media.eventManager().onParsedChanged([res](VLC::Media::ParsedStatus status) {
+                res->set(static_cast<ParsedStatus>(status));
+            });
+            if (m_media.parseWithOptions(static_cast<VLC::Media::ParseFlags>(flags), timeoutMs) == false)
+                res->set(ParsedStatus::Failed);
+            return concurrency::create_task(*res, ct);
+        });
     }
 
     ParsedStatus Media::parsedStatus()
