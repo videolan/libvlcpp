@@ -523,6 +523,7 @@ public:
         return libvlc_media_get_duration(*this);
     }
 
+#if LIBVLC_VERSION_INT < LIBVLC_VERSION(3, 0, 0, 0)
     /**
      * Parse a media.
      *
@@ -540,7 +541,6 @@ public:
         libvlc_media_parse(*this);
     }
 
-#if LIBVLC_VERSION_INT < LIBVLC_VERSION(3, 0, 0, 0)
     /**
      * Parse a media.
      *
