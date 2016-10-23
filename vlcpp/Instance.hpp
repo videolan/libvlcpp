@@ -522,7 +522,7 @@ public:
         libvlc_media_discoverer_description_t** pp_descs;
         auto nbSd = libvlc_media_discoverer_list_get( *this, static_cast<libvlc_media_discoverer_category_t>( category ),
                                                       &pp_descs );
-        if ( nbSd <= 0 )
+        if ( nbSd == 0 )
             return {};
         auto releaser = [nbSd](libvlc_media_discoverer_description_t** ptr) {
             libvlc_media_discoverer_list_release( ptr, nbSd );
@@ -530,7 +530,7 @@ public:
         std::unique_ptr<libvlc_media_discoverer_description_t*, decltype(releaser)> descPtr( pp_descs, releaser );
         std::vector<MediaDiscoverer::Description> res;
         res.reserve( nbSd );
-        for ( auto i = 0; i < nbSd; ++i )
+        for ( auto i = 0u; i < nbSd; ++i )
             res.emplace_back( pp_descs[i]->psz_name, pp_descs[i]->psz_longname, pp_descs[i]->i_cat );
         return res;
     }
