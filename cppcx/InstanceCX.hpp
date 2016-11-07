@@ -313,7 +313,7 @@ namespace libVLCX
     internal:
         VLC::Instance m_instance;
         // <HACK HACK HACK!>
-        std::unique_ptr<DirectXManger> m_dxManager;
+        std::unique_ptr<DirectXManager> m_dxManager;
         unsigned int m_width;
         unsigned int m_height;
         SwapChainPanel^ m_chainPanel;

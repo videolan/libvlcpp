@@ -53,7 +53,7 @@ namespace libVLCX
 
     void Instance::InitializeHack(char** argv, unsigned int nbArgs)
     {
-        m_dxManager.reset(new DirectXManger);
+        m_dxManager.reset(new DirectXManager);
         m_dxManager->CreateSwapPanel(m_chainPanel);
         UpdateSize(m_chainPanel->ActualWidth, m_chainPanel->ActualHeight);
 
