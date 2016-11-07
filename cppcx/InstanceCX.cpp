@@ -55,7 +55,8 @@ namespace libVLCX
     {
         m_dxManager.reset(new DirectXManager);
         m_dxManager->CreateSwapPanel(m_chainPanel);
-        UpdateSize(m_chainPanel->ActualWidth, m_chainPanel->ActualHeight);
+        UpdateSize(m_chainPanel->ActualWidth * m_chainPanel->CompositionScaleX,
+                   m_chainPanel->ActualHeight * m_chainPanel->CompositionScaleY);
 
         char ptr_d3dstring[64];
         sprintf_s(ptr_d3dstring, "--winrt-d3ddevice=0x%p", m_dxManager->cp_d3dDevice);
