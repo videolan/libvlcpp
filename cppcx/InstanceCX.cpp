@@ -32,7 +32,7 @@ namespace libVLCX
     Instance::Instance(Windows::Foundation::Collections::IVector<Platform::String^>^ argv, SwapChainPanel^ panel)
         : m_chainPanel(panel)
     {
-        int extraArgs = 3;
+        int extraArgs = 2;
         auto c_argv = new char*[argv->Size + extraArgs];
         unsigned int i = 0;
         for (auto arg : argv)
@@ -57,10 +57,6 @@ namespace libVLCX
         m_dxManager->CreateSwapPanel(m_chainPanel);
         UpdateSize(m_chainPanel->ActualWidth * m_chainPanel->CompositionScaleX,
                    m_chainPanel->ActualHeight * m_chainPanel->CompositionScaleY);
-
-        char ptr_d3dstring[64];
-        sprintf_s(ptr_d3dstring, "--winrt-d3ddevice=0x%p", m_dxManager->cp_d3dDevice);
-        argv[nbArgs++] = _strdup(ptr_d3dstring);
 
         char ptr_d3dcstring[64];
         sprintf_s(ptr_d3dcstring, "--winrt-d3dcontext=0x%p", m_dxManager->cp_d3dContext);
