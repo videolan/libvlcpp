@@ -40,9 +40,9 @@ namespace libVLCX
             c_argv[i++] = _strdup((const char*) VLCString(arg));
         }
         InitializeHack(c_argv, i);
-        m_instance = VLC::Instance(argv->Size + extraArgs, c_argv);
-        for (i = 0; i < argv->Size + extraArgs; ++i)
-            free(c_argv[i]);
+        m_instance = VLC::Instance(i, c_argv);
+        for (unsigned j = 0; j < i; ++j)
+            free(c_argv[j]);
         delete [] c_argv;
     }
 
@@ -51,7 +51,7 @@ namespace libVLCX
         m_dxManager->Trim();
     }
 
-    void Instance::InitializeHack(char** argv, unsigned int nbArgs)
+    void Instance::InitializeHack(char** argv, unsigned int & nbArgs)
     {
         m_dxManager.reset(new DirectXManager);
         m_dxManager->CreateSwapPanel(m_chainPanel);
