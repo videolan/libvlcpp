@@ -607,6 +607,7 @@ public:
         return libvlc_get_fullscreen(*this) != 0;
     }
 
+#if LIBVLC_VERSION_INT < LIBVLC_VERSION(3, 0, 0, 0)
     /**
      * Toggle teletext transparent status on video output.
      */
@@ -614,6 +615,7 @@ public:
     {
         libvlc_toggle_teletext(*this);
     }
+#endif
 
     /**
      * Apply new equalizer settings to a media player.
