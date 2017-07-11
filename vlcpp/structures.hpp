@@ -111,6 +111,33 @@ public:
         /// Subtitle track (also called SPU sometimes)
         Subtitle
     };
+
+    ///
+    /// \brief The Orientation enum indicates the orientation of a video
+    ///
+    enum class Orientation
+    {
+        TopLeft,
+        TopRight,
+        BottomLeft,
+        BottomRight,
+        LeftTop,
+        LeftBottom,
+        RightTop,
+        RightBottom
+    };
+
+    ///
+    /// \brief The Projection enum indicates the projection of a video
+    ///
+    enum class Projection
+    {
+        Rectangular,
+        /// 360 spherical
+        Equirectangular,
+        CubemapLayoutStandard = 0x100
+    };
+
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
     constexpr static Type Unknown = Type::Unknown;
     constexpr static Type Audio = Type::Audio;
@@ -292,6 +319,26 @@ public:
         return m_fpsDen;
     }
 
+    ///
+    /// \brief Orientation
+    ///
+    /// \see orientation
+    ///
+    Orientation orientation() const
+    {
+        return m_orientation;
+    }
+
+    ///
+    /// \brief Projection
+    ///
+    /// \see projection
+    ///
+    Projection projection() const
+    {
+        return m_projection;
+    }
+
     ////////////////////////////////////////////////////////////////////////////
     // Subtitles specific
     ////////////////////////////////////////////////////////////////////////////
@@ -331,6 +378,8 @@ public:
                 m_sarDen = c->video->i_sar_den;
                 m_fpsNum = c->video->i_frame_rate_num;
                 m_fpsDen = c->video->i_frame_rate_den;
+                m_orientation = static_cast<Orientation>( c->video->i_orientation );
+                m_projection = static_cast<Projection>( c->video->i_projection );
                 break;
             case libvlc_track_text:
                 m_type = Subtitle;
@@ -364,6 +413,8 @@ private:
     uint32_t m_sarDen;
     uint32_t m_fpsNum;
     uint32_t m_fpsDen;
+    Orientation m_orientation;
+    Projection m_projection;
     // Subtitles
     std::string m_encoding;
 };
