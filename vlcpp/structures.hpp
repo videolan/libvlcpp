@@ -649,6 +649,45 @@ public:
         return psz_uri;
     }
 };
+
+
+///
+/// \brief C++ Type wrapper for libvlc_video_viewpoint_t 
+///
+class VideoViewpoint : public libvlc_video_viewpoint_t
+{
+public:
+    VideoViewpoint( float yaw, float pitch, float roll, float fieldOfView )
+    {
+        f_yaw = yaw;
+        f_pitch = pitch;
+        f_roll = roll;
+        f_field_of_view = fieldOfView;
+    }
+
+public:
+    float yaw() const
+    {
+        return f_yaw;
+    }
+
+    float pitch() const
+    {
+        return f_pitch;
+    }
+
+    float roll() const
+    {
+        return f_roll;
+    }
+
+    float field_of_view() const
+    {
+        return f_field_of_view;
+    }
+};
+
+
 #endif
 
 } // namespace VLC
