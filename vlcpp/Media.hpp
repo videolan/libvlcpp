@@ -613,6 +613,11 @@ public:
     {
         return static_cast<ParsedStatus>( libvlc_media_get_parsed_status( *this ) );
     }
+
+    void parseStop()
+    {
+        libvlc_media_parse_stop( *this );
+    }
 #endif
 
     /**
