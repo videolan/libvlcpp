@@ -257,7 +257,9 @@ public:
             if ( _vsnprintf_s( psz_msg, _TRUNCATE, format, va ) < 0 )
                 return;
             char psz_ctx[1024];
-            sprintf_s(psz_ctx, "[%s] (%s:%d) %s", psz_module, psz_file, i_line, psz_msg);
+            if( sprintf_s( psz_ctx, "[%s] (%s:%d) %s", psz_module, psz_file,
+                          i_line, psz_msg ) < 0 )
+                return;
 #endif
             logCb( level, ctx, std::string{ psz_ctx } );
         };
