@@ -254,7 +254,7 @@ public:
 #else
             //MSVC treats passing nullptr as 1st vsnprintf(_s) as an error
             char psz_msg[512];
-            if ( vsnprintf(psz_msg, sizeof(psz_msg) - 1, format, va) < 0 )
+            if ( _vsnprintf_s( psz_msg, _TRUNCATE, format, va ) < 0 )
                 return;
             char psz_ctx[1024];
             sprintf_s(psz_ctx, "[%s] (%s:%d) %s", psz_module, psz_file, i_line, psz_msg);
