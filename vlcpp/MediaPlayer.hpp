@@ -127,7 +127,7 @@ public:
         auto media = libvlc_media_player_get_media(*this);
         if ( media == nullptr )
             return nullptr;
-        return std::make_shared<Media>( media, true );
+        return std::make_shared<Media>( media, false );
     }
 
     /**
