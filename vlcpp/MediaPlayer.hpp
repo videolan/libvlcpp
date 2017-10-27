@@ -1690,7 +1690,7 @@ public:
 
     bool updateViewpoint( const VideoViewpoint& viewpoint, bool b_absolute )
     {
-        return libvlc_video_update_viewpoint( *this, 
+        return libvlc_video_update_viewpoint( *this,
             static_cast<const libvlc_video_viewpoint_t*>( &viewpoint ), b_absolute ) == 0;
     }
 

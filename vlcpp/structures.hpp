@@ -652,7 +652,7 @@ public:
 
 
 ///
-/// \brief C++ Type wrapper for libvlc_video_viewpoint_t 
+/// \brief C++ Type wrapper for libvlc_video_viewpoint_t
 ///
 class VideoViewpoint : public libvlc_video_viewpoint_t
 {
