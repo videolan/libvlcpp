@@ -125,7 +125,7 @@ public:
         static_assert(std::is_convertible<decltype(e), const EventHandlerBase*>::value, "Expected const RegisteredEvent");
 
         {
-            auto it = std::find_if(begin(m_lambdas), end(m_lambdas), [&e](decltype(m_lambdas)::value_type &value) {
+            auto it = std::find_if(begin(m_lambdas), end(m_lambdas), [&e](typename decltype(m_lambdas)::value_type &value) {
                 return e == value.get();
             });
             if (it != end(m_lambdas))
