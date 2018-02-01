@@ -1153,6 +1153,46 @@ class VLMEventManager : public EventManager
             });
         }
 };
+
+#if LIBVLC_VERSION_INT >= LIBVLC_VERSION(3, 0, 0, 0)
+
+/*
+* \brief The RendererDiscovererEventManager class allows one to register
+* renderer discoverer related events
+*/
+class RendererDiscovererEventManager : public EventManager
+{
+public:
+    RendererDiscovererEventManager( InternalPtr ptr ) : EventManager(ptr) {}
+
+    template <typename Func>
+    RegisteredEvent onItemAdded( Func&& f )
+    {
+        EXPECT_SIGNATURE(void(const RendererDiscoverer::Item&));
+        return handle(libvlc_RendererDiscovererItemAdded, std::forward<Func>( f ),
+                      [](const libvlc_event_t* e, void* data)
+        {
+            auto callback = static_cast<DecayPtr<Func>>( data );
+            (*callback)( RendererDiscoverer::Item( e->u.renderer_discoverer_item_added.item ) );
+        });
+    }
+
+    template <typename Func>
+    RegisteredEvent onItemDeleted( Func&& f )
+    {
+        EXPECT_SIGNATURE(void(const RendererDiscoverer::Item&));
+        return handle(libvlc_RendererDiscovererItemDeleted, std::forward<Func>( f ),
+                      [](const libvlc_event_t* e, void* data)
+        {
+            auto callback = static_cast<DecayPtr<Func>>( data );
+            (*callback)( RendererDiscoverer::Item( e->u.renderer_discoverer_item_deleted.item ) );
+        });
+    }
+
+};
+
+#endif
+
 }
 
 #endif // LIBVLC_EVENTMANAGER_HPP

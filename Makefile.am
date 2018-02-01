@@ -17,6 +17,7 @@ libvlcpp_HEADERS =          \
 	vlcpp/MediaListPlayer.hpp     \
 	vlcpp/MediaPlayer.hpp         \
 	vlcpp/Dialog.hpp			  \
+	vlcpp/RendererDiscoverer.hpp  \
 	vlcpp/structures.hpp          \
 	vlcpp/vlc.hpp                 \
 	$(NULL)
@@ -25,7 +26,7 @@ pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = libvlcpp.pc
 
 if HAVE_EXAMPLES
-noinst_PROGRAMS = helloworld tests imem
+noinst_PROGRAMS = helloworld tests imem discovery
 
 AM_CPPFLAGS = $(vlc_CFLAGS) -Wextra -Wall
 AM_LDFLAGS = $(vlc_LIBS)
@@ -38,5 +39,6 @@ endif
 helloworld_SOURCES = examples/helloworld/main.cpp
 imem_SOURCES = examples/imem/imem.cpp
 tests_SOURCES = test/main.cpp
+discovery_SOURCES = examples/renderers/discovery.cpp
 
 endif

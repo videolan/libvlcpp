@@ -32,6 +32,7 @@
 #include "MediaList.hpp"
 #include "MediaPlayer.hpp"
 #include "MediaLibrary.hpp"
+#include "RendererDiscoverer.hpp"
 #include "EventManager.hpp"
 #include "structures.hpp"
 
