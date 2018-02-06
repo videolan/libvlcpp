@@ -319,6 +319,7 @@ public:
         return m_fpsDen;
     }
 
+#if LIBVLC_VERSION_INT >= LIBVLC_VERSION(3, 0, 0, 0)
     ///
     /// \brief Orientation
     ///
@@ -338,6 +339,7 @@ public:
     {
         return m_projection;
     }
+#endif
 
     ////////////////////////////////////////////////////////////////////////////
     // Subtitles specific
@@ -378,8 +380,10 @@ public:
                 m_sarDen = c->video->i_sar_den;
                 m_fpsNum = c->video->i_frame_rate_num;
                 m_fpsDen = c->video->i_frame_rate_den;
+#if LIBVLC_VERSION_INT >= LIBVLC_VERSION(3, 0, 0, 0)
                 m_orientation = static_cast<Orientation>( c->video->i_orientation );
                 m_projection = static_cast<Projection>( c->video->i_projection );
+#endif
                 break;
             case libvlc_track_text:
                 m_type = Subtitle;
@@ -413,8 +417,10 @@ private:
     uint32_t m_sarDen;
     uint32_t m_fpsNum;
     uint32_t m_fpsDen;
+#if LIBVLC_VERSION_INT >= LIBVLC_VERSION(3, 0, 0, 0)
     Orientation m_orientation;
     Projection m_projection;
+#endif
     // Subtitles
     std::string m_encoding;
 };
