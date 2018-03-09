@@ -1694,6 +1694,11 @@ public:
             static_cast<const libvlc_video_viewpoint_t*>( &viewpoint ), b_absolute ) == 0;
     }
 
+    bool setRenderer( const RendererDiscoverer::Item& rendererItem )
+    {
+        return libvlc_media_player_set_renderer( *this, rendererItem ) == 0;
+    }
+
 #endif
 
 private:

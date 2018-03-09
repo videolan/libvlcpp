@@ -30,9 +30,9 @@
 #include "MediaDiscoverer.hpp"
 #include "Media.hpp"
 #include "MediaList.hpp"
+#include "RendererDiscoverer.hpp"
 #include "MediaPlayer.hpp"
 #include "MediaLibrary.hpp"
-#include "RendererDiscoverer.hpp"
 #include "EventManager.hpp"
 #include "structures.hpp"
 
