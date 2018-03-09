@@ -693,6 +693,31 @@ public:
     }
 };
 
+class RendererDiscovererDescription 
+{
+public:
+    explicit RendererDiscovererDescription( const libvlc_rd_description_t* d )
+    {
+        if (d->psz_name != NULL)
+            m_name = d->psz_name;
+        if (d->psz_longname != NULL)
+            m_longName = d->psz_longname;
+    }
+
+    const std::string& name() const
+    {
+        return m_name;
+    }
+
+    const std::string& longName() const
+    {
+        return m_longName;
+    }
+
+private:
+    std::string m_name;
+    std::string m_longName;
+};
 
 #endif
 

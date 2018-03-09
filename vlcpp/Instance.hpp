@@ -536,6 +536,24 @@ public:
             res.emplace_back( pp_descs[i]->psz_name, pp_descs[i]->psz_longname, pp_descs[i]->i_cat );
         return res;
     }
+
+    std::vector<RendererDiscovererDescription> rendererDiscoverers()
+    {
+        libvlc_rd_description_t** pp_descs;
+        auto nbSd = libvlc_renderer_discoverer_list_get(*this, &pp_descs);
+        if (nbSd == 0)
+            return {};
+        auto releaser = [nbSd](libvlc_rd_description_t** ptr) {
+            libvlc_renderer_discoverer_list_release(ptr, nbSd);
+        };
+        std::unique_ptr<libvlc_rd_description_t*, decltype(releaser)> descPtr(pp_descs, releaser);
+        std::vector<RendererDiscovererDescription> res;
+        res.reserve(nbSd);
+        for (auto i = 0u; i < nbSd; ++i)
+            res.emplace_back( pp_descs[i] );
+        return res;
+    }
+
 #endif
 
 #endif
