@@ -1699,6 +1699,11 @@ public:
         return libvlc_media_player_set_renderer( *this, rendererItem ) == 0;
     }
 
+	void unsetRenderer()
+	{
+		libvlc_media_player_set_renderer(*this, nullptr);
+	}
+
 #endif
 
 private:
