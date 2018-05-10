@@ -65,6 +65,15 @@ private:
         VideoCleanup,
     };
 public:
+#if LIBVLC_VERSION_INT >= LIBVLC_VERSION(4, 0, 0, 0)
+    enum class DeinterlaceState : char
+    {
+        Auto     = -1,
+        Disabled =  0,
+        Enabled  =  1
+    };
+#endif
+
     /**
      * Check if 2 MediaPlayer objects contain the same libvlc_media_player_t.
      * \param another another MediaPlayer
@@ -1500,13 +1509,27 @@ public:
     /**
      * Enable or disable deinterlace filter
      *
-     * \param psz_mode  type of deinterlace filter, empty string to disable
+     * \version{2.x}
+     * \version{3.x}
+     * \param psz_mode  type of deinterlace filter, empty string to disable.
+     * \version{4.x}
+     * \param state     The required deinterlacing state.
+     * \param mode      The deinterlace mode, or empty string for the current
+     *                  or default filter.
      */
+#if LIBVLC_VERSION_INT >= LIBVLC_VERSION(4, 0, 0, 0)
+    void setDeinterlace(DeinterlaceState state, const std::string& mode)
+    {
+        libvlc_video_set_deinterlace(*this, static_cast<int>( state ),
+                                     mode.empty() ? NULL : mode.c_str());
+    }
+#else
     void setDeinterlace(const std::string& mode)
     {
         libvlc_video_set_deinterlace(*this,
                                      mode.empty() ? NULL : mode.c_str());
     }
+#endif
 
     /**
      * Get an integer marquee option value
