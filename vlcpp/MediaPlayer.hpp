@@ -66,7 +66,7 @@ private:
     };
 public:
 #if LIBVLC_VERSION_INT >= LIBVLC_VERSION(4, 0, 0, 0)
-    enum class DeinterlaceState : char
+    enum class DeinterlaceState : signed char
     {
         Auto     = -1,
         Disabled =  0,
