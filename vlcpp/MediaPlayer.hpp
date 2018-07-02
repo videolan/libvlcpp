@@ -322,12 +322,23 @@ public:
      * Set the movie time (in ms). This has no effect if no media is being
      * played. Not all formats and protocols support this.
      *
+     * \version{2.x}
+     * \version{3.x}
      * \param i_time  the movie time (in ms).
+     * \version{4.x}
+     * \param b_fast  prefer fast seeking or precise seeking
      */
+#if LIBVLC_VERSION_INT >= LIBVLC_VERSION(4, 0, 0, 0)
+    void setTime(libvlc_time_t i_time, bool b_fast)
+    {
+        libvlc_media_player_set_time(*this, i_time, b_fast);
+    }
+#else
     void setTime(libvlc_time_t i_time)
     {
         libvlc_media_player_set_time(*this, i_time);
     }
+#endif
 
     /**
      * Get movie position as percentage between 0.0 and 1.0.
@@ -344,12 +355,23 @@ public:
      * effect if playback is not enabled. This might not work depending on
      * the underlying input format and protocol.
      *
+     * \version{2.x}
+     * \version{3.x}
      * \param f_pos  the position
+     * \version{4.x}
+     * \param b_fast prefer fast seeking or precise seeking
      */
+#if LIBVLC_VERSION_INT >= LIBVLC_VERSION(4, 0, 0, 0)
+    void setPosition(float f_pos, bool b_fast)
+    {
+        libvlc_media_player_set_position(*this, f_pos, b_fast);
+    }
+#else
     void setPosition(float f_pos)
     {
         libvlc_media_player_set_position(*this, f_pos);
     }
+#endif
 
     /**
      * Set movie chapter (if applicable).
