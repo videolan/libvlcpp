@@ -18,6 +18,7 @@ libvlcpp_HEADERS =          \
 	vlcpp/MediaPlayer.hpp         \
 	vlcpp/Dialog.hpp			  \
 	vlcpp/RendererDiscoverer.hpp  \
+	vlcpp/Picture.hpp			  \
 	vlcpp/structures.hpp          \
 	vlcpp/vlc.hpp                 \
 	$(NULL)

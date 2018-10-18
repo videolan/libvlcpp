@@ -28,6 +28,7 @@
 #include "Equalizer.hpp"
 #include "MediaListPlayer.hpp"
 #include "MediaDiscoverer.hpp"
+#include "Picture.hpp"
 #include "Media.hpp"
 #include "MediaList.hpp"
 #include "RendererDiscoverer.hpp"
