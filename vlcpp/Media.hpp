@@ -743,6 +743,48 @@ public:
         return res;
     }
 #endif
+#if LIBVLC_VERSION_INT >= LIBVLC_VERSION(4, 0, 0, 0)
+    using ThumbnailRequest = libvlc_media_thumbnail_request_t;
+
+    enum class ThumbnailSeekSpeed
+    {
+        Precise = libvlc_media_thumbnail_seek_precise,
+        Fast = libvlc_media_thumbnail_seek_fast,
+    };
+
+    ThumbnailRequest* thumbnailRequestByTime( libvlc_time_t time, ThumbnailSeekSpeed speed,
+                                              uint32_t width, uint32_t height,
+                                              Picture::Type type, libvlc_time_t timeout )
+    {
+        return libvlc_media_thumbnail_request_by_time( *this, time,
+                    static_cast<libvlc_thumbnailer_seek_speed>( speed ), width,
+                    height, static_cast<libvlc_picture_type_t>( type ), timeout );
+    }
+
+    ThumbnailRequest* thumbnailRequestByPos( float pos, ThumbnailSeekSpeed speed,
+                                             uint32_t width, uint32_t height,
+                                             Picture::Type type, libvlc_time_t timeout )
+    {
+        return libvlc_media_thumbnail_request_by_pos( *this, pos,
+                    static_cast<libvlc_thumbnailer_seek_speed>( speed ), width,
+                    height, static_cast<libvlc_picture_type_t>( type ), timeout );
+    }
+
+    /**
+     * @brief thumbnailCancel cancels a thumbnailing request
+     * @param request An opaque thumbnail request object.
+     *
+     * Cancelling the request will still cause onThumbnailGenerated callback
+     * to be invoked, with nullptr as the picture instance.
+     * If the request is cancelled after its completion, the behavior is undefined.
+     */
+    void thumbnailCancel( ThumbnailRequest* request )
+    {
+        libvlc_media_thumbnail_cancel( request );
+    }
+
+#endif
+
 
 private:
 

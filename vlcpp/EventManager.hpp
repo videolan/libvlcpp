@@ -371,6 +371,34 @@ class MediaEventManager : public EventManager
                 (*callback)( media != nullptr ? std::make_shared<Media>( media, true ) : nullptr );
             });
         }
+
+#if LIBVLC_VERSION_INT >= LIBVLC_VERSION(4, 0, 0, 0)
+        /**
+         * \brief onThumbnailGenerated is invoked upon success & failure of a thumbnail generation
+         * \param A std::function<void(const Picture*)> (or an equivalent Callable type)
+         *        The provided picture will be null if the thumbnail generation failed.
+         *        In case of success, the thumbnail is only valid for the duration
+         *        of the callback, but can be safely copied if needed.
+         */
+        template <typename Func>
+        RegisteredEvent onThumbnailGenerated( Func&& f)
+        {
+            EXPECT_SIGNATURE(void(const Picture*));
+            return handle(libvlc_MediaThumbnailGenerated, std::forward<Func>( f ), [](const libvlc_event_t* e, void* data)
+            {
+                auto callback = static_cast<DecayPtr<Func>>(data);
+                auto pic = e->u.media_thumbnail_generated.p_thumbnail;
+                if ( pic != nullptr )
+                {
+                    Picture p{ pic };
+                    (*callback)( &p );
+                }
+                else
+                    (*callback)( nullptr );
+            });
+        }
+#endif
+
 };
 
 /**
