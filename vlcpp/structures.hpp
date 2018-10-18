@@ -693,7 +693,7 @@ public:
     }
 };
 
-class RendererDiscovererDescription 
+class RendererDiscovererDescription
 {
 public:
     explicit RendererDiscovererDescription( const libvlc_rd_description_t* d )
