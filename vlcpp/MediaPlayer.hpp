@@ -107,7 +107,7 @@ public:
     {
     }
 
-/**
+    /**
      * Create an empty VLC MediaPlayer instance.
      *
      * Calling any method on such an instance is undefined.
