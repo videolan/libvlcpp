@@ -29,6 +29,7 @@ using ssize_t = long int;
 #endif
 
 #include <vlc/vlc.h>
+#include <vlc/libvlc_version.h>
 #include <array>
 #include <cassert>
 #include <memory>

@@ -27,7 +27,7 @@
 #include <string>
 
 #include "common.hpp"
-#include <vlc/libvlc_version.h>
+#include "Picture.hpp"
 
 //FIXME:
 //Should we make the constructors private again and implement our own vector allocator?
