@@ -757,7 +757,7 @@ public:
                                               Picture::Type type, libvlc_time_t timeout )
     {
         return libvlc_media_thumbnail_request_by_time( *this, time,
-                    static_cast<libvlc_thumbnailer_seek_speed>( speed ), width,
+                    static_cast<libvlc_thumbnailer_seek_speed_t>( speed ), width,
                     height, static_cast<libvlc_picture_type_t>( type ), timeout );
     }
 
@@ -766,7 +766,7 @@ public:
                                              Picture::Type type, libvlc_time_t timeout )
     {
         return libvlc_media_thumbnail_request_by_pos( *this, pos,
-                    static_cast<libvlc_thumbnailer_seek_speed>( speed ), width,
+                    static_cast<libvlc_thumbnailer_seek_speed_t>( speed ), width,
                     height, static_cast<libvlc_picture_type_t>( type ), timeout );
     }
 
