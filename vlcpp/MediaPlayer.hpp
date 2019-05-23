@@ -192,6 +192,15 @@ public:
         libvlc_media_player_pause(*this);
     }
 
+#if LIBVLC_VERSION_INT >= LIBVLC_VERSION(4, 0, 0, 0)
+    /**
+     * @brief stop Stop the playback (no effect if there is no media)
+     */
+    void stopAsync()
+    {
+        libvlc_media_player_stop_async(*this);
+    }
+#else
     /**
      * @brief stop Stop the playback (no effect if there is no media)
      *
@@ -203,6 +212,7 @@ public:
     {
         libvlc_media_player_stop(*this);
     }
+#endif
 
     /**
      * Set the NSView handler where the media player should render its video

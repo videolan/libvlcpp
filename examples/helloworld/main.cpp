@@ -14,5 +14,9 @@ int main(int ac, char** av)
     auto mp = VLC::MediaPlayer(media);
     mp.play();
     std::this_thread::sleep_for( std::chrono::seconds( 10 ) );
+#if LIBVLC_VERSION_INT >= LIBVLC_VERSION(4, 0, 0, 0)
+    mp.stopAsync();
+#else
     mp.stop();
+#endif
 }

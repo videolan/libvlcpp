@@ -139,7 +139,11 @@ int main(int ac, char** av)
         // expect a single call since both media player share the same event manager
         expected = false;
     });
+#if LIBVLC_VERSION_INT >= LIBVLC_VERSION(4, 0, 0, 0)
+    mp.stopAsync();
+#else
     mp.stop();
+#endif
     // Unregister the RegisteredEvent from the other MP's event manager.
     // It will be unregistered from both, and when the object gets destroyed
     // by leaving the scope, it won't be unregistered from mp2's eventManager.

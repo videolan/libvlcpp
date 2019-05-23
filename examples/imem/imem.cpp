@@ -78,8 +78,13 @@ int main(int ac, char**av)
 
     std::this_thread::sleep_for( std::chrono::seconds( 10 ) );
 
+#if LIBVLC_VERSION_INT >= LIBVLC_VERSION(4, 0, 0, 0)
+    mp.stopAsync();
+    mp2.stopAsync();
+#else
     mp.stop();
     mp2.stop();
+#endif
 
     delete dummyOpaque;
     fclose(opaque2->file);
