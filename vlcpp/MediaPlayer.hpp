@@ -413,6 +413,7 @@ public:
         return libvlc_media_player_get_chapter_count(*this);
     }
 
+#if LIBVLC_VERSION_INT < LIBVLC_VERSION(4, 0, 0, 0)
     /**
      * Is the player able to play
      *
@@ -422,6 +423,7 @@ public:
     {
         return libvlc_media_player_will_play(*this) != 0;
     }
+#endif
 
     /**
      * Get title chapter count
