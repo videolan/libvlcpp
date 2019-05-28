@@ -55,7 +55,7 @@ namespace VLC
 
     inline std::unique_ptr<char, void (*)(void*)> wrapCStr(char* str)
     {
-        return std::unique_ptr<char, void(*)(void*)>( str, [](void* ptr) { libvlc_free(ptr); } );
+        return std::unique_ptr<char, decltype(&libvlc_free)>( str, &libvlc_free );
     }
 
 #if !defined(_MSC_VER)
