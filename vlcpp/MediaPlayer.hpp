@@ -1577,6 +1577,7 @@ public:
         return libvlc_video_get_marquee_int(*this, option);
     }
 
+#if LIBVLC_VERSION_INT < LIBVLC_VERSION(4, 0, 0, 0)
     /**
      * Get a string marquee option value
      *
@@ -1591,6 +1592,7 @@ public:
             return {};
         return str.get();
     }
+#endif
 
     /**
      * Enable, disable or set an integer marquee option
