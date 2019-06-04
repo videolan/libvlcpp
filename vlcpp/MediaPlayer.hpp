@@ -1434,6 +1434,80 @@ public:
     }
 #endif
 
+#if LIBVLC_VERSION_INT >= LIBVLC_VERSION(4, 0, 0, 0)
+    /**
+     * Set/unset the video crop ratio.
+     *
+     * This function forces a crop ratio on any and all video tracks rendered by
+     * the media player. If the display aspect ratio of a video does not match the
+     * crop ratio, either the top and bottom, or the left and right of the video
+     * will be cut out to fit the crop ratio.
+     *
+     * For instance, a ratio of 1:1 will force the video to a square shape.
+     *
+     * To disable video crop, set a crop ratio with zero as denominator.
+     *
+     * A call to this function overrides any previous call to any of
+     * setCropRatio(), setCropBorder() and/or setCropWindow().
+     *
+     * \see setAspectRatio()
+     *
+     * \param num crop ratio numerator (ignored if denominator is 0)
+     * \param den crop ratio denominator (or 0 to unset the crop ratio)
+     *
+     * \version LibVLC 4.0.0 and later
+     */
+    void setCropRatio( uint32_t num, uint32_t den )
+    {
+        libvlc_video_set_crop_ratio( *this, num, den );
+    }
+
+    /**
+     * Set the video crop window.
+     *
+     * This function selects a sub-rectangle of video to show. Any pixels outsid
+     * the rectangle will not be shown.
+     *
+     * To unset the video crop window, use setCropRatio() or
+     * setCropBorder().
+     *
+     * A call to this function overrides any previous call to any of
+     * setCropRatio(), setCropBorder() and/or setCropWindow().
+     *
+     * \param x abscissa (i.e. leftmost sample column offset) of the crop window
+     * \param y ordinate (i.e. topmost sample row offset) of the crop window
+     * \param width sample width of the crop window (cannot be zero)
+     * \param height sample height of the crop window (cannot be zero)
+     *
+     * \version LibVLC 4.0.0 and later
+     */
+    void setCropWindow( uint32_t x, uint32_t y, uint32_t width, uint32_t height )
+    {
+        libvlc_video_set_crop_window( *this, x, y, width, height );
+    }
+
+    /**
+     * Set the video crop borders.
+     *
+     * This function selects the size of video edges to be cropped out.
+     *
+     * To unset the video crop borders, set all borders to zero.
+     *
+     * A call to this function overrides any previous call to any of
+     * setCropRatio(), setCropBorder() and/or setCropWindow().
+     *
+     * \param left number of sample columns to crop on the left
+     * \param right number of sample columns to crop on the right
+     * \param top number of sample rows to crop on the top
+     * \param bottom number of sample rows to corp on the bottom
+     *
+     * \version LibVLC 4.0.0 and later
+     */
+    void setCropBorder( uint32_t left, uint32_t right, uint32_t top, uint32_t bottom )
+    {
+        libvlc_video_set_crop_border( *this, left, right, top, bottom );
+    }
+#else
     /**
      * Get current crop filter geometry.
      *
@@ -1456,6 +1530,7 @@ public:
     {
         libvlc_video_set_crop_geometry( *this, geometry.size() > 0 ? geometry.c_str() : nullptr );
     }
+#endif
 
     /**
      * Get current teletext page requested.
