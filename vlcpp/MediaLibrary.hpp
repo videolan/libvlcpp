@@ -25,6 +25,9 @@
 #define LIBVLC_CXX_MEDIALIBRARY_H
 
 #include "common.hpp"
+
+#if LIBVLC_VERSION_INT < LIBVLC_VERSION(4, 0, 0, 0)
+
 #include "Internal.hpp"
 
 namespace VLC
@@ -74,3 +77,4 @@ public:
 
 #endif
 
+#endif

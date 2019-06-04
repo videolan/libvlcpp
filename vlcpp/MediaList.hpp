@@ -73,6 +73,7 @@ public:
     {
     }
 
+#if LIBVLC_VERSION_INT < LIBVLC_VERSION(4, 0, 0, 0)
     /**
      * Get media library subitems.
      *
@@ -82,6 +83,7 @@ public:
         : Internal{ libvlc_media_library_media_list( getInternalPtr<libvlc_media_library_t>( mlib ) ), libvlc_media_list_release }
     {
     }
+#endif
 
 
     /**
