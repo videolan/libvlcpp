@@ -236,7 +236,7 @@ public:
         if ( m_eventManager == nullptr )
         {
             libvlc_event_manager_t* obj = libvlc_media_list_event_manager( *this );
-            m_eventManager = std::make_shared<MediaListEventManager>( obj );
+            m_eventManager = std::make_shared<MediaListEventManager>( obj, *this );
         }
         return *m_eventManager;
     }

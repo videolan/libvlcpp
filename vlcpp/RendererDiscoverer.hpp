@@ -95,7 +95,7 @@ public:
         if ( m_eventManager == nullptr )
         {
             libvlc_event_manager_t* obj = libvlc_renderer_discoverer_event_manager( *this );
-            m_eventManager = std::make_shared<RendererDiscovererEventManager>( obj );
+            m_eventManager = std::make_shared<RendererDiscovererEventManager>( obj, *this );
         }
         return *m_eventManager;
     }

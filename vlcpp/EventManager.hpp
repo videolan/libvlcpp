@@ -243,8 +243,25 @@ protected:
  */
 class MediaEventManager : public EventManager
 {
+    private:
+        // Hold on to the object firing events. Otherwise, when copying/move
+        // assigning over its object, the Internal parent class would be copied/moved
+        // first, and only then would the event manager be copied/moved.
+        // This can cause the last instance of the object to be released, and
+        // then used by the event manager as it unregisters its callbacks.
+        Media m_media;
+
     public:
-        MediaEventManager(InternalPtr ptr) : EventManager( ptr ) {}
+        MediaEventManager(InternalPtr ptr, Media m)
+            : EventManager( ptr )
+            , m_media( std::move( m ) )
+        {
+        }
+        ~MediaEventManager()
+        {
+            // Clear the events as long as the underlying VLC object is alive
+            m_lambdas.clear();
+        }
 
         /**
          * @brief onMetaChanged Registers an event called when a Media meta changes
@@ -406,8 +423,18 @@ class MediaEventManager : public EventManager
  */
 class MediaPlayerEventManager : public EventManager
 {
+    private:
+        MediaPlayer m_mp;
     public:
-        MediaPlayerEventManager(InternalPtr ptr) : EventManager( ptr ) {}
+        MediaPlayerEventManager(InternalPtr ptr, MediaPlayer mp)
+            : EventManager( ptr )
+            , m_mp( std::move( mp ) )
+        {
+        }
+        ~MediaPlayerEventManager()
+        {
+            m_lambdas.clear();
+        }
 
         /**
          * \brief onMediaChanged Registers an event called when the played media changes
@@ -820,8 +847,18 @@ class MediaPlayerEventManager : public EventManager
  */
 class MediaListEventManager : public EventManager
 {
+    private:
+        MediaList m_ml;
     public:
-        MediaListEventManager(InternalPtr ptr) : EventManager( ptr ) {}
+        MediaListEventManager(InternalPtr ptr, MediaList ml)
+            : EventManager( ptr )
+            , m_ml( std::move( ml ) )
+        {
+        }
+        ~MediaListEventManager()
+        {
+            m_lambdas.clear();
+        }
 
         /**
          * \brief onItemAdded Registers an event called when an item gets added to the media list
@@ -914,8 +951,18 @@ class MediaListEventManager : public EventManager
  */
 class MediaListPlayerEventManager : public EventManager
 {
+    private:
+        MediaListPlayer m_mlp;
     public:
-        MediaListPlayerEventManager(InternalPtr ptr) : EventManager( ptr ) {}
+        MediaListPlayerEventManager(InternalPtr ptr, MediaListPlayer mlp)
+            : EventManager( ptr )
+            , m_mlp( std::move( mlp ) )
+        {
+        }
+        ~MediaListPlayerEventManager()
+        {
+            m_lambdas.clear();
+        }
 
         template <typename Func>
         RegisteredEvent onPlayed(Func&& f)
@@ -981,8 +1028,18 @@ class MediaDiscovererEventManager : public EventManager
 */
 class RendererDiscovererEventManager : public EventManager
 {
+private:
+    RendererDiscoverer m_rd;
 public:
-    RendererDiscovererEventManager( InternalPtr ptr ) : EventManager(ptr) {}
+    RendererDiscovererEventManager( InternalPtr ptr, RendererDiscoverer rd )
+        : EventManager(ptr)
+        , m_rd( std::move( rd ) )
+    {
+    }
+    ~RendererDiscovererEventManager()
+    {
+        m_lambdas.clear();
+    }
 
     template <typename Func>
     RegisteredEvent onItemAdded( Func&& f )

@@ -157,4 +157,6 @@ int main(int ac, char** av)
         std::cout << f.name() << std::endl;
     }
     free(imgBuffer);
+    // Check that we don't use the old media player when releasing its event manager
+    mp = VLC::MediaPlayer{};
 }
