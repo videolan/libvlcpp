@@ -753,21 +753,21 @@ public:
     };
 
     ThumbnailRequest* thumbnailRequestByTime( libvlc_time_t time, ThumbnailSeekSpeed speed,
-                                              uint32_t width, uint32_t height,
+                                              uint32_t width, uint32_t height, bool crop,
                                               Picture::Type type, libvlc_time_t timeout )
     {
         return libvlc_media_thumbnail_request_by_time( *this, time,
                     static_cast<libvlc_thumbnailer_seek_speed_t>( speed ), width,
-                    height, static_cast<libvlc_picture_type_t>( type ), timeout );
+                    height, crop, static_cast<libvlc_picture_type_t>( type ), timeout );
     }
 
     ThumbnailRequest* thumbnailRequestByPos( float pos, ThumbnailSeekSpeed speed,
-                                             uint32_t width, uint32_t height,
+                                             uint32_t width, uint32_t height, bool crop,
                                              Picture::Type type, libvlc_time_t timeout )
     {
         return libvlc_media_thumbnail_request_by_pos( *this, pos,
                     static_cast<libvlc_thumbnailer_seek_speed_t>( speed ), width,
-                    height, static_cast<libvlc_picture_type_t>( type ), timeout );
+                    height, crop, static_cast<libvlc_picture_type_t>( type ), timeout );
     }
 
     /**
