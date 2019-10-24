@@ -778,14 +778,14 @@ public:
      * to be invoked, with nullptr as the picture instance.
      * If the request is cancelled after its completion, the behavior is undefined.
      */
-    void thumbnailCancel( ThumbnailRequest* request )
+    void thumbnailRequestCancel( ThumbnailRequest* request )
     {
-        libvlc_media_thumbnail_cancel( request );
+        libvlc_media_thumbnail_request_cancel( request );
     }
 
-    void thumbnailDestroy( ThumbnailRequest* request )
+    void thumbnailRequestDestroy( ThumbnailRequest* request )
     {
-        libvlc_media_thumbnail_destroy( request );
+        libvlc_media_thumbnail_request_destroy( request );
     }
 
 #endif
