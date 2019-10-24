@@ -783,6 +783,11 @@ public:
         libvlc_media_thumbnail_cancel( request );
     }
 
+    void thumbnailDestroy( ThumbnailRequest* request )
+    {
+        libvlc_media_thumbnail_destroy( request );
+    }
+
 #endif
 
 
