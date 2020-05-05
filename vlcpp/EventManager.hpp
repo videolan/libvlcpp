@@ -612,6 +612,35 @@ class MediaPlayerEventManager : public EventManager
             });
         }
 
+#if LIBVLC_VERSION_INT >= LIBVLC_VERSION(4, 0, 0, 0)
+        /**
+         * \brief onTitleListChanged Registers an event called when the list of titles changes
+         * \param f A std::function<void(void)> (or an equivalent Callable type)
+         *
+         * The updated list can be obtained by calling MediaPlayer::titleDescription()
+         */
+        template <typename Func>
+        RegisteredEvent onTitleListChanged( Func&& f )
+        {
+            return handle( libvlc_MediaPlayerTitleListChanged, std::forward<Func>( f ) );
+        }
+
+        /**
+         * \brief onTitleSelectionChanged Registers an event called when the title selection changes
+         * \param f A std::function<void(const TitleDescription&, int)> (or an equivalent callable type)
+         */
+        template <typename Func>
+        RegisteredEvent onTitleSelectionChanged( Func&& f )
+        {
+            EXPECT_SIGNATURE(void(const TitleDescription&, int));
+            return handle( libvlc_MediaPlayerTitleSelectionChanged, std::forward<Func>( f ), [](const libvlc_event_t* e, void* data)
+            {
+                auto callback = static_cast<DecayPtr<Func>>( data );
+                (*callback)( TitleDescription{ e->u.media_player_title_selection_changed.title },
+                             e->u.media_player_title_selection_changed.index );
+            });
+        }
+#else
         /**
          * \brief onTitleChanged Registers an event called when the current title changes
          * \param f A std::function<void(int)> (or an equivalent Callable type)
@@ -629,6 +658,7 @@ class MediaPlayerEventManager : public EventManager
                 (*callback)( e->u.media_player_title_changed.new_title );
             });
         }
+#endif
 
 #if LIBVLC_VERSION_INT >= LIBVLC_VERSION(3, 0, 0, 0)
         /**
