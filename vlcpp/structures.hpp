@@ -341,6 +341,28 @@ public:
     }
 #endif
 
+#if LIBVLC_VERSION_INT >= LIBVLC_VERSION(3, 0, 0, 0)
+    const std::string& idStr() const
+    {
+        return m_idStr;
+    }
+
+    bool idStable() const
+    {
+        return m_idStable;
+    }
+
+    const std::string& name() const
+    {
+        return m_name;
+    }
+
+    bool selected() const
+    {
+        return m_selected;
+    }
+#endif
+
     ////////////////////////////////////////////////////////////////////////////
     // Subtitles specific
     ////////////////////////////////////////////////////////////////////////////
@@ -360,11 +382,19 @@ public:
         , m_profile( c->i_profile )
         , m_level( c->i_level )
         , m_bitrate( c->i_bitrate )
+#if LIBVLC_VERSION_INT >= LIBVLC_VERSION(4, 0, 0, 0)
+        , m_idStable( c->id_stable )
+        , m_selected( c->selected )
+#endif
     {
         if ( c->psz_language != NULL )
             m_language = c->psz_language;
         if ( c->psz_description != NULL )
             m_description = c->psz_description;
+        if ( c->psz_id != nullptr )
+            m_idStr = c->psz_id;
+        if ( c->psz_name )
+            m_name = c->psz_name;
         switch ( c->i_type )
         {
             case libvlc_track_audio:
@@ -420,6 +450,12 @@ private:
 #if LIBVLC_VERSION_INT >= LIBVLC_VERSION(3, 0, 0, 0)
     Orientation m_orientation;
     Projection m_projection;
+#endif
+#if LIBVLC_VERSION_INT >= LIBVLC_VERSION(4, 0, 0, 0)
+    std::string m_idStr;
+    bool m_idStable;
+    std::string m_name;
+    bool m_selected;
 #endif
     // Subtitles
     std::string m_encoding;
