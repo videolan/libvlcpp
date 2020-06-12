@@ -35,6 +35,7 @@ namespace VLC
 class MediaEventManager;
 class Instance;
 class MediaList;
+class TrackList;
 
 class Media : protected CallbackOwner<4>, public Internal<libvlc_media_t>
 {
@@ -653,6 +654,15 @@ public:
      *
      * \return a vector containing all tracks
      */
+#if LIBVLC_VERSION_INT >= LIBVLC_VERSION(4, 0, 0, 0)
+    std::shared_ptr<TrackList> tracks( libvlc_track_type_t type )
+    {
+        auto trackList = libvlc_media_get_tracklist( *this, type );
+        if ( trackList == nullptr )
+            return nullptr;
+        return std::make_shared<TrackList>( trackList );
+    }
+#elif #if LIBVLC_VERSION_INT >= LIBVLC_VERSION(3, 0, 0, 0)
     std::vector<MediaTrack> tracks()
     {
         libvlc_media_track_t**  tracks;
@@ -667,6 +677,7 @@ public:
         libvlc_media_tracks_release( tracks, nbTracks );
         return res;
     }
+#endif
 
     std::shared_ptr<MediaList> subitems()
     {
