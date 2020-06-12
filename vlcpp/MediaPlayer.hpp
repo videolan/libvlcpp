@@ -40,6 +40,7 @@ class Instance;
 class Media;
 class MediaPlayerEventManager;
 class TrackDescription;
+class TrackList;
 
 ///
 /// \brief The MediaPlayer class exposes libvlc_media_player_t functionnalities
@@ -1836,6 +1837,18 @@ public:
     void unsetRenderer()
     {
         libvlc_media_player_set_renderer( *this, nullptr );
+    }
+
+#endif
+
+#if LIBVLC_VERSION_INT >= LIBVLC_VERSION(3, 0, 0, 0)
+
+    std::shared_ptr<TrackList> tracks( libvlc_track_type_t type )
+    {
+        auto trackList = libvlc_media_player_get_tracklist( *this, type );
+        if ( trackList == nullptr )
+            return nullptr;
+        return std::make_shared<TrackList>( trackList );
     }
 
 #endif
