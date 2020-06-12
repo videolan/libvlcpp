@@ -75,13 +75,13 @@ public:
 
     explicit ModuleDescription( libvlc_module_description_t* c )
     {
-        if ( c->psz_name != NULL )
+        if ( c->psz_name != nullptr )
             m_name = c->psz_name;
-        if ( c->psz_shortname != NULL )
+        if ( c->psz_shortname != nullptr )
             m_shortname = c->psz_shortname;
-        if ( c->psz_longname != NULL )
+        if ( c->psz_longname != nullptr )
             m_longname = c->psz_longname;
-        if ( c->psz_help != NULL )
+        if ( c->psz_help != nullptr )
             m_help = c->psz_help;
     }
 
@@ -387,9 +387,9 @@ public:
         , m_selected( c->selected )
 #endif
     {
-        if ( c->psz_language != NULL )
+        if ( c->psz_language != nullptr )
             m_language = c->psz_language;
-        if ( c->psz_description != NULL )
+        if ( c->psz_description != nullptr )
             m_description = c->psz_description;
         if ( c->psz_id != nullptr )
             m_idStr = c->psz_id;
@@ -417,7 +417,7 @@ public:
                 break;
             case libvlc_track_text:
                 m_type = Subtitle;
-                if ( c->subtitle->psz_encoding != NULL )
+                if ( c->subtitle->psz_encoding != nullptr )
                     m_encoding = c->subtitle->psz_encoding;
                 break;
             case libvlc_track_unknown:
@@ -485,9 +485,9 @@ public:
 
     explicit AudioOutputDescription( libvlc_audio_output_t* c )
     {
-        if ( c->psz_name != NULL )
+        if ( c->psz_name != nullptr )
             m_name = c->psz_name;
-        if ( c->psz_description != NULL )
+        if ( c->psz_description != nullptr )
             m_description = c->psz_description;
     }
 
@@ -517,9 +517,9 @@ class AudioOutputDeviceDescription
 
         explicit AudioOutputDeviceDescription( libvlc_audio_output_device_t* d )
         {
-            if ( d->psz_device != NULL )
+            if ( d->psz_device != nullptr )
                 m_device = d->psz_device;
-            if ( d->psz_description != NULL )
+            if ( d->psz_description != nullptr )
                 m_device = d->psz_description;
         }
 
@@ -734,9 +734,9 @@ class RendererDiscovererDescription
 public:
     explicit RendererDiscovererDescription( const libvlc_rd_description_t* d )
     {
-        if (d->psz_name != NULL)
+        if (d->psz_name != nullptr)
             m_name = d->psz_name;
-        if (d->psz_longname != NULL)
+        if (d->psz_longname != nullptr)
             m_longName = d->psz_longname;
     }
 
