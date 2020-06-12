@@ -743,7 +743,79 @@ class MediaPlayerEventManager : public EventManager
             });
         }
 
-#if LIBVLC_VERSION_INT >= LIBVLC_VERSION(3, 0, 0, 0)
+#if LIBVLC_VERSION_INT >= LIBVLC_VERSION(4, 0, 0, 0)
+        /**
+         * \brief onESAdded Registers an event called when an elementary stream get added
+         * \param f A std::function<void(libvlc_track_type_t, int)> (or an equivalent Callable type)
+         *          libvlc_track_type_t: The new track type
+         *          int: the new track index
+         */
+        template <typename Func>
+        RegisteredEvent onESAdded( Func&& f )
+        {
+            //FIXME: Expose libvlc_track_type_t as an enum class
+            EXPECT_SIGNATURE(void(libvlc_track_type_t, const std::string&));
+            return handle( libvlc_MediaPlayerESAdded, std::forward<Func>( f ), [](const libvlc_event_t* e, void* data)
+            {
+                auto callback = static_cast<DecayPtr<Func>>( data );
+                (*callback)( e->u.media_player_es_changed.i_type,
+                             std::string{ e->u.media_player_es_changed.psz_id } );
+            });
+        }
+
+        /**
+         * \brief onESDeleted Registers an event called when an elementary stream get deleted
+         * \param f A std::function<void(libvlc_track_type_t, int)> (or an equivalent Callable type)
+         *          libvlc_track_type_t: The track type
+         *          int: the track index
+         */
+        template <typename Func>
+        RegisteredEvent onESDeleted( Func&& f )
+        {
+            EXPECT_SIGNATURE(void(libvlc_track_type_t, const std::string&));
+            return handle( libvlc_MediaPlayerESDeleted, std::forward<Func>( f ), [](const libvlc_event_t* e, void* data)
+            {
+                auto callback = static_cast<DecayPtr<Func>>( data );
+                (*callback)( e->u.media_player_es_changed.i_type,
+                             std::string{ e->u.media_player_es_changed.psz_id } );
+            });
+        }
+
+        /**
+         * \brief onESSelected Registers an event called when an elementary stream get selected
+         * \param f A std::function<void(libvlc_track_type_t, int)> (or an equivalent Callable type)
+         *          libvlc_track_type_t: The track type
+         *          int: the track index
+         */
+        template <typename Func>
+        RegisteredEvent onESSelected( Func&& f )
+        {
+            EXPECT_SIGNATURE(void(libvlc_track_type_t, const std::string&, const std::string&));
+            return handle( libvlc_MediaPlayerESSelected, std::forward<Func>( f ), [](const libvlc_event_t* e, void* data)
+            {
+                auto callback = static_cast<DecayPtr<Func>>( data );
+                (*callback)( e->u.media_player_es_changed.i_type,
+                             std::string{ e->u.media_player_es_selection_changed.psz_selected_id },
+                             std::string{ e->u.media_player_es_selection_changed.psz_unselected_id } );
+            });
+        }
+
+        /**
+         * \brief onAudioDevice Registers an event called when the current audio output device changes
+         * \param f A std::function<void(std::string)> (or an equivalent Callable type)
+         *          The provided string is the new current audio device.
+         */
+        template <typename Func>
+        RegisteredEvent onAudioDevice( Func&& f )
+        {
+            EXPECT_SIGNATURE(void(std::string));
+            return handle( libvlc_MediaPlayerAudioDevice, std::forward<Func>( f ), [](const libvlc_event_t* e, void* data)
+            {
+                auto callback = static_cast<DecayPtr<Func>>( data );
+                (*callback)( e->u.media_player_audio_device.device );
+            });
+        }
+#elif LIBVLC_VERSION_INT >= LIBVLC_VERSION(3, 0, 0, 0)
         /**
          * \brief onESAdded Registers an event called when an elementary stream get added
          * \param f A std::function<void(libvlc_track_type_t, int)> (or an equivalent Callable type)
