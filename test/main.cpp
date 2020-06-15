@@ -105,10 +105,12 @@ int main(int ac, char** av)
     auto lFunc = std::function<void(float)>{ l };
     auto h1 = mp.eventManager().onTimeChanged(lFunc);
     auto h2 = mp.eventManager().onPositionChanged(lFunc);
+#if LIBVLC_VERSION_INT >= LIBVLC_VERSION(4, 0, 0, 0)
     mp.eventManager().onTitleSelectionChanged(
                 [](const VLC::TitleDescription& t, int idx ) {
         std::cout << "New title selected: " << t.name() << " at index " << idx << std::endl;
     });
+#endif
 
     std::this_thread::sleep_for( std::chrono::seconds( 2 ) );
 

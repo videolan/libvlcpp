@@ -1841,7 +1841,7 @@ public:
 
 #endif
 
-#if LIBVLC_VERSION_INT >= LIBVLC_VERSION(3, 0, 0, 0)
+#if LIBVLC_VERSION_INT >= LIBVLC_VERSION(4, 0, 0, 0)
 
     std::shared_ptr<TrackList> tracks( libvlc_track_type_t type )
     {

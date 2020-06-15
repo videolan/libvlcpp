@@ -341,7 +341,7 @@ public:
     }
 #endif
 
-#if LIBVLC_VERSION_INT >= LIBVLC_VERSION(3, 0, 0, 0)
+#if LIBVLC_VERSION_INT >= LIBVLC_VERSION(4, 0, 0, 0)
     const std::string& idStr() const
     {
         return m_idStr;
@@ -391,10 +391,12 @@ public:
             m_language = c->psz_language;
         if ( c->psz_description != nullptr )
             m_description = c->psz_description;
+#if LIBVLC_VERSION_INT >= LIBVLC_VERSION(4, 0, 0, 0)
         if ( c->psz_id != nullptr )
             m_idStr = c->psz_id;
         if ( c->psz_name )
             m_name = c->psz_name;
+#endif
         switch ( c->i_type )
         {
             case libvlc_track_audio:

@@ -662,7 +662,7 @@ public:
             return nullptr;
         return std::make_shared<TrackList>( trackList );
     }
-#elif #if LIBVLC_VERSION_INT >= LIBVLC_VERSION(3, 0, 0, 0)
+#elif LIBVLC_VERSION_INT >= LIBVLC_VERSION(3, 0, 0, 0)
     std::vector<MediaTrack> tracks()
     {
         libvlc_media_track_t**  tracks;
