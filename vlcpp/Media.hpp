@@ -655,12 +655,19 @@ public:
      * \return a vector containing all tracks
      */
 #if LIBVLC_VERSION_INT >= LIBVLC_VERSION(4, 0, 0, 0)
-    std::shared_ptr<TrackList> tracks( libvlc_track_type_t type )
+    std::vector<MediaTrack> tracks( libvlc_track_type_t type )
     {
-        auto trackList = libvlc_media_get_tracklist( *this, type );
+        using TrackListPtr = std::unique_ptr<libvlc_media_tracklist_t,
+                                decltype(&libvlc_media_tracklist_delete)>;
+        TrackListPtr trackList{ libvlc_media_get_tracklist( *this, type ),
+                                &libvlc_media_tracklist_delete };
         if ( trackList == nullptr )
-            return nullptr;
-        return std::make_shared<TrackList>( trackList );
+            return {};
+        auto count = libvlc_media_tracklist_count( trackList.get() );
+        std::vector<MediaTrack> res{};
+        for ( auto i = 0u; i < count; ++i )
+            res.emplace_back( libvlc_media_tracklist_at( trackList.get(), i ) );
+        return res;
     }
 #elif LIBVLC_VERSION_INT >= LIBVLC_VERSION(3, 0, 0, 0)
     std::vector<MediaTrack> tracks()

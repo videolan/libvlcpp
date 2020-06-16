@@ -759,28 +759,5 @@ private:
 
 #endif
 
-#if LIBVLC_VERSION_INT >= LIBVLC_VERSION(4, 0, 0, 0)
-
-class TrackList : public Internal<libvlc_media_tracklist_t>
-{
-public:
-    explicit TrackList( libvlc_media_tracklist_t *trackList )
-        : Internal{ trackList, libvlc_media_tracklist_delete }
-    {
-    }
-
-    size_t count() const
-    {
-        return libvlc_media_tracklist_count( *this );
-    }
-
-    MediaTrack at( size_t index ) const
-    {
-        return MediaTrack{ libvlc_media_tracklist_at( *this, index ) };
-    }
-};
-
-#endif
-
 } // namespace VLC
 #endif
