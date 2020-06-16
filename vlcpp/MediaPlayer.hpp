@@ -1859,6 +1859,17 @@ public:
         return res;
     }
 
+    void selectTracks( MediaTrack::Type type, const std::vector<MediaTrack>& tracks )
+    {
+        std::vector<const libvlc_media_track_t*> ctracks{};
+        ctracks.reserve( tracks.size() );
+        for ( const auto& mt : tracks )
+            ctracks.push_back( mt.get() );
+        libvlc_media_player_select_tracks( *this,
+                                           static_cast<libvlc_track_type_t>( type ),
+                                           ctracks.data(),
+                                           ctracks.size() );
+    }
 #endif
 
 private:
