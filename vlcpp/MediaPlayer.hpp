@@ -1843,11 +1843,12 @@ public:
 
 #if LIBVLC_VERSION_INT >= LIBVLC_VERSION(4, 0, 0, 0)
 
-    std::vector<MediaTrack> tracks( libvlc_track_type_t type )
+    std::vector<MediaTrack> tracks( MediaTrack::Type type )
     {
         using TrackListPtr = std::unique_ptr<libvlc_media_tracklist_t,
                                 decltype(&libvlc_media_tracklist_delete)>;
-        TrackListPtr trackList{ libvlc_media_player_get_tracklist( *this, type ),
+        TrackListPtr trackList{ libvlc_media_player_get_tracklist( *this,
+                                    static_cast<libvlc_track_type_t>( type ) ),
                                 &libvlc_media_tracklist_delete };
         if ( trackList == nullptr )
             return {};

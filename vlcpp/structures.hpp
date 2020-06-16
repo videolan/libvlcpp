@@ -103,13 +103,13 @@ public:
     ///
     enum class Type
     {
-        Unknown = -1,
+        Unknown = libvlc_track_unknown,
         /// Audio track
-        Audio,
+        Audio = libvlc_track_audio,
         /// Video track
-        Video,
+        Video = libvlc_track_video,
         /// Subtitle track (also called SPU sometimes)
-        Subtitle
+        Subtitle = libvlc_track_text,
     };
 
     ///
