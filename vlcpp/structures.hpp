@@ -930,7 +930,7 @@ private:
 ///
 /// \brief C++ Type wrapper for libvlc_media_slave_t
 ///
-class MediaSlave : private libvlc_media_slave_t
+class MediaSlave
 {
 public:
     ///
@@ -942,26 +942,33 @@ public:
         Audio = libvlc_media_slave_type_audio
     };
 
-    MediaSlave(libvlc_media_slave_t *other) :
-        libvlc_media_slave_t(*other)
+    MediaSlave( libvlc_media_slave_t *m )
+      : m_type( static_cast<Type>( m->i_type ) )
+      , m_priority( m->i_priority )
+      , m_uri( m->psz_uri )
     {
     }
 
 public:
     Type type() const
     {
-        return (Type)i_type;
+        return m_type;
     }
 
     unsigned priority() const
     {
-        return i_priority;
+        return m_priority;
     }
 
-    std::string uri() const
+    const std::string& uri() const
     {
-        return psz_uri;
+        return m_uri;
     }
+
+private:
+    Type m_type;
+    unsigned int m_priority;
+    std::string m_uri;
 };
 
 
