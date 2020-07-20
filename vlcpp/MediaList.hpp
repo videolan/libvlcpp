@@ -85,18 +85,6 @@ public:
     }
 #endif
 
-
-    /**
-     * Create an empty media list.
-     *
-     * \param p_instance  libvlc instance
-     */
-    MediaList(Instance& instance)
-        : Internal{ libvlc_media_list_new( getInternalPtr<libvlc_instance_t>( instance ) ),
-                                           libvlc_media_list_release }
-    {
-    }
-
     MediaList( Internal::InternalPtr mediaList )
         : Internal{ mediaList, libvlc_media_list_release }
     {
