@@ -1876,6 +1876,18 @@ public:
                                            ctracks.data(),
                                            ctracks.size() );
     }
+
+    void selectTrack( const MediaTrack& track )
+    {
+        libvlc_media_player_select_track( *this, track );
+    }
+
+    void unselectTrackType( MediaTrack::Type type )
+    {
+        libvlc_media_player_unselect_track_type( *this,
+                                    static_cast<libvlc_track_type_t>( type ) );
+    }
+
 #endif
 
 #if LIBVLC_VERSION_INT < LIBVLC_VERSION(4, 0, 0, 0)
