@@ -967,6 +967,7 @@ public:
         return libvlc_audio_set_volume(*this, i_volume) == 0;
     }
 
+#if LIBVLC_VERSION_INT < LIBVLC_VERSION(4, 0, 0, 0)
     /**
      * Get number of available audio tracks.
      *
@@ -1008,6 +1009,7 @@ public:
     {
         return libvlc_audio_set_track(*this, i_track) == 0;
     }
+#endif
 
     /**
      * Get current audio channel.
@@ -1276,6 +1278,7 @@ public:
         libvlc_video_set_aspect_ratio( *this, ar.size() > 0 ? ar.c_str() : nullptr );
     }
 
+#if LIBVLC_VERSION_INT < LIBVLC_VERSION(4, 0, 0, 0)
     /**
      * Get current video subtitle.
      *
@@ -1319,6 +1322,7 @@ public:
     {
         return libvlc_video_set_spu(*this, i_spu);
     }
+#endif
 
 #if LIBVLC_VERSION_INT < LIBVLC_VERSION(3, 0, 0, 0)
     /**
@@ -1553,6 +1557,7 @@ public:
         libvlc_video_set_teletext(*this, i_page);
     }
 
+#if LIBVLC_VERSION_INT < LIBVLC_VERSION(4, 0, 0, 0)
     /**
      * Get number of available video tracks.
      *
@@ -1595,6 +1600,7 @@ public:
     {
         return libvlc_video_set_track(*this, i_track);
     }
+#endif
 
     /**
      * Take a snapshot of the current video window.
@@ -1872,6 +1878,8 @@ public:
     }
 #endif
 
+#if LIBVLC_VERSION_INT < LIBVLC_VERSION(4, 0, 0, 0)
+
 private:
     std::vector<TrackDescription> getTracksDescription( libvlc_track_description_t* tracks ) const
     {
@@ -1888,6 +1896,7 @@ private:
         }
         return result;
     }
+#endif
 
 private:
     std::shared_ptr<MediaPlayerEventManager> m_eventManager;
