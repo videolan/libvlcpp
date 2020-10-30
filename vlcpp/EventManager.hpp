@@ -727,6 +727,7 @@ class MediaPlayerEventManager : public EventManager
             });
         }
 
+#if LIBVLC_VERSION_INT < LIBVLC_VERSION(4, 0, 0, 0)
         /**
          * \brief onScrambledChanged Registers an event called when the scrambled state changes
          * \param f A std::function<void(bool)> (or an equivalent Callable type)
@@ -742,6 +743,7 @@ class MediaPlayerEventManager : public EventManager
                 (*callback)( e->u.media_player_scrambled_changed.new_scrambled != 0 );
             });
         }
+#endif
 
 #if LIBVLC_VERSION_INT >= LIBVLC_VERSION(4, 0, 0, 0)
         /**
