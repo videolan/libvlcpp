@@ -414,6 +414,23 @@ class MediaEventManager : public EventManager
                     (*callback)( nullptr );
             });
         }
+
+        template <typename Func>
+        RegisteredEvent onAttachedThumbnailsFound( Func&& f )
+        {
+            EXPECT_SIGNATURE(void( const std::vector<Picture>& ) );
+            return handle(libvlc_MediaAttachedThumbnailsFound, std::forward<Func>( f ),
+                          []( const libvlc_event_t* e, void* data ) {
+                auto callback = static_cast<DecayPtr<Func>>(data);
+                std::vector<Picture> pictures;
+                auto picList = e->u.media_attached_thumbnails_found.thumbnails;
+                auto nbPictures = libvlc_picture_list_count( picList );
+                pictures.reserve( nbPictures );
+                for ( auto i = 0u; i < nbPictures; ++i )
+                    pictures.emplace_back( libvlc_picture_list_at( picList, i ) );
+                (*callback)( pictures );
+            });
+        }
 #endif
 
 };
