@@ -1,6 +1,6 @@
 variables:
   VLC30_IMAGE: registry.videolan.org/medialibrary:20201009131431
-  VLC40_IMAGE: registry.videolan.org/libvlcpp-unstable:20201106140307
+  VLC40_IMAGE: registry.videolan.org/libvlcpp-unstable:20201119105540
 
 .common_build:
   rules:
