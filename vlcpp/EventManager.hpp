@@ -334,6 +334,7 @@ class MediaEventManager : public EventManager
 #endif
         }
 
+#if LIBVLC_VERSION_INT < LIBVLC_VERSION(4, 0, 0, 0)
         /**
          * \brief onFreed Registers an event called when the media reaches a refcount of 0
          * \param f A std::function<void(MediaPtr)> (or an equivalent Callable type)
@@ -354,6 +355,7 @@ class MediaEventManager : public EventManager
                 (*callback)( media != nullptr ? std::make_shared<Media>( media, true ) : nullptr );
             });
         }
+#endif
 
         /**
          * \brief onStateChanged Registers an event called when the Media state changes
