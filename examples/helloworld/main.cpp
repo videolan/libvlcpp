@@ -19,4 +19,5 @@ int main(int ac, char** av)
 #else
     mp.stop();
 #endif
+    return 0;
 }
