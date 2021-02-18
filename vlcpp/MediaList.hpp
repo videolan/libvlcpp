@@ -79,14 +79,8 @@ public:
      *
      * \param p_mlib  media library object
      */
-    MediaList(MediaLibrary& mlib )
+    MediaList(MediaLibrary& mlib)
         : Internal{ libvlc_media_library_media_list( getInternalPtr<libvlc_media_library_t>( mlib ) ), libvlc_media_list_release }
-    {
-    }
-#endif
-
-    MediaList( Internal::InternalPtr mediaList )
-        : Internal{ mediaList, libvlc_media_list_release }
     {
     }
 
@@ -96,6 +90,34 @@ public:
      * Calling any method on such an instance is undefined.
     */
     MediaList() = default;
+
+    /**
+     * Create an empty media list.
+     *
+     * \param p_instance  libvlc instance
+     */
+    MediaList(Instance& instance)
+        : Internal{ libvlc_media_list_new( getInternalPtr<libvlc_instance_t>( instance ) ),
+                                           libvlc_media_list_release }
+    {
+    }
+#else
+    /**
+     * Create an empty media list.
+     *
+     * \param p_instance  libvlc instance
+     */
+    MediaList()
+        : Internal{ libvlc_media_list_new(),
+                    libvlc_media_list_release }
+    {
+    }
+#endif
+
+    MediaList( Internal::InternalPtr mediaList )
+        : Internal{ mediaList, libvlc_media_list_release }
+    {
+    }
 
     /**
      * Associate media instance with this media list instance. If another
