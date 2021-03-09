@@ -112,6 +112,19 @@ public:
     }
 
     /**
+     * \brief Instance Wraps an existing libvlc instance to be used with libvlcpp
+     * \param instance A libvlc_instance_t
+     *
+     * The instance will be held by the constructor, the caller can release it
+     * as soon at the instance is constructed.
+     */
+    explicit Instance( libvlc_instance_t* instance )
+        : Internal{ instance, libvlc_release }
+    {
+        libvlc_retain( instance );
+    }
+
+    /**
      * Create an empty VLC instance.
      *
      * Calling any method on such an instance is undefined.
