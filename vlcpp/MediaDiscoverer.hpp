@@ -98,6 +98,13 @@ public:
     {
     }
 
+    /**
+     * Create an empty Media Discoverer instance.
+     *
+     * Calling any method on such an instance is undefined.
+    */
+    MediaDiscoverer() = default;
+
 #if LIBVLC_VERSION_INT >= LIBVLC_VERSION(3, 0, 0, 0)
     /**
      * Start media discovery.
