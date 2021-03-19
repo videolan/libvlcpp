@@ -792,7 +792,7 @@ class AudioOutputDeviceDescription
             if ( d->psz_device != nullptr )
                 m_device = d->psz_device;
             if ( d->psz_description != nullptr )
-                m_device = d->psz_description;
+                m_description = d->psz_description;
         }
 
     private:
