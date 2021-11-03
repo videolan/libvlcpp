@@ -61,7 +61,7 @@ int main(int ac, char** av)
     mp.setVideoCallbacks([imgBuffer](void** pBuffer) -> void* {
         std::cout << "Lock" << std::endl;
         *pBuffer = imgBuffer;
-        return NULL;
+        return nullptr;
     }, [](void*, void*const*) {
         std::cout << "unlock" << std::endl;
     }, nullptr);

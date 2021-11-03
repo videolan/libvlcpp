@@ -129,8 +129,8 @@ public:
     /**
      * Get the media used by the media_player.
      *
-     * \return the media associated with p_mi, or NULL if no media is
-     * associated
+     * \return the media associated with p_mi, or a nullptr shared_ptr if no
+     * media is associated
      */
     MediaPtr media()
     {
@@ -853,7 +853,7 @@ public:
         std::vector<AudioOutputDeviceDescription> res;
         std::unique_ptr<libvlc_audio_output_device_t, decltype(&libvlc_audio_output_device_list_release)>
                 devicesPtr( devices, libvlc_audio_output_device_list_release);
-        for ( auto* p = devices; p != NULL; p = p->p_next )
+        for ( auto* p = devices; p != nullptr; p = p->p_next )
             res.emplace_back( p );
         return res;
     }
@@ -1637,13 +1637,13 @@ public:
     void setDeinterlace(DeinterlaceState state, const std::string& mode)
     {
         libvlc_video_set_deinterlace(*this, static_cast<int>( state ),
-                                     mode.empty() ? NULL : mode.c_str());
+                                     mode.empty() ? nullptr: mode.c_str());
     }
 #else
     void setDeinterlace(const std::string& mode)
     {
         libvlc_video_set_deinterlace(*this,
-                                     mode.empty() ? NULL : mode.c_str());
+                                     mode.empty() ? nullptr : mode.c_str());
     }
 #endif
 

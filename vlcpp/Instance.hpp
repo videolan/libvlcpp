@@ -90,7 +90,7 @@ public:
      * LibVLC, just like VLC media player does. The list of valid arguments
      * depends on the LibVLC version, the operating system and platform, and
      * set of available LibVLC plugins. Invalid or unsupported arguments will
-     * cause the function to fail (i.e. return NULL). Also, some arguments
+     * cause the function to fail (i.e. return nullptr). Also, some arguments
      * may alter the behaviour or otherwise interfere with other LibVLC
      * functions.
      *
@@ -101,7 +101,7 @@ public:
      *
      * \param argc  the number of arguments (should be 0)
      *
-     * \param argv  list of arguments (should be NULL)
+     * \param argv  list of arguments (should be nullptr)
      */
     Instance(int argc, const char *const * argv)
         : Internal{ libvlc_new( argc, argv ), libvlc_release }
@@ -306,7 +306,7 @@ public:
             return {};
         libvlc_module_description_t* p = ptr.get();
         std::vector<ModuleDescription> res;
-        while ( p != NULL )
+        while ( p != nullptr )
         {
             res.emplace_back( p );
             p = p->p_next;
@@ -328,7 +328,7 @@ public:
             return {};
         libvlc_module_description_t* p = ptr.get();
         std::vector<ModuleDescription> res;
-        while ( p != NULL )
+        while ( p != nullptr )
         {
             res.emplace_back( p );
             p = p->p_next;
@@ -350,7 +350,7 @@ public:
         std::vector<AudioOutputDescription> res;
 
         libvlc_audio_output_t* p = result.get();
-        while ( p != NULL )
+        while ( p != nullptr )
         {
             res.emplace_back( p );
             p = p->p_next;
@@ -364,7 +364,7 @@ public:
      * \see Audio::outputDeviceSet() .
      *
      * \note Not all audio outputs support this. In particular, an empty
-     * (NULL) list of devices does imply that the specified audio output does
+     * (nullptr) list of devices does imply that the specified audio output does
      * not work.
      *
      * \note The list might not be exhaustive.
@@ -407,7 +407,7 @@ public:
      *
      *You can interact with this dialog by using the postLogin method on dialog to post an answer or the dismiss method to cancel this dialog.
      *
-     *\note to receive this callack, CancelCb should not be NULL.
+     *\note to receive this callack, CancelCb should not be nullptr.
      *\param dialog used to interact with the dialog
      *\param title title of the dialog
      *\param text text of the dialog
@@ -421,8 +421,7 @@ public:
      * You can interact with this dialog by using the postAction method on dialog
      * to post an answer or dismiss method to cancel this dialog.
      *
-     * \note to receive this callack, CancelCb should not be
-     * NULL.
+     * \note to receive this callack, CancelCb should not be nullptr.
      *
      * \param dialog used to interact with the dialog
      * \param title title of the diaog

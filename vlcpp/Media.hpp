@@ -421,7 +421,7 @@ public:
     /**
      * Read the meta of the media.
      *
-     * If the media has not yet been parsed this will return NULL.
+     * If the media has not yet been parsed this will return an empty string.
      *
      * This methods automatically calls parseAsync() , so after
      * calling it you may receive a libvlc_MediaMetaChanged event. If you
