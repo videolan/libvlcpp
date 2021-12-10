@@ -807,6 +807,18 @@ public:
         libvlc_media_thumbnail_request_destroy( request );
     }
 
+    enum class Stat : uint8_t
+    {
+        Mtime = libvlc_media_stat_mtime,
+        Size = libvlc_media_stat_size,
+    };
+
+    std::pair<bool, uint64_t> stat( Stat s )
+    {
+        uint64_t value = 0;
+        auto res = libvlc_media_get_stat( *this, static_cast<uint8_t>( s ), &value ) == 1;
+        return std::make_pair( res, value );
+    }
 #endif
 
 
