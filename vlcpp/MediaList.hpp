@@ -96,7 +96,7 @@ public:
      *
      * \param p_instance  libvlc instance
      */
-    MediaList(Instance& instance)
+    MediaList(const Instance& instance)
         : Internal{ libvlc_media_list_new( getInternalPtr<libvlc_instance_t>( instance ) ),
                                            libvlc_media_list_release }
     {
