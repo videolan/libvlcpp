@@ -34,6 +34,9 @@ int main(int ac, char** av)
         return 1;
     }
     const char* vlcArgs = "-vv";
+    auto imgBuffer = malloc(480 * 320 * 4);
+    std::unique_ptr<uint8_t, decltype(&free)> imgBufferPtr{
+        static_cast<uint8_t*>( imgBuffer ), &free };
     auto instance = VLC::Instance(1, &vlcArgs);
 
 #if LIBVLC_VERSION_INT >= LIBVLC_VERSION(3, 0, 0, 0)
@@ -57,7 +60,6 @@ int main(int ac, char** av)
         std::cout << media.mrl() << " is playing" << std::endl;
     });
 
-    auto imgBuffer = malloc(480 * 320 * 4);
     mp.setVideoCallbacks([imgBuffer](void** pBuffer) -> void* {
         std::cout << "Lock" << std::endl;
         *pBuffer = imgBuffer;
@@ -169,7 +171,6 @@ int main(int ac, char** av)
     {
         std::cout << f.name() << std::endl;
     }
-    free(imgBuffer);
     // Check that we don't use the old media player when releasing its event manager
     mp = VLC::MediaPlayer{};
 }
