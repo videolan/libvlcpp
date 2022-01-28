@@ -88,7 +88,7 @@ public:
      *
      * \param psz_name  service name
      */
-    MediaDiscoverer(Instance& inst, const std::string& name)
+    MediaDiscoverer(const Instance& inst, const std::string& name)
 #if LIBVLC_VERSION_INT >= LIBVLC_VERSION(3, 0, 0, 0)
         : Internal{ libvlc_media_discoverer_new(getInternalPtr<libvlc_instance_t>( inst ), name.c_str()),
 #else
