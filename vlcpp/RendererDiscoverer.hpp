@@ -74,7 +74,7 @@ public:
         friend RendererDiscovererEventManager;
     };
 
-    RendererDiscoverer( Instance& instance, const std::string& name )
+    RendererDiscoverer( const Instance& instance, const std::string& name )
         : Internal( libvlc_renderer_discoverer_new( getInternalPtr<libvlc_instance_t>( instance ),
                                                     name.c_str() ), libvlc_renderer_discoverer_release )
     {
