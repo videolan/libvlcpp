@@ -91,7 +91,7 @@ public:
      * \param p_libvlc_instance  the libvlc instance in which the Media
      * Player should be created.
      */
-    MediaPlayer( Instance& instance )
+    MediaPlayer( const Instance& instance )
         : Internal{ libvlc_media_player_new( instance ), libvlc_media_player_release }
     {
     }
