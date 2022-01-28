@@ -142,7 +142,7 @@ public:
      * @param mrl       A path, location, or node name, depending on the 3rd parameter
      * @param type      The type of the 2nd argument. \sa{FromType}
      */
-    Media(Instance& instance, const std::string& mrl, FromType type)
+    Media(const Instance& instance, const std::string& mrl, FromType type)
         : Internal{ libvlc_media_release }
     {
         InternalPtr ptr = nullptr;
@@ -185,7 +185,7 @@ public:
      * \param fd open file descriptor
      * \return the newly created media
      */
-    Media(Instance& instance, int fd)
+    Media(const Instance& instance, int fd)
         : Internal { libvlc_media_new_fd( getInternalPtr<libvlc_instance_t>( instance ), fd ),
                      libvlc_media_release }
     {
@@ -293,7 +293,7 @@ public:
      */
 
     template <typename OpenCb, typename ReadCb, typename SeekCb, typename CloseCb>
-    Media( Instance& instance, OpenCb&& openCb, ReadCb&& readCb, SeekCb&& seekCb, CloseCb&& closeCb )
+    Media( const Instance& instance, OpenCb&& openCb, ReadCb&& readCb, SeekCb&& seekCb, CloseCb&& closeCb )
     {
         static_assert( signature_match_or_nullptr<OpenCb, ExpectedMediaOpenCb>::value, "Mismatched Open callback prototype" );
         static_assert( signature_match_or_nullptr<SeekCb, ExpectedMediaSeekCb>::value, "Mismatched Seek callback prototype" );
