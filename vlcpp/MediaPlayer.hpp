@@ -896,6 +896,12 @@ public:
      *
      * \return Nothing. Errors are ignored (this is a design bug).
      */
+#if LIBVLC_VERSION_INT >= LIBVLC_VERSION(4, 0, 0, 0)
+    void outputDeviceSet(const std::string& device_id)
+    {
+        libvlc_audio_output_device_set(*this, device_id.c_str());
+    }
+#else
     void outputDeviceSet(const std::string& module, const std::string& device_id)
     {
         libvlc_audio_output_device_set(*this, module.c_str(), device_id.c_str());
@@ -905,6 +911,8 @@ public:
     {
         libvlc_audio_output_device_set(*this, nullptr, device_id.c_str());
     }
+#endif
+
 
     /**
      * Toggle mute status.
