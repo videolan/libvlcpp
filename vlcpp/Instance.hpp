@@ -358,6 +358,7 @@ public:
         return res;
     }
 
+#if LIBVLC_VERSION_INT < LIBVLC_VERSION(4, 0, 0, 0)
     /**
      * Gets a list of audio output devices for a given audio output module,
      *
@@ -392,6 +393,7 @@ public:
             res.emplace_back( p );
         return res;
     }
+#endif
 
 #if LIBVLC_VERSION_INT >= LIBVLC_VERSION(3, 0, 0, 0)
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
