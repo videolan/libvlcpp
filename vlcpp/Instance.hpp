@@ -31,6 +31,7 @@
 #include "Dialog.hpp"
 #include "MediaDiscoverer.hpp"
 
+#include <algorithm>
 #include <string>
 #include <vector>
 #include <cstring>
