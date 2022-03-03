@@ -242,7 +242,7 @@ public:
      * In particular, the callback should return an error if playback is stopped;
      * if it does not return, then libvlc_media_player_stop() will never return.
      */
-    using ExpectedMediaReadCb = ssize_t(void* opaque, unsigned char* buf, size_t len);
+    using ExpectedMediaReadCb = ptrdiff_t(void* opaque, unsigned char* buf, size_t len);
 
     /**
      * Callback prototype to seek a custom bitstream input media.
