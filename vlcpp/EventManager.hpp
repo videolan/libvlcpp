@@ -547,6 +547,17 @@ class MediaPlayerEventManager : public EventManager
             return handle( libvlc_MediaPlayerBackward, std::forward<Func>( f ) );
         }
 
+#if LIBVLC_VERSION_INT >= LIBVLC_VERSION(4, 0, 0, 0)
+        /**
+         * \brief onStopping Registers an event called when the media player begin stopping.
+         * \param f A std::function<void(void)> (or an equivalent Callable type)
+         */
+        template <typename Func>
+        RegisteredEvent onStopping(Func&& f)
+        {
+            return handle( libvlc_MediaPlayerStopping, std::forward<Func>( f ) );
+        }
+#else
         /**
          * \brief onEndReached Registers an event called when the media player reaches the end of a media
          * \param f A std::function<void(void)> (or an equivalent Callable type)
@@ -556,7 +567,7 @@ class MediaPlayerEventManager : public EventManager
         {
             return handle( libvlc_MediaPlayerEndReached, std::forward<Func>( f ) );
         }
-
+#endif
         /**
          * \brief onEncounteredError Registers an event called when the media player reaches encounters an error
          * \param f A std::function<void(void)> (or an equivalent Callable type)
