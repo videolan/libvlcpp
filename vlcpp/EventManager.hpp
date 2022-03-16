@@ -355,7 +355,6 @@ class MediaEventManager : public EventManager
                 (*callback)( media != nullptr ? std::make_shared<Media>( media, true ) : nullptr );
             });
         }
-#endif
 
         /**
          * \brief onStateChanged Registers an event called when the Media state changes
@@ -372,6 +371,7 @@ class MediaEventManager : public EventManager
                 (*callback)( e->u.media_state_changed.new_state );
             });
         }
+#endif
 
         /**
          * \brief onSubItemTreeAdded Registers an event called when all subitem have been added.
