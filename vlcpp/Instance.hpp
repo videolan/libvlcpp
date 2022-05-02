@@ -68,8 +68,8 @@ private:
     {
         Exit = 0,
         Log,
-        ErrorDisplay,
 #if LIBVLC_VERSION_INT >= LIBVLC_VERSION(3, 0, 0, 0)
+        ErrorDisplay,
         LoginDisplay,
         QuestionDisplay,
         ProgressDisplay,
