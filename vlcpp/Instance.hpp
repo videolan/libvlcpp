@@ -491,6 +491,39 @@ public:
      * \param cancel   lambda callback that will get called when a displayed dialog needs to be cancelled. \see CancelCb
      * \param updtProgress   lambda callback that will get called when a progress dialog needs to be updated. \see UpdtProgressCb
      */
+#if LIBVLC_VERSION_INT >= LIBVLC_VERSION(4, 0, 0, 0)
+    template <class Login, class Question, class DspProgress, class Cancel, class UpdtProgress>
+    void setDialogHandlers(Login&& login, Question&& question, DspProgress&& dspProgress, Cancel &&cancel, UpdtProgress &&updtProgress)
+    {
+#if !defined(_MSC_VER) || _MSC_VER >= 1900
+        static_assert(signature_match_or_nullptr<Login, LoginCb>::value, "Mismatched login display callback prototype");
+        static_assert(signature_match_or_nullptr<Question, QuestionCb>::value, "Mismatched question display callback prototype");
+        static_assert(signature_match_or_nullptr<DspProgress, DspProgressCb>::value, "Mismatched progress display callback prototype");
+        static_assert(signature_match_or_nullptr<Cancel, CancelCb>::value, "Mismatched cancel callback prototype");
+        static_assert(signature_match_or_nullptr<UpdtProgress, UpdtProgressCb>::value, "Mismatched update progress callback prototype");
+#endif
+        libvlc_dialog_cbs tmp = {
+            CallbackWrapper<(unsigned)CallbackIdx::LoginDisplay, decltype(libvlc_dialog_cbs::pf_display_login)>::wrap(*m_callbacks, std::forward<Login>(login)),
+            CallbackWrapper<(unsigned)CallbackIdx::QuestionDisplay, decltype(libvlc_dialog_cbs::pf_display_question)>::wrap(*m_callbacks, std::forward<Question>(question)),
+            CallbackWrapper<(unsigned)CallbackIdx::ProgressDisplay, decltype(libvlc_dialog_cbs::pf_display_progress)>::wrap(*m_callbacks, std::forward<DspProgress>(dspProgress)),
+            CallbackWrapper<(unsigned)CallbackIdx::CancelDialog, decltype(libvlc_dialog_cbs::pf_cancel)>::wrap(*m_callbacks, std::forward<Cancel>(cancel)),
+            CallbackWrapper<(unsigned)CallbackIdx::ProgressUpdate, decltype(libvlc_dialog_cbs::pf_update_progress)>::wrap(*m_callbacks, std::forward<UpdtProgress>(updtProgress))
+        };
+        m_callbacks_pointers = std::make_shared<libvlc_dialog_cbs>(tmp);
+        libvlc_dialog_set_callbacks(*this, m_callbacks_pointers.get(), m_callbacks.get());
+    }
+
+    template <typename Error>
+    void setErrorCallback(Error&& error)
+    {
+#if !defined(_MSC_VER) || _MSC_VER >= 1900
+        static_assert(signature_match_or_nullptr<Error, ErrorCb>::value, "Mismatched error callback prototype");
+#endif
+        libvlc_dialog_set_error_callback(*this,
+            CallbackWrapper<(unsigned int)CallbackIdx::ErrorDisplay, libvlc_dialog_error_cbs>::wrap(
+                *m_callbacks, std::forward(error)));
+    }
+#else
     template <class Error, class Login, class Question, class DspProgress, class Cancel, class UpdtProgress>
     void setDialogHandlers(Error&& error, Login&& login, Question&& question, DspProgress&& dspProgress, Cancel &&cancel, UpdtProgress &&updtProgress)
     {
@@ -513,7 +546,7 @@ public:
         m_callbacks_pointers = std::make_shared<libvlc_dialog_cbs>(tmp);
         libvlc_dialog_set_callbacks(*this, m_callbacks_pointers.get(), m_callbacks.get());
     }
-
+#endif
     /**
      * Unset all callbacks
      */
