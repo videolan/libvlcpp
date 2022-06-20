@@ -53,8 +53,13 @@ int main(int ac, char** av)
         std::cout << "Hooked VLC log: " << lvl << ' ' << message << std::endl;
     });
 
+#if LIBVLC_VERSION_INT >= LIBVLC_VERSION(4, 0, 0, 0)
+    auto media = VLC::Media(av[1], VLC::Media::FromPath);
+    auto mp = VLC::MediaPlayer(instance, media);
+#else
     auto media = VLC::Media(instance, av[1], VLC::Media::FromPath);
     auto mp = VLC::MediaPlayer(media);
+#endif
     auto eventManager = mp.eventManager();
     eventManager.onPlaying([&media]() {
         std::cout << media.mrl() << " is playing" << std::endl;

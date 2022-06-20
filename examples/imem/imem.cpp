@@ -21,7 +21,11 @@ int main(int ac, char**av)
     auto instance = VLC::Instance(0, nullptr);
     auto dummyOpaque = new ImemOpaque{};
     dummyOpaque->path = av[1];
+#if LIBVLC_VERSION_INT >= LIBVLC_VERSION(4, 0, 0, 0)
+    auto imemMedia = VLC::Media(
+#else
     auto imemMedia = VLC::Media( instance,
+#endif
         // Open
         [dummyOpaque]( void*, void** opaque, uint64_t* p_size ) -> int {
             dummyOpaque->file = fopen( dummyOpaque->path.c_str(), "rb" );
@@ -55,7 +59,11 @@ int main(int ac, char**av)
 
     // Do not use a user defined opaque
     // This is mostly meant to test that our nullptr overload are functionnal
+#if LIBVLC_VERSION_INT >= LIBVLC_VERSION(4, 0, 0, 0)
+    auto imemMedia2 = VLC::Media(
+#else
     auto imemMedia2 = VLC::Media( instance,
+#endif
         nullptr,
         [opaque2]( void* opaque, unsigned char* buf, size_t size ) -> ssize_t {
             assert( opaque == nullptr );
@@ -70,11 +78,19 @@ int main(int ac, char**av)
             return 0;
         }, nullptr );
 
+#if LIBVLC_VERSION_INT >= LIBVLC_VERSION(4, 0, 0, 0)
+    auto mp = VLC::MediaPlayer( instance, imemMedia );
+    mp.play();
+
+    auto mp2 = VLC::MediaPlayer( instance, imemMedia2 );
+    mp2.play();
+#else
     auto mp = VLC::MediaPlayer( imemMedia );
     mp.play();
 
     auto mp2 = VLC::MediaPlayer( imemMedia2 );
     mp2.play();
+#endif
 
     std::this_thread::sleep_for( std::chrono::seconds( 10 ) );
 
