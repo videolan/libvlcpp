@@ -103,7 +103,7 @@ public:
      *
      * \param p_md  the media. Afterwards the p_md can be safely destroyed.
      */
-    MediaPlayer( Instance& inst, Media& md )
+    MediaPlayer( const Instance& inst, Media& md )
         : Internal{ libvlc_media_player_new_from_media(
                         getInternalPtr<libvlc_instance_t>( inst ),
                         getInternalPtr<libvlc_media_t>( md ) ),
