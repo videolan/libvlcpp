@@ -144,7 +144,7 @@ int main(int ac, char** av)
     std::this_thread::sleep_for( std::chrono::milliseconds(500) );
 
 #if LIBVLC_VERSION_INT >= LIBVLC_VERSION(4, 0, 0, 0)
-    auto tracks = mp.tracks( VLC::MediaTrack::Type::Video );
+    auto tracks = mp.tracks( VLC::MediaTrack::Type::Video, false );
     std::cout << "Got " << tracks.size() << " tracks" << std::endl;
     mp.selectTracks( VLC::MediaTrack::Type::Video, tracks );
     std::this_thread::sleep_for( std::chrono::milliseconds(1000) );
