@@ -604,7 +604,7 @@ public:
 
 #endif
 
-#endif
+#endif // LIBVLC_VERSION_INT >= LIBVLC_VERSION(3, 0, 0, 0)
 };
 
 } // namespace VLC
