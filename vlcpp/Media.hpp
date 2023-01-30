@@ -933,18 +933,12 @@ public:
     }
 
     /**
-     * @brief thumbnailCancel cancels a thumbnailing request
+     * @brief thumbnailRequestDestroy Destroy and cancel a thumbnailing request
      * @param request An opaque thumbnail request object.
      *
-     * Cancelling the request will still cause onThumbnailGenerated callback
-     * to be invoked, with nullptr as the picture instance.
-     * If the request is cancelled after its completion, the behavior is undefined.
+     * This will also cancel the thumbnail request, no events will be emitted after
+     * this call.
      */
-    void thumbnailRequestCancel( ThumbnailRequest* request )
-    {
-        libvlc_media_thumbnail_request_cancel( request );
-    }
-
     void thumbnailRequestDestroy( ThumbnailRequest* request )
     {
         libvlc_media_thumbnail_request_destroy( request );
