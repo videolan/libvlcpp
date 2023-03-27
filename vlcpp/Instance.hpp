@@ -33,6 +33,7 @@
 
 #include <algorithm>
 #include <string>
+#include <sstream>
 #include <vector>
 #include <cstring>
 #include <cstdio>
@@ -261,21 +262,17 @@ public:
             char* psz_msg = message.get();
             if (vsnprintf(psz_msg, len + 1, format, va) < 0 )
                 return;
-            char* psz_ctx;
-            if (asprintf(&psz_ctx, "[%s] (%s:%d) %s", psz_module, psz_file, i_line, psz_msg) < 0)
-                return;
-            std::unique_ptr<char, void(*)(void*)> ctxPtr(psz_ctx, &free);
 #else
             //MSVC treats passing nullptr as 1st vsnprintf(_s) as an error
             char psz_msg[512];
             if ( _vsnprintf_s( psz_msg, _TRUNCATE, format, va ) < 0 )
                 return;
-            char psz_ctx[1024];
-            if( sprintf_s( psz_ctx, "[%s] (%s:%d) %s", psz_module, psz_file,
-                          i_line, psz_msg ) < 0 )
-                return;
 #endif
-            logCb( level, ctx, std::string{ psz_ctx } );
+            std::ostringstream ss;
+            ss << '[' << psz_module << "] ("
+               << psz_file << ':' << i_line
+               << ") " << psz_msg;
+            logCb( level, ctx, ss.str() );
         };
         libvlc_log_set(*this, CallbackWrapper<(unsigned int)CallbackIdx::Log, libvlc_log_cb>::wrap( *m_callbacks, std::move(wrapper)),
             m_callbacks.get() );
