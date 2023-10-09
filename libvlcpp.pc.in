@@ -7,3 +7,4 @@ Name: libvlcpp
 Description: libvlc C++ bindings
 Version: @PACKAGE_VERSION@
 Cflags: -I${includedir}
+Requires: libvlc >= 3
