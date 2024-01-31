@@ -800,6 +800,7 @@ class AudioOutputDeviceDescription
         std::string m_description;
 };
 
+#if LIBVLC_VERSION_INT < LIBVLC_VERSION(4, 0, 0, 0)
 ///
 /// \brief The TrackDescription class describes a track
 ///
@@ -833,6 +834,7 @@ private:
     int m_id;
     std::string m_name;
 };
+#endif
 
 #if LIBVLC_VERSION_INT >= LIBVLC_VERSION(3, 0, 0, 0)
 ///
