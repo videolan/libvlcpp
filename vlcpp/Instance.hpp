@@ -144,6 +144,7 @@ public:
     }
 
 
+#if LIBVLC_VERSION_INT < LIBVLC_VERSION(4, 0, 0, 0)
     /**
      * Try to start a user interface for the libvlc instance.
      *
@@ -177,6 +178,7 @@ public:
             CallbackWrapper<(unsigned int)CallbackIdx::Exit, void(*)(void*)>::wrap( *m_callbacks, std::forward<ExitCb>( exitCb ) ),
             m_callbacks.get() );
     }
+#endif
 
     /**
      * Sets the application name. LibVLC passes this as the user agent string

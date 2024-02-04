@@ -45,9 +45,11 @@ int main(int ac, char** av)
         std::cout << "Found SD: " << sd.name() << "(" << sd.longName() << ")" << std::endl;
 #endif
 
+#if LIBVLC_VERSION_INT < LIBVLC_VERSION(4, 0, 0, 0)
     instance.setExitHandler([] {
         std::cout << "Libvlc is exiting" << std::endl;
     });
+#endif
 
     instance.logSet([](int lvl, const libvlc_log_t*, std::string message ) {
         std::cout << "Hooked VLC log: " << lvl << ' ' << message << std::endl;
