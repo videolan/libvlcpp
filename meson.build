@@ -1,0 +1,32 @@
+# Copyright (C) 2014-2025 VideoLAN - VideoLabs
+
+project(
+    'libvlcpp',
+    ['cpp'],
+    license: 'LGPL-2.1-or-later',
+    license_files: ['COPYING'],
+    version: '0.1.0',
+    meson_version: '>=1.1.0',
+)
+
+subdir('vlcpp')
+
+install_headers(
+    libvlcpp_headers,
+    subdir: 'vlcpp',
+)
+
+libvlc_dep = dependency('libvlc', version: '>=3.0')
+
+pkg = import('pkgconfig')
+pkg.generate(
+    version: meson.project_version(),
+    requires: libvlc_dep,
+    name: 'libvlcpp',
+    description: 'libvlc C++ bindings',
+)
+
+if get_option('examples').enabled()
+    subdir('examples')
+    subdir('test')
+endif

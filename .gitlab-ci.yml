@@ -10,10 +10,9 @@ variables:
     - docker
     - amd64
   script:
-    - ./bootstrap
-    - ./configure --enable-examples --enable-werror
-    - make -j4
-    - make -j4 distcheck
+    - export CXXFLAGS="-Werror" # Mainly to fail on deprecation errors.
+    - meson setup build -Dexamples=enabled
+    - meson compile -C build
 
 continuous_build_4.0:
   extends: .common_build

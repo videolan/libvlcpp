@@ -1,0 +1,3 @@
+# Copyright (C) 2014-2025 VideoLAN - VideoLabs
+
+option('examples', type: 'feature', value: 'auto')
