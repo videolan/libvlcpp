@@ -28,5 +28,8 @@ pkg.generate(
 
 if get_option('examples').enabled()
     subdir('examples')
+endif
+
+if get_option('tests').enabled()
     subdir('test')
 endif

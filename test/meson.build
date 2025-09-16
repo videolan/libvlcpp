@@ -8,3 +8,7 @@ regression_test_exe = executable(
     dependencies: [libvlc_dep],
     include_directories: [vlcpp_includes],
 )
+
+regression_test_sample = files('sample.mp4')
+
+test('regression-test', regression_test_exe, args: regression_test_sample)

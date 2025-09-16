@@ -11,8 +11,9 @@ variables:
     - amd64
   script:
     - export CXXFLAGS="-Werror" # Mainly to fail on deprecation errors.
-    - meson setup build -Dexamples=enabled
+    - meson setup build -Dexamples=enabled -Dtests=enabled
     - meson compile -C build
+    - meson test -C build
 
 continuous_build_4.0:
   extends: .common_build
