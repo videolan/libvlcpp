@@ -1,6 +1,6 @@
 variables:
   VLC30_IMAGE: registry.videolan.org/medialibrary-3.0:20231017192545
-  VLC40_IMAGE: registry.videolan.org/medialibrary-4.0:20231017192545
+  VLC40_IMAGE: registry.videolan.org/vlc-debian-unstable:20230705133021
 
 .common_build:
   rules:
@@ -11,9 +11,10 @@ variables:
     - amd64
   script:
     - export CXXFLAGS="-Werror" # Mainly to fail on deprecation errors.
-    - meson setup build -Dexamples=enabled -Dtests=enabled
+    - export VLC_PLUGIN_PATH="${CI_PROJECT_DIR}/build/subprojects/libvlc/modules/"
+    - meson setup build -Dexamples=enabled -Dtests=enabled --native-file subprojects/packagefiles/libvlc/libvlc-minimal.ini
     - meson compile -C build
-    - meson test -C build
+    - meson test -C build "libvlcpp:"
 
 continuous_build_4.0:
   extends: .common_build
