@@ -15,6 +15,13 @@ variables:
     - meson setup build -Dexamples=enabled -Dtests=enabled --native-file subprojects/packagefiles/libvlc/libvlc-minimal.ini
     - meson compile -C build
     - meson test -C build "libvlcpp:"
+  artifacts:
+    reports:
+      junit: build/meson-logs/testlog.junit.xml
+    paths:
+      - ${CI_PROJECT_DIR}/build/meson-logs/testlog.txt
+    when: always
+
 
 continuous_build_4.0:
   extends: .common_build
