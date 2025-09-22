@@ -1,0 +1,10 @@
+[wrap-git]
+url = https://code.videolan.org/videolan/vlc.git
+depth = 1
+diff_files = libvlc/af374ba7224ea342fe43443b306eac0a856f8784.patch, libvlc/0e4be111590da80c4a695e4efc4a007eae604bc8.patch, libvlc/declare-libvlc-dependency.patch
+
+# Oct 13 2023
+revision = 2706a5a5c77a86987143999a08f6988626299477
+
+[provide]
+libvlc = libvlc_dep

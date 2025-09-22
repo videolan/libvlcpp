@@ -1,0 +1,56 @@
+From af374ba7224ea342fe43443b306eac0a856f8784 Mon Sep 17 00:00:00 2001
+From: Alexandre Janniaux <ajanni@videolabs.io>
+Date: Fri, 19 Jan 2024 16:10:32 +0100
+Subject: [PATCH] meson: refactor link_language usage
+
+Refactor the way link_language is specified to ensure a correct value
+(the default one or the one provided by the module) is always used.
+Before, [] was allowed as a default value to fallback to meson
+autodetection but it has been removed when link_language and other
+kwargs have been typed[^1] in the interpreter, leading to the followin
+error in meson 1.3.1
+
+    ../modules/meson.build:295:17: ERROR: library keyword argument 'link_language' was of type array[] but should have been one of: str, NoneType
+
+[^1]: https://github.com/mesonbuild/meson/commit/0f23dc5b03fda2e8958903eb25587a7e4e2daa67
+---
+ modules/meson.build | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
+
+diff --git a/modules/meson.build b/modules/meson.build
+index 6262fa94e1e..e19ab35529e 100644
+--- a/modules/meson.build
++++ b/modules/meson.build
+@@ -292,13 +292,18 @@ foreach module : vlc_modules
+         '-DVLC_DYNAMIC_PLUGIN'
+     ]
+ 
++    kwargs = {}
++
++    if module.has_key('link_language')
++      kwargs += { link_language: module.get('link_language') }
++    endif
++
+     vlc_plugin = library(
+         module['name'] + '_plugin',
+         module['sources'],
+         link_with: [module.get('link_with', []), vlc_libcompat],
+         link_args: module.get('link_args', []),
+         link_depends: module.get('link_depends', []),
+-        link_language: module.get('link_language', []),
+         include_directories: [module.get('include_directories', []), vlc_include_dirs],
+         dependencies: [module.get('dependencies', []), libvlccore_dep],
+         c_args: [module.get('c_args', []), common_args],
+@@ -306,7 +311,8 @@ foreach module : vlc_modules
+         objc_args: [module.get('objc_args', []), common_args],
+         build_by_default: true,
+         install: true,
+-        install_dir: get_option('libdir') / 'vlc/plugins'
++        install_dir: get_option('libdir') / 'vlc/plugins',
++        kwargs: kwargs
+     )
+     vlc_plugins_targets += {
+         module['name']: vlc_plugin
+-- 
+GitLab
+

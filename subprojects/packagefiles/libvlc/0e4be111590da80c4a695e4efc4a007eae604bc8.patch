@@ -1,0 +1,55 @@
+From 0e4be111590da80c4a695e4efc4a007eae604bc8 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Fri, 18 Oct 2024 10:01:55 +0200
+Subject: [PATCH] meson: allow disabling building test executables
+
+They should not be built when cross-compiling and we don't have an exe_wrapper.
+They can't be run directly. They may be used on another machine, so it should be
+possible to force it.
+
+Disabled on Windows for now as we can't run them because they rely on alarm().
+---
+ meson.build       | 10 +++++++---
+ meson_options.txt |  5 +++++
+ 2 files changed, 12 insertions(+), 3 deletions(-)
+
+diff --git a/meson.build b/meson.build
+index 1f4acaa50b..0b3980c5a2 100644
+--- a/meson.build
++++ b/meson.build
+@@ -1064,9 +1064,13 @@ subdir('bin')
+ # VLC plugins
+ subdir('modules')
+ 
+-# Integration and non-regression tests, some unittest are there too but the
+-# modules/, src/ and lib/ folders should be favoured for those.
+-subdir('test')
++if (get_option('tests')
++    .disable_auto_if(host_system in ['windows'])
++    .allowed())
++    # Integration and non-regression tests, some unittest are there too but the
++    # modules/, src/ and lib/ folders should be favoured for those.
++    subdir('test')
++endif
+ 
+ if get_option('rust').allowed()
+     warning('''
+diff --git a/meson_options.txt b/meson_options.txt
+index 608117b6d1..dfebc028c1 100644
+--- a/meson_options.txt
++++ b/meson_options.txt
+@@ -5,6 +5,11 @@ option('vlc',
+     value : true,
+     description : 'Build the VLC executable program.')
+ 
++option('tests',
++    type : 'feature',
++    value : 'auto',
++    description : 'Build the VLC test executables.')
++
+ option('nls',
+     type : 'feature',
+     value : 'auto',
+-- 
+2.48.1
+
