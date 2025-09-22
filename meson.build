@@ -7,6 +7,7 @@ project(
     license_files: ['COPYING'],
     version: '0.1.0',
     meson_version: '>=1.1.0',
+    default_options: ['cpp_std=c++11'],
 )
 
 subdir('vlcpp')
