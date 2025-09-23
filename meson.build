@@ -22,7 +22,7 @@ libvlc_dep = dependency('libvlc', version: '>=3.0')
 pkg = import('pkgconfig')
 pkg.generate(
     version: meson.project_version(),
-    requires: libvlc_dep,
+    requires: ['libvlc>=3.0'],
     name: 'libvlcpp',
     description: 'libvlc C++ bindings',
 )
