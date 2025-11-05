@@ -136,6 +136,7 @@ public:
         Skipped = libvlc_media_parsed_status_skipped,
         Failed = libvlc_media_parsed_status_failed,
         Timeout = libvlc_media_parsed_status_timeout,
+        Cancelled = libvlc_media_parsed_status_cancelled,
         Done = libvlc_media_parsed_status_done,
     };
     /**
