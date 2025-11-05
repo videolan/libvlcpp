@@ -117,14 +117,6 @@ public:
         Interact = libvlc_media_do_interact,
     };
 
-    enum class ParsedStatus
-    {
-        Skipped = libvlc_media_parsed_status_skipped,
-        Failed = libvlc_media_parsed_status_failed,
-        Done = libvlc_media_parsed_status_done,
-        Timeout = libvlc_media_parsed_status_timeout,
-    };
-
     enum class Type
     {
         Unknown = libvlc_media_type_unknown,
@@ -137,6 +129,15 @@ public:
 #endif
 
 #if LIBVLC_VERSION_INT >= LIBVLC_VERSION(4, 0, 0, 0)
+    enum class ParsedStatus
+    {
+        None = libvlc_media_parsed_status_none,
+        Pending = libvlc_media_parsed_status_pending,
+        Skipped = libvlc_media_parsed_status_skipped,
+        Failed = libvlc_media_parsed_status_failed,
+        Timeout = libvlc_media_parsed_status_timeout,
+        Done = libvlc_media_parsed_status_done,
+    };
     /**
      * @brief Media Constructs a libvlc Media instance
      * @param instance  A libvlc instance
@@ -191,6 +192,14 @@ public:
     {
     }
 #else
+    enum class ParsedStatus
+    {
+        Skipped = libvlc_media_parsed_status_skipped,
+        Failed = libvlc_media_parsed_status_failed,
+        Done = libvlc_media_parsed_status_done,
+        Timeout = libvlc_media_parsed_status_timeout,
+    };
+
     /**
      * @brief Media Constructs a libvlc Media instance
      * @param instance  A libvlc instance
