@@ -6,7 +6,7 @@
 
 ## Documentation
 
-Since libvlcpp is a close wrapper over libvlc, your documentation needs will be best served by either checking the libvlcpp source code, or the [libvlc documentation](https://www.videolan.org/developers/vlc/doc/doxygen/html/group__libvlc.html).
+Since libvlcpp is a close wrapper over libvlc, your documentation needs will be best served by either checking the libvlcpp source code, or the [libvlc documentation](https://videolan.videolan.me/vlc/master/index.html).
 
 ## Issues
 
