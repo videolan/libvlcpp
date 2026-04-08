@@ -161,7 +161,6 @@ public:
                         getInternalPtr<libvlc_media_t>( md ) ) == 0;
     }
 
-#if LIBVLC_VERSION_INT >= LIBVLC_VERSION(4, 0, 0, 0)
     /**
      * Stop playing media list
      */
@@ -169,15 +168,6 @@ public:
     {
         libvlc_media_list_player_stop_async(*this);
     }
-#else
-    /**
-     * Stop playing media list
-     */
-    void stop()
-    {
-        libvlc_media_list_player_stop(*this);
-    }
-#endif
 
     /**
      * Play next item from media list

@@ -25,8 +25,6 @@
 
 #include "common.hpp"
 
-#if LIBVLC_VERSION_INT >= LIBVLC_VERSION(3, 0, 0, 0)
-
 namespace VLC
 {
 
@@ -105,7 +103,5 @@ private:
 };
 
 }
-
-#endif
 
 #endif // LIBVLC_CXX_RENDERERDISCOVERER_HPP

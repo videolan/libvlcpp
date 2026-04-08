@@ -25,8 +25,6 @@
 
 #include "common.hpp"
 
-#if LIBVLC_VERSION_INT >= LIBVLC_VERSION(4, 0, 0, 0)
-
 namespace VLC
 {
 
@@ -118,7 +116,5 @@ public:
 };
 
 }
-
-#endif
 
 #endif // LIBVLC_CXX_PICTURE_HPP

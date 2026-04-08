@@ -317,61 +317,13 @@ class MediaEventManager : public EventManager
         template <typename Func>
         RegisteredEvent onParsedChanged( Func&& f )
         {
-#if LIBVLC_VERSION_INT >= LIBVLC_VERSION(3, 0, 0, 0)
             EXPECT_SIGNATURE( void(Media::ParsedStatus) );
             return handle(libvlc_MediaParsedChanged, std::forward<Func>( f ), [](const libvlc_event_t* e, void* data)
             {
                 auto callback = static_cast<DecayPtr<Func>>(data);
                 (*callback)( static_cast<Media::ParsedStatus>( e->u.media_parsed_changed.new_status ) );
             });
-#else
-            EXPECT_SIGNATURE( void(bool) );
-            return handle(libvlc_MediaParsedChanged, std::forward<Func>( f ), [](const libvlc_event_t* e, void* data)
-            {
-                auto callback = static_cast<DecayPtr<Func>>(data);
-                (*callback)( bool( e->u.media_parsed_changed.new_status ) );
-            });
-#endif
         }
-
-#if LIBVLC_VERSION_INT < LIBVLC_VERSION(4, 0, 0, 0)
-        /**
-         * \brief onFreed Registers an event called when the media reaches a refcount of 0
-         * \param f A std::function<void(MediaPtr)> (or an equivalent Callable type)
-         *          The media is being destroyed by libvlc when this event gets called.
-         *          Any Media instance that would live past this call would wrap
-         *          a dangling pointer.
-         *
-         */
-        template <typename Func>
-        RegisteredEvent onFreed( Func&& f)
-        {
-            //FIXME: Provide a read-only Media wrapper, to avoid wild dangling references to appear.
-            EXPECT_SIGNATURE(void(MediaPtr));
-            return handle(libvlc_MediaFreed, std::forward<Func>( f ), [](const libvlc_event_t* e, void* data)
-            {
-                auto callback = static_cast<DecayPtr<Func>>(data);
-                auto media = e->u.media_freed.md;
-                (*callback)( media != nullptr ? std::make_shared<Media>( media, true ) : nullptr );
-            });
-        }
-
-        /**
-         * \brief onStateChanged Registers an event called when the Media state changes
-         * \param f A std::function<void(libvlc_state_t)> (or an equivalent Callable type)
-         */
-        template <typename Func>
-        RegisteredEvent onStateChanged( Func&& f)
-        {
-            //FIXME: Wrap libvlc_state_t in a class enum
-            EXPECT_SIGNATURE(void(libvlc_state_t));
-            return handle(libvlc_MediaStateChanged, std::forward<Func>( f ), [](const libvlc_event_t* e, void* data)
-            {
-                auto callback = static_cast<DecayPtr<Func>>(data);
-                (*callback)( e->u.media_state_changed.new_state );
-            });
-        }
-#endif
 
         /**
          * \brief onSubItemTreeAdded Registers an event called when all subitem have been added.
@@ -391,7 +343,6 @@ class MediaEventManager : public EventManager
             });
         }
 
-#if LIBVLC_VERSION_INT >= LIBVLC_VERSION(4, 0, 0, 0)
         /**
          * \brief onThumbnailGenerated is invoked upon success & failure of a thumbnail generation
          * \param A std::function<void(const Picture*)> (or an equivalent Callable type)
@@ -433,7 +384,6 @@ class MediaEventManager : public EventManager
                 (*callback)( pictures );
             });
         }
-#endif
 
 };
 
@@ -547,7 +497,6 @@ class MediaPlayerEventManager : public EventManager
             return handle( libvlc_MediaPlayerBackward, std::forward<Func>( f ) );
         }
 
-#if LIBVLC_VERSION_INT >= LIBVLC_VERSION(4, 0, 0, 0)
         /**
          * \brief onStopping Registers an event called when the media player begin stopping.
          * \param f A std::function<void(void)> (or an equivalent Callable type)
@@ -557,17 +506,6 @@ class MediaPlayerEventManager : public EventManager
         {
             return handle( libvlc_MediaPlayerStopping, std::forward<Func>( f ) );
         }
-#else
-        /**
-         * \brief onEndReached Registers an event called when the media player reaches the end of a media
-         * \param f A std::function<void(void)> (or an equivalent Callable type)
-         */
-        template <typename Func>
-        RegisteredEvent onEndReached(Func&& f)
-        {
-            return handle( libvlc_MediaPlayerEndReached, std::forward<Func>( f ) );
-        }
-#endif
         /**
          * \brief onEncounteredError Registers an event called when the media player reaches encounters an error
          * \param f A std::function<void(void)> (or an equivalent Callable type)
@@ -642,7 +580,6 @@ class MediaPlayerEventManager : public EventManager
             });
         }
 
-#if LIBVLC_VERSION_INT >= LIBVLC_VERSION(4, 0, 0, 0)
         /**
          * \brief onTitleListChanged Registers an event called when the list of titles changes
          * \param f A std::function<void(void)> (or an equivalent Callable type)
@@ -670,27 +607,7 @@ class MediaPlayerEventManager : public EventManager
                              e->u.media_player_title_selection_changed.index );
             });
         }
-#else
-        /**
-         * \brief onTitleChanged Registers an event called when the current title changes
-         * \param f A std::function<void(int)> (or an equivalent Callable type)
-         *          The provided integer is the new current title identifier.
-         *          Please note that this has nothing to do with a text title (the name of
-         *          the video being played, for instance)
-         */
-        template <typename Func>
-        RegisteredEvent onTitleChanged( Func&& f )
-        {
-            EXPECT_SIGNATURE(void(int));
-            return handle( libvlc_MediaPlayerTitleChanged, std::forward<Func>( f ), [](const libvlc_event_t* e, void* data)
-            {
-                auto callback = static_cast<DecayPtr<Func>>( data );
-                (*callback)( e->u.media_player_title_changed.new_title );
-            });
-        }
-#endif
 
-#if LIBVLC_VERSION_INT >= LIBVLC_VERSION(3, 0, 0, 0)
         /**
          * \brief onChapterChanged Registers an event called when the current chapter changes
          * \param f A std::function<void(int)> (or an equivalent Callable type)
@@ -708,7 +625,6 @@ class MediaPlayerEventManager : public EventManager
                 (*callback)( e->u.media_player_chapter_changed.new_chapter );
             });
         }
-#endif
 
         /**
          * \brief onSnapshotTaken Registers an event called when a snapshot gets taken
@@ -757,25 +673,6 @@ class MediaPlayerEventManager : public EventManager
             });
         }
 
-#if LIBVLC_VERSION_INT < LIBVLC_VERSION(4, 0, 0, 0)
-        /**
-         * \brief onScrambledChanged Registers an event called when the scrambled state changes
-         * \param f A std::function<void(bool)> (or an equivalent Callable type)
-         *          The provided boolean will be true if the media is scrambled, false otherwise.
-         */
-        template <typename Func>
-        RegisteredEvent onScrambledChanged( Func&& f )
-        {
-            EXPECT_SIGNATURE(void(bool));
-            return handle( libvlc_MediaPlayerScrambledChanged, std::forward<Func>( f ), [](const libvlc_event_t* e, void* data)
-            {
-                auto callback = static_cast<DecayPtr<Func>>( data );
-                (*callback)( e->u.media_player_scrambled_changed.new_scrambled != 0 );
-            });
-        }
-#endif
-
-#if LIBVLC_VERSION_INT >= LIBVLC_VERSION(4, 0, 0, 0)
         /**
          * \brief onESAdded Registers an event called when an elementary stream get added
          * \param f A std::function<void(MediaTrack::Type, int)> (or an equivalent Callable type)
@@ -846,79 +743,7 @@ class MediaPlayerEventManager : public EventManager
                 (*callback)( e->u.media_player_audio_device.device );
             });
         }
-#elif LIBVLC_VERSION_INT >= LIBVLC_VERSION(3, 0, 0, 0)
-        /**
-         * \brief onESAdded Registers an event called when an elementary stream get added
-         * \param f A std::function<void(MediaTrack::Type, int)> (or an equivalent Callable type)
-         *          MediaTrack::Type: The new track type
-         *          int: the new track index
-         */
-        template <typename Func>
-        RegisteredEvent onESAdded( Func&& f )
-        {
-            EXPECT_SIGNATURE(void(MediaTrack::Type, int));
-            return handle( libvlc_MediaPlayerESAdded, std::forward<Func>( f ), [](const libvlc_event_t* e, void* data)
-            {
-                auto callback = static_cast<DecayPtr<Func>>( data );
-                (*callback)( static_cast<MediaTrack::Type>( e->u.media_player_es_changed.i_type ),
-                             e->u.media_player_es_changed.i_id );
-            });
-        }
 
-        /**
-         * \brief onESDeleted Registers an event called when an elementary stream get deleted
-         * \param f A std::function<void(MediaTrack::Type, int)> (or an equivalent Callable type)
-         *          MediaTrack::Type: The track type
-         *          int: the track index
-         */
-        template <typename Func>
-        RegisteredEvent onESDeleted( Func&& f )
-        {
-            EXPECT_SIGNATURE(void(MediaTrack::Type, int));
-            return handle( libvlc_MediaPlayerESDeleted, std::forward<Func>( f ), [](const libvlc_event_t* e, void* data)
-            {
-                auto callback = static_cast<DecayPtr<Func>>( data );
-                (*callback)( static_cast<MediaTrack::Type>( e->u.media_player_es_changed.i_type ),
-                             e->u.media_player_es_changed.i_id );
-            });
-        }
-
-        /**
-         * \brief onESSelected Registers an event called when an elementary stream get selected
-         * \param f A std::function<void(MediaTrack::Type, int)> (or an equivalent Callable type)
-         *          MediaTrack::Type: The track type
-         *          int: the track index
-         */
-        template <typename Func>
-        RegisteredEvent onESSelected( Func&& f )
-        {
-            EXPECT_SIGNATURE(void(MediaTrack::Type, int));
-            return handle( libvlc_MediaPlayerESSelected, std::forward<Func>( f ), [](const libvlc_event_t* e, void* data)
-            {
-                auto callback = static_cast<DecayPtr<Func>>( data );
-                (*callback)( static_cast<MediaTrack::Type>( e->u.media_player_es_changed.i_type ),
-                             e->u.media_player_es_changed.i_id );
-            });
-        }
-
-        /**
-         * \brief onAudioDevice Registers an event called when the current audio output device changes
-         * \param f A std::function<void(std::string)> (or an equivalent Callable type)
-         *          The provided string is the new current audio device.
-         */
-        template <typename Func>
-        RegisteredEvent onAudioDevice( Func&& f )
-        {
-            EXPECT_SIGNATURE(void(std::string));
-            return handle( libvlc_MediaPlayerAudioDevice, std::forward<Func>( f ), [](const libvlc_event_t* e, void* data)
-            {
-                auto callback = static_cast<DecayPtr<Func>>( data );
-                (*callback)( e->u.media_player_audio_device.device );
-            });
-        }
-#endif
-
-#if LIBVLC_VERSION_INT >= LIBVLC_VERSION(2, 2, 2, 0)
         /**
          * \brief onCorked Registers an event called when the playback is paused automatically for a higher priority audio stream
          * \param f A std::function<void(void)> (or an equivalent Callable type)
@@ -974,7 +799,6 @@ class MediaPlayerEventManager : public EventManager
                 (*callback)( e->u.media_player_audio_volume.volume );
             });
         }
-#endif
 };
 
 /**
@@ -1071,13 +895,11 @@ class MediaListEventManager : public EventManager
             });
         }
 
-#if LIBVLC_VERSION_INT >= LIBVLC_VERSION(3, 0, 0, 0)
         template <typename Func>
         RegisteredEvent onEndReached( Func&& f )
         {
             return handle( libvlc_MediaListEndReached, std::forward<Func>( f ) );
         }
-#endif
 };
 
 /**
@@ -1124,39 +946,6 @@ class MediaListPlayerEventManager : public EventManager
         }
 };
 
-#if LIBVLC_VERSION_INT < LIBVLC_VERSION(3, 0, 0, 0)
-/**
- * @brief The MediaDiscovererEventManager class allows one to register MediaDiscoverer related events
- */
-class MediaDiscovererEventManager : public EventManager
-{
-    public:
-        MediaDiscovererEventManager(InternalPtr ptr) : EventManager( ptr ) {}
-
-        /**
-         * \brief onStarted Registers an event called when the discovery starts
-         * \param f A std::function<void(void)> (or an equivalent Callable type)
-         */
-        template <typename Func>
-        RegisteredEvent onStarted(Func&& f)
-        {
-            return handle(libvlc_MediaDiscovererStarted, std::forward<Func>( f ) );
-        }
-
-        /**
-         * \brief onStopped Registers an event called when the discovery stops
-         * \param f A std::function<void(void)> (or an equivalent Callable type)
-         */
-        template <typename Func>
-        RegisteredEvent onStopped(Func&& f)
-        {
-            return handle(libvlc_MediaDiscovererEnded, std::forward<Func>( f ) );
-        }
-};
-#endif
-
-#if LIBVLC_VERSION_INT >= LIBVLC_VERSION(3, 0, 0, 0)
-
 /*
 * \brief The RendererDiscovererEventManager class allows one to register
 * renderer discoverer related events
@@ -1201,8 +990,6 @@ public:
     }
 
 };
-
-#endif
 
 }
 

@@ -27,21 +27,16 @@
 #include "common.hpp"
 
 #include <string>
-#include <vlc/libvlc_version.h>
 
 namespace VLC
 {
 
 class Instance;
 class MediaList;
-#if LIBVLC_VERSION_INT < LIBVLC_VERSION(3, 0, 0, 0)
-class MediaDiscovererEventManager;
-#endif
 
 class MediaDiscoverer : public Internal<libvlc_media_discoverer_t>
 {
 public:
-#if LIBVLC_VERSION_INT >= LIBVLC_VERSION(3, 0, 0, 0)
     enum class Category
     {
         Devices = libvlc_media_discoverer_devices,
@@ -80,7 +75,6 @@ public:
         std::string m_longName;
         Category m_category;
     };
-#endif
     /**
      * Discover media service by name.
      *
@@ -89,11 +83,7 @@ public:
      * \param psz_name  service name
      */
     MediaDiscoverer(const Instance& inst, const std::string& name)
-#if LIBVLC_VERSION_INT >= LIBVLC_VERSION(3, 0, 0, 0)
         : Internal{ libvlc_media_discoverer_new(getInternalPtr<libvlc_instance_t>( inst ), name.c_str()),
-#else
-        : Internal{ libvlc_media_discoverer_new_from_name(getInternalPtr<libvlc_instance_t>( inst ), name.c_str()),
-#endif
                     libvlc_media_discoverer_release }
     {
     }
@@ -105,7 +95,6 @@ public:
     */
     MediaDiscoverer() = default;
 
-#if LIBVLC_VERSION_INT >= LIBVLC_VERSION(3, 0, 0, 0)
     /**
      * Start media discovery.
      *
@@ -130,37 +119,6 @@ public:
     {
         libvlc_media_discoverer_stop( *this );
     }
-#endif
-
-#if LIBVLC_VERSION_INT < LIBVLC_VERSION(3, 0, 0, 0)
-    /**
-     * Get media service discover object its localized name.
-     *
-     * \return localized name
-     */
-    std::string localizedName()
-    {
-        auto str = wrapCStr( libvlc_media_discoverer_localized_name(*this) );
-        if ( str == nullptr )
-            return {};
-        return str.get();
-    }
-
-    /**
-     * Get event manager from media service discover object.
-     *
-     * \return event manager object.
-     */
-    MediaDiscovererEventManager& eventManager()
-    {
-        if ( m_eventManager == nullptr )
-        {
-            libvlc_event_manager_t* obj = libvlc_media_discoverer_event_manager( *this );
-            m_eventManager = std::make_shared<MediaDiscovererEventManager>( obj );
-        }
-        return *m_eventManager;
-    }
-#endif
 
     /**
      * Query if media service discover object is running.
@@ -185,9 +143,6 @@ public:
     }
 
 private:
-#if LIBVLC_VERSION_INT < LIBVLC_VERSION(3, 0, 0, 0)
-    std::shared_ptr<MediaDiscovererEventManager> m_eventManager;
-#endif
     std::shared_ptr<MediaList> m_mediaList;
 };
 

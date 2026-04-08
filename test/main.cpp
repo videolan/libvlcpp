@@ -39,29 +39,16 @@ int main(int ac, char** av)
         static_cast<uint8_t*>( imgBuffer ), &free };
     auto instance = VLC::Instance(1, &vlcArgs);
 
-#if LIBVLC_VERSION_INT >= LIBVLC_VERSION(3, 0, 0, 0)
     auto sds = instance.mediaDiscoverers( VLC::MediaDiscoverer::Category::Lan );
     for ( const auto& sd : sds )
         std::cout << "Found SD: " << sd.name() << "(" << sd.longName() << ")" << std::endl;
-#endif
-
-#if LIBVLC_VERSION_INT < LIBVLC_VERSION(4, 0, 0, 0)
-    instance.setExitHandler([] {
-        std::cout << "Libvlc is exiting" << std::endl;
-    });
-#endif
 
     instance.logSet([](int lvl, const libvlc_log_t*, std::string message ) {
         std::cout << "Hooked VLC log: " << lvl << ' ' << message << std::endl;
     });
 
-#if LIBVLC_VERSION_INT >= LIBVLC_VERSION(4, 0, 0, 0)
     auto media = VLC::Media(av[1], VLC::Media::FromPath);
     auto mp = VLC::MediaPlayer(instance, media);
-#else
-    auto media = VLC::Media(instance, av[1], VLC::Media::FromPath);
-    auto mp = VLC::MediaPlayer(media);
-#endif
     auto eventManager = mp.eventManager();
     eventManager.onPlaying([&media]() {
         std::cout << media.mrl() << " is playing" << std::endl;
@@ -114,12 +101,10 @@ int main(int ac, char** av)
     auto lFunc = std::function<void(float)>{ l };
     auto h1 = mp.eventManager().onTimeChanged(lFunc);
     auto h2 = mp.eventManager().onPositionChanged(lFunc);
-#if LIBVLC_VERSION_INT >= LIBVLC_VERSION(4, 0, 0, 0)
     mp.eventManager().onTitleSelectionChanged(
                 [](const VLC::TitleDescription& t, int idx ) {
         std::cout << "New title selected: " << t.name() << " at index " << idx << std::endl;
     });
-#endif
 
     std::this_thread::sleep_for( std::chrono::seconds( 2 ) );
 
@@ -145,13 +130,11 @@ int main(int ac, char** av)
 
     std::this_thread::sleep_for( std::chrono::milliseconds(500) );
 
-#if LIBVLC_VERSION_INT >= LIBVLC_VERSION(4, 0, 0, 0)
     auto tracks = mp.tracks( VLC::MediaTrack::Type::Video, false );
     std::cout << "Got " << tracks.size() << " tracks" << std::endl;
     assert(!tracks.empty());
     mp.selectTracks( VLC::MediaTrack::Type::Video, tracks );
     std::this_thread::sleep_for( std::chrono::milliseconds(1000) );
-#endif
 
     // Showing that copying an object shares the associated eventmanager
     auto mp2 = mp;
@@ -162,11 +145,7 @@ int main(int ac, char** av)
         // expect a single call since both media player share the same event manager
         expected = false;
     });
-#if LIBVLC_VERSION_INT >= LIBVLC_VERSION(4, 0, 0, 0)
     mp.stopAsync();
-#else
-    mp.stop();
-#endif
     // Unregister the RegisteredEvent from the other MP's event manager.
     // It will be unregistered from both, and when the object gets destroyed
     // by leaving the scope, it won't be unregistered from mp2's eventManager.

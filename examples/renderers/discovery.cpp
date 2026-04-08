@@ -27,7 +27,6 @@
 
 int main()
 {
-#if LIBVLC_VERSION_INT >= LIBVLC_VERSION(3, 0, 0, 0)
     VLC::Instance inst( 0, nullptr );
     VLC::RendererDiscoverer disc( inst, "microdns" );
 
@@ -44,8 +43,4 @@ int main()
     if ( disc.start() == false )
         abort();
     std::this_thread::sleep_for( std::chrono::seconds{ 10 } );
-#else
-    std::cerr << "Renderer discovery isn't available before VLC 3." << std::endl;
-    return 1;
-#endif
 }

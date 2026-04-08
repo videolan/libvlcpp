@@ -8,7 +8,6 @@ libvlcpp_headers = files(
     'Internal.hpp',
     'Media.hpp',
     'MediaDiscoverer.hpp',
-    'MediaLibrary.hpp',
     'MediaList.hpp',
     'MediaListPlayer.hpp',
     'MediaPlayer.hpp',

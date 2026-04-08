@@ -41,7 +41,6 @@
 namespace VLC
 {
 
-#if LIBVLC_VERSION_INT >= LIBVLC_VERSION(3, 0, 0, 0)
 using Question = libvlc_dialog_question_type;
 
 namespace DialogType
@@ -56,32 +55,23 @@ namespace DialogType
     static const Question critical = LIBVLC_DIALOG_QUESTION_CRITICAL;
 #endif
 }
-#endif
 
-#if LIBVLC_VERSION_INT >= LIBVLC_VERSION(3, 0, 0, 0)
 class Instance : protected CallbackOwner<8>, public Internal<libvlc_instance_t>
-#else
-class Instance : protected CallbackOwner<5>, public Internal<libvlc_instance_t>
-#endif
 {
 private:
     enum class CallbackIdx : unsigned int
     {
         Exit = 0,
         Log,
-#if LIBVLC_VERSION_INT >= LIBVLC_VERSION(3, 0, 0, 0)
         ErrorDisplay,
         LoginDisplay,
         QuestionDisplay,
         ProgressDisplay,
         CancelDialog,
         ProgressUpdate
-#endif
     };
 
-#if LIBVLC_VERSION_INT >= LIBVLC_VERSION(3, 0, 0, 0)
     std::shared_ptr<libvlc_dialog_cbs> m_callbacks_pointers;
-#endif
 public:
     /**
      * Create and initialize a libvlc instance. This functions accept a list
@@ -107,9 +97,7 @@ public:
      */
     Instance(int argc, const char *const * argv)
         : Internal{ libvlc_new( argc, argv ), libvlc_release }
-#if LIBVLC_VERSION_INT >= LIBVLC_VERSION(3, 0, 0, 0)
-          , m_callbacks_pointers { std::make_shared<libvlc_dialog_cbs>() }
-#endif
+        , m_callbacks_pointers { std::make_shared<libvlc_dialog_cbs>() }
     {
     }
 
@@ -143,42 +131,6 @@ public:
         return m_obj == another.m_obj;
     }
 
-
-#if LIBVLC_VERSION_INT < LIBVLC_VERSION(4, 0, 0, 0)
-    /**
-     * Try to start a user interface for the libvlc instance.
-     *
-     * \param name  interface name, or empty string for default
-     */
-    bool addIntf(const std::string& name)
-    {
-        return libvlc_add_intf( *this, name.length() > 0 ? name.c_str() : nullptr ) == 0;
-    }
-
-    /**
-     * Registers a callback for the LibVLC exit event. This is mostly useful
-     * if the VLC playlist and/or at least one interface are started with
-     * libvlc_playlist_play() or Instance::addIntf() respectively. Typically,
-     * this function will wake up your application main loop (from another
-     * thread).
-     *
-     * \note This function should be called before the playlist or interface
-     * are started. Otherwise, there is a small race condition: the exit
-     * event could be raised before the handler is registered.
-     *
-     * \param cb  callback to invoke when LibVLC wants to exit, or nullptr to
-     * disable the exit handler (as by default). It is expected to be a
-     * std::function<void()>, or an equivalent Callable type
-     */
-    template <typename ExitCb>
-    void setExitHandler(ExitCb&& exitCb)
-    {
-        static_assert(signature_match_or_nullptr<ExitCb, void()>::value, "Mismatched exit callback" );
-        libvlc_set_exit_handler( *this,
-            CallbackWrapper<(unsigned int)CallbackIdx::Exit, void(*)(void*)>::wrap( *m_callbacks, std::forward<ExitCb>( exitCb ) ),
-            m_callbacks.get() );
-    }
-#endif
 
     /**
      * Sets the application name. LibVLC passes this as the user agent string
@@ -358,44 +310,6 @@ public:
         return res;
     }
 
-#if LIBVLC_VERSION_INT < LIBVLC_VERSION(4, 0, 0, 0)
-    /**
-     * Gets a list of audio output devices for a given audio output module,
-     *
-     * \see Audio::outputDeviceSet() .
-     *
-     * \note Not all audio outputs support this. In particular, an empty
-     * (nullptr) list of devices does imply that the specified audio output does
-     * not work.
-     *
-     * \note The list might not be exhaustive.
-     *
-     * \warning Some audio output devices in the list might not actually work
-     * in some circumstances. By default, it is recommended to not specify
-     * any explicit audio device.
-     *
-     * \param psz_aout  audio output name (as returned by
-     * Instance::audioOutputList() )
-     *
-     * \return A vector containing all audio output devices for this module
-     *
-     * \version LibVLC 2.1.0 or later.
-     */
-    std::vector<AudioOutputDeviceDescription> audioOutputDeviceList(const std::string& aout)
-    {
-        std::unique_ptr<libvlc_audio_output_device_t, decltype(&libvlc_audio_output_device_list_release)>
-                devices(  libvlc_audio_output_device_list_get( *this, aout.c_str() ), libvlc_audio_output_device_list_release );
-        if ( devices == nullptr )
-            return {};
-        std::vector<AudioOutputDeviceDescription> res;
-
-        for ( auto p = devices.get(); p != nullptr; p = p->p_next )
-            res.emplace_back( p );
-        return res;
-    }
-#endif
-
-#if LIBVLC_VERSION_INT >= LIBVLC_VERSION(3, 0, 0, 0)
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
     /**
      * Called when an error message needs to be displayed.
@@ -490,7 +404,6 @@ public:
      * \param cancel   lambda callback that will get called when a displayed dialog needs to be cancelled. \see CancelCb
      * \param updtProgress   lambda callback that will get called when a progress dialog needs to be updated. \see UpdtProgressCb
      */
-#if LIBVLC_VERSION_INT >= LIBVLC_VERSION(4, 0, 0, 0)
     template <class Login, class Question, class DspProgress, class Cancel, class UpdtProgress>
     void setDialogHandlers(Login&& login, Question&& question, DspProgress&& dspProgress, Cancel &&cancel, UpdtProgress &&updtProgress)
     {
@@ -522,30 +435,6 @@ public:
             CallbackWrapper<(unsigned int)CallbackIdx::ErrorDisplay, libvlc_dialog_error_cbs>::wrap(
                 *m_callbacks, std::forward(error)));
     }
-#else
-    template <class Error, class Login, class Question, class DspProgress, class Cancel, class UpdtProgress>
-    void setDialogHandlers(Error&& error, Login&& login, Question&& question, DspProgress&& dspProgress, Cancel &&cancel, UpdtProgress &&updtProgress)
-    {
-#if !defined(_MSC_VER) || _MSC_VER >= 1900
-        static_assert(signature_match_or_nullptr<Error, ErrorCb>::value, "Mismatched error display callback prototype");
-        static_assert(signature_match_or_nullptr<Login, LoginCb>::value, "Mismatched login display callback prototype");
-        static_assert(signature_match_or_nullptr<Question, QuestionCb>::value, "Mismatched question display callback prototype");
-        static_assert(signature_match_or_nullptr<DspProgress, DspProgressCb>::value, "Mismatched progress display callback prototype");
-        static_assert(signature_match_or_nullptr<Cancel, CancelCb>::value, "Mismatched cancel callback prototype");
-        static_assert(signature_match_or_nullptr<UpdtProgress, UpdtProgressCb>::value, "Mismatched update progress callback prototype");
-#endif
-        libvlc_dialog_cbs tmp = {
-            CallbackWrapper<(unsigned)CallbackIdx::ErrorDisplay, decltype(libvlc_dialog_cbs::pf_display_error)>::wrap(*m_callbacks, std::forward<Error>(error)),
-            CallbackWrapper<(unsigned)CallbackIdx::LoginDisplay, decltype(libvlc_dialog_cbs::pf_display_login)>::wrap(*m_callbacks, std::forward<Login>(login)),
-            CallbackWrapper<(unsigned)CallbackIdx::QuestionDisplay, decltype(libvlc_dialog_cbs::pf_display_question)>::wrap(*m_callbacks, std::forward<Question>(question)),
-            CallbackWrapper<(unsigned)CallbackIdx::ProgressDisplay, decltype(libvlc_dialog_cbs::pf_display_progress)>::wrap(*m_callbacks, std::forward<DspProgress>(dspProgress)),
-            CallbackWrapper<(unsigned)CallbackIdx::CancelDialog, decltype(libvlc_dialog_cbs::pf_cancel)>::wrap(*m_callbacks, std::forward<Cancel>(cancel)),
-            CallbackWrapper<(unsigned)CallbackIdx::ProgressUpdate, decltype(libvlc_dialog_cbs::pf_update_progress)>::wrap(*m_callbacks, std::forward<UpdtProgress>(updtProgress))
-        };
-        m_callbacks_pointers = std::make_shared<libvlc_dialog_cbs>(tmp);
-        libvlc_dialog_set_callbacks(*this, m_callbacks_pointers.get(), m_callbacks.get());
-    }
-#endif
     /**
      * Unset all callbacks
      */
@@ -556,7 +445,6 @@ public:
         libvlc_dialog_set_callbacks(*this, nullptr, nullptr);
     }
 
-#if LIBVLC_VERSION_INT >= LIBVLC_VERSION(3, 0, 0, 0)
     /**
      * Get media discoverer services by category
      *
@@ -600,10 +488,6 @@ public:
             res.emplace_back( pp_descs[i] );
         return res;
     }
-
-#endif
-
-#endif // LIBVLC_VERSION_INT >= LIBVLC_VERSION(3, 0, 0, 0)
 };
 
 } // namespace VLC
