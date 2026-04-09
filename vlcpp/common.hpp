@@ -32,6 +32,7 @@ using ssize_t = long int;
 #include <array>
 #include <cassert>
 #include <memory>
+#include <type_traits>
 
 namespace VLC
 {
@@ -177,17 +178,100 @@ namespace VLC
     template <size_t Idx, typename Ret, typename Opaque, typename... Args>
     struct CallbackWrapper<Idx, Ret(*)(Opaque, Args...)>
     {
+        /* argWrapper converts a single raw libVLC callback argument into its libvlcpp
+           equivalent at compile time using SFINAE overloads. The correct overload is
+           selected based on the Wrapper type */
+
+        /* 1. Wrapper is an enum */
+        template <typename Wrapper, typename Arg>
+        static typename std::enable_if<std::is_enum<Wrapper>::value, Wrapper>::type
+        argWrapper(Arg arg)
+        {
+            return static_cast<Wrapper>(arg);
+        }
+
+        /* 2. Wrapper is MediaPtr */
+        template <typename Wrapper, typename Arg>
+        static typename std::enable_if<std::is_same<Wrapper, MediaPtr>::value, Wrapper>::type
+        argWrapper(Arg arg)
+        {
+            return arg == nullptr ? nullptr : std::make_shared<Media>(arg, true);
+        }
+
+        /* 3. Wrapper is a class type (but not MediaPtr) */
+        template <typename Wrapper, typename Arg>
+        static typename std::enable_if<
+            std::is_class<Wrapper>::value &&
+            !std::is_same<Wrapper, MediaPtr>::value, Wrapper
+        >::type
+        argWrapper(Arg arg)
+        {
+            return Wrapper{arg};
+        }
+
+        /* 4. Everything else */
+        template <typename Wrapper, typename Arg>
+        static typename std::enable_if<
+            !std::is_enum<Wrapper>::value &&
+            !std::is_class<Wrapper>::value, Wrapper
+        >::type
+        argWrapper(Arg arg)
+        {
+            return arg;
+        }
+
         using Wrapped = Ret(*)(Opaque, Args...);
 
-        template <size_t NbEvents, typename Func>
-        static Wrapped wrap(CallbackArray<NbEvents>& callbacks, Func&& func)
+        /* wrap() overload 1: ArgWrapper types explicitly provided (sizeof...(ArgWrapper) > 0).
+           Use this when the raw libVLC callback arguments need to be converted into
+           libvlcpp wrapper types before being forwarded to the user-provided callback.
+
+           The number of ArgWrapper types must match the number of callback arguments (Args).
+           Example: CallbackWrapper<Idx, void(*)(void*, libvlc_state_t, libvlc_media_t*)>
+                        ::wrap<MediaState, MediaPtr>(callbacks, myFunc); */
+        template <typename... ArgWrapper, size_t NbEvents, typename Func>
+        static typename std::enable_if<sizeof...(ArgWrapper) != 0, Wrapped>::type
+        wrap(CallbackArray<NbEvents>& callbacks, Func&& func)
         {
             callbacks[Idx] = std::unique_ptr<CallbackHandler<Func>>( new CallbackHandler<Func>( std::forward<Func>( func ) ) );
             return [](Opaque opaque, Args... args) -> Ret {
                 auto& callbacks = FromOpaque<NbEvents, Opaque>::get( opaque );
                 assert(callbacks[Idx] != nullptr);
                 auto cbHandler = static_cast<CallbackHandler<Func>*>( callbacks[Idx].get() );
-                return cbHandler->func( detail::converterForNullToString<Args>(std::forward<Args>(args))... );
+                return cbHandler->func(
+                    CallbackWrapper::argWrapper<ArgWrapper>(
+                        detail::converterForNullToString<Args>(
+                            std::forward<Args>(args)
+                        )
+                    )...
+                );
+            };
+        }
+
+        /* wrap() overload 2: No ArgWrapper types provided (sizeof...(ArgWrapper) == 0).
+         Backwards-compatible pass-through overload. Arguments are forwarded to the
+         user-provided callback as-is (only null-to-empty-string conversion applies).
+         This is the behaviour all pre-existing call sites relied on before argWrapper
+         was introduced, so omitting ArgWrapper or calling wrap<>() continues to work
+         without modification.
+
+         Example (legacy / no conversion needed):
+           CallbackWrapper<Idx, void(*)(void*, int)>::wrap(callbacks, myFunc);
+           CallbackWrapper<Idx, void(*)(void*, int)>::wrap<>(callbacks, myFunc); */
+        template <typename... ArgWrapper, size_t NbEvents, typename Func>
+        static typename std::enable_if<sizeof...(ArgWrapper) == 0, Wrapped>::type
+        wrap(CallbackArray<NbEvents>& callbacks, Func&& func)
+        {
+            callbacks[Idx] = std::unique_ptr<CallbackHandler<Func>>( new CallbackHandler<Func>( std::forward<Func>( func ) ) );
+            return [](Opaque opaque, Args... args) -> Ret {
+                auto& callbacks = FromOpaque<NbEvents, Opaque>::get( opaque );
+                assert(callbacks[Idx] != nullptr);
+                auto cbHandler = static_cast<CallbackHandler<Func>*>( callbacks[Idx].get() );
+                return cbHandler->func(
+                    detail::converterForNullToString<Args>(
+                        std::forward<Args>(args)
+                    )...
+                );
             };
         }
 
