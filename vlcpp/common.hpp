@@ -451,31 +451,38 @@ namespace VLC
         // and forward the user provided opaque only when it's actually used
         // However, this would mean that depending on the OpenCb type, the expected
         // prototype of Read/Seek/Close cb would change, which might not be ideal.
-        // Using CallbackWrapper type is preferable to wrapping user provided callbacks
-        // with lambdas, as we would lose the ability to detect when nullptr is provided,
-        // so we'd have VLC call a no-op function, while the nullptr wrap() specialization
-        // takes care of this.
+        //
+        // Unlike the general case, registering a callback is split in two steps:
+        // store() records the user callback (independent of any BoxingStrategy),
+        // and produce() emits the libvlc C function pointer for a chosen strategy. The split
+        // is required because the strategy of the read/seek/close callbacks depends
+        // on whether an open callback is present, which may be supplied after them.
         template <size_t Idx, typename Ret, typename... Args>
         struct CallbackWrapper<Idx, Ret(*)(void*, Args...)>
         {
             using Wrapped = Ret(*)(void*, Args...);
 
-            template <BoxingStrategy Strategy, size_t NbEvents, typename Func>
-            static Wrapped wrap(CallbackArray<NbEvents>& callbacks, Func&& func)
+            // Stores the user provided callback into the callback array.
+            // This step is independent of the BoxingStrategy, so it can be
+            // performed as soon as the callback is provided, even before we
+            // know whether an open callback exists.
+            template <size_t NbEvents, typename Func>
+            static void store(CallbackArray<NbEvents>& callbacks, Func&& func)
             {
-                callbacks[Idx] = std::unique_ptr<CallbackHandler<Func>>( new CallbackHandler<Func>( std::forward<Func>( func ) ) );
+                callbacks[Idx] = std::unique_ptr<CallbackHandler<Func>>(
+                    new CallbackHandler<Func>(std::forward<Func>(func)));
+            }
+
+            // Produces the libvlc C callback function pointer for a given BoxingStrategy.
+            template <BoxingStrategy Strategy, size_t NbEvents, typename Func>
+            static Wrapped produce()
+            {
                 return [](void* opaque, Args... args) -> Ret {
                     auto boxed = BoxOpaque<NbEvents, Strategy>( opaque, std::forward<Args>( args )... );
                     assert(boxed.callbacks()[Idx] != nullptr );
                     auto cbHandler = static_cast<CallbackHandler<Func>*>( boxed.callbacks()[Idx].get() );
                     return cbHandler->func( boxed, std::forward<Args>(args)... );
                 };
-            }
-
-            template <BoxingStrategy Strategy, size_t NbEvents>
-            static std::nullptr_t wrap(CallbackArray<NbEvents>&, std::nullptr_t)
-            {
-                return nullptr;
             }
         };
     } //namespace imem

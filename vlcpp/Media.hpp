@@ -37,16 +37,9 @@ class Instance;
 class MediaList;
 class TrackList;
 
-class Media : protected CallbackOwner<4>, public Internal<libvlc_media_t>
+class Media : public Internal<libvlc_media_t>
 {
 private:
-    enum class CallbackIdx : unsigned int
-    {
-        Open,
-        Read,
-        Seek,
-        Close,
-    };
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
     static constexpr unsigned int NbEvents = 4;
 #else
@@ -259,16 +252,173 @@ public:
      */
     using ExpectedMediaCloseCb = void(void* opaque);
 
+    class Callbacks : protected CallbackOwner<NbEvents>
+    {
+    private:
+        enum class CallbackIdx : unsigned int
+        {
+            Open,
+            Read,
+            Seek,
+            Close,
+        };
+
+        friend class Media;
+
+        /* The boxing strategy of the read/seek/close callbacks depends on
+           whether an open callback is provided: with an open callback, the
+           opaque is boxed (Unbox/Cleanup), without one libvlc forwards the
+           raw opaque untouched (NoBoxing). Since the open callback may be set
+           after read/seek/close, we cannot pick their strategy when they are
+           provided. We therefore only store the user callbacks in the setter
+           methods, and defer producing the actual C function pointers to build(),
+           once the full set of callbacks (hence the presence of open) is known.
+           m_cbs is mutable because build() finalizes it from a const Media
+           constructor. */
+        mutable libvlc_media_open_cbs m_cbs;
+
+        using OpenFn  = decltype(libvlc_media_open_cbs::open);
+        using ReadFn  = decltype(libvlc_media_open_cbs::read);
+        using SeekFn  = decltype(libvlc_media_open_cbs::seek);
+        using CloseFn = decltype(libvlc_media_open_cbs::close);
+
+        bool m_hasOpen = false;
+        OpenFn  (*m_makeOpen)()        = nullptr;
+        ReadFn  (*m_makeRead)( bool )  = nullptr;
+        SeekFn  (*m_makeSeek)( bool )  = nullptr;
+        CloseFn (*m_makeClose)( bool ) = nullptr;
+
+        template <typename Func>
+        static OpenFn makeOpenCb()
+        {
+            using CW = imem::CallbackWrapper<(unsigned int)CallbackIdx::Open, OpenFn>;
+            return CW::produce<imem::BoxingStrategy::Setup, NbEvents, Func>();
+        }
+
+        template <typename Func>
+        static ReadFn makeReadCb( bool hasOpen )
+        {
+            using CW = imem::CallbackWrapper<(unsigned int)CallbackIdx::Read, ReadFn>;
+            return hasOpen ? CW::produce<imem::BoxingStrategy::Unbox, NbEvents, Func>()
+                           : CW::produce<imem::BoxingStrategy::NoBoxing, NbEvents, Func>();
+        }
+
+        template <typename Func>
+        static SeekFn makeSeekCb( bool hasOpen )
+        {
+            using CW = imem::CallbackWrapper<(unsigned int)CallbackIdx::Seek, SeekFn>;
+            return hasOpen ? CW::produce<imem::BoxingStrategy::Unbox, NbEvents, Func>()
+                           : CW::produce<imem::BoxingStrategy::NoBoxing, NbEvents, Func>();
+        }
+
+        template <typename Func>
+        static CloseFn makeCloseCb( bool hasOpen )
+        {
+            using CW = imem::CallbackWrapper<(unsigned int)CallbackIdx::Close, CloseFn>;
+            return hasOpen ? CW::produce<imem::BoxingStrategy::Cleanup, NbEvents, Func>()
+                           : CW::produce<imem::BoxingStrategy::NoBoxing, NbEvents, Func>();
+        }
+
+        void build() const
+        {
+            m_cbs.read = m_makeRead( m_hasOpen );
+
+            if ( m_makeOpen )
+                m_cbs.open = m_makeOpen();
+            if ( m_makeSeek )
+                m_cbs.seek = m_makeSeek( m_hasOpen );
+            if ( m_makeClose )
+                m_cbs.close = m_makeClose( m_hasOpen );
+        }
+
+    public:
+        Callbacks() = delete;
+
+        /**
+         * Constructor with the mandatory read callback.
+         *
+         * \param readCb callback to read data (must not be nullptr)
+         *
+         * \see ExpectedMediaReadCb
+         */
+        template <typename ReadCb>
+        Callbacks( ReadCb&& readCb )
+        {
+            static_assert( signature_match<ReadCb, ExpectedMediaReadCb>::value,
+                           "Mismatched Read callback prototype" );
+            m_cbs = {};
+            m_cbs.version = 0;
+            imem::CallbackWrapper<(unsigned int)CallbackIdx::Read, ReadFn>::
+                store( *m_callbacks, std::forward<ReadCb>( readCb ) );
+            m_makeRead = &makeReadCb<ReadCb>;
+        }
+
+        /**
+         * Sets the open callback.
+         *
+         * \param openCb callback to open the custom bitstream input media
+         *
+         * \see ExpectedMediaOpenCb
+         *
+         * \return reference to this Callbacks object for chaining
+         */
+        template <typename OpenCb>
+        Callbacks& open( OpenCb&& openCb )
+        {
+            static_assert( signature_match<OpenCb, ExpectedMediaOpenCb>::value,
+                           "Mismatched Open callback prototype" );
+            imem::CallbackWrapper<(unsigned int)CallbackIdx::Open, OpenFn>::
+                store( *m_callbacks, std::forward<OpenCb>( openCb ) );
+            m_makeOpen = &makeOpenCb<OpenCb>;
+            m_hasOpen = true;
+            return *this;
+        }
+
+        /**
+         * Sets the seek callback.
+         *
+         * \param seekCb callback to seek
+         *
+         * \see ExpectedMediaSeekCb
+         *
+         * \return reference to this Callbacks object for chaining
+         */
+        template <typename SeekCb>
+        Callbacks& seek( SeekCb&& seekCb )
+        {
+            static_assert( signature_match<SeekCb, ExpectedMediaSeekCb>::value,
+                           "Mismatched Seek callback prototype" );
+            imem::CallbackWrapper<(unsigned int)CallbackIdx::Seek, SeekFn>::
+                store( *m_callbacks, std::forward<SeekCb>( seekCb ) );
+            m_makeSeek = &makeSeekCb<SeekCb>;
+            return *this;
+        }
+
+        /**
+         * Sets the close callback.
+         *
+         * \param closeCb callback to close the media
+         *
+         * \see ExpectedMediaCloseCb
+         *
+         * \return reference to this Callbacks object for chaining
+         */
+        template <typename CloseCb>
+        Callbacks& close( CloseCb&& closeCb )
+        {
+            static_assert( signature_match<CloseCb, ExpectedMediaCloseCb>::value,
+                           "Mismatched Close callback prototype" );
+            imem::CallbackWrapper<(unsigned int)CallbackIdx::Close, CloseFn>::
+                store( *m_callbacks, std::forward<CloseCb>( closeCb ) );
+            m_makeClose = &makeCloseCb<CloseCb>;
+            return *this;
+        }
+    };
+
     /**
      * Create a media with custom callbacks to read the data from.
      *
-     * \param instance LibVLC instance
-     * \param open_cb callback to open the custom bitstream input media
-     * \param read_cb callback to read data (must not be nullptr)
-     * \param seek_cb callback to seek, or nullptr if seeking is not supported
-     * \param close_cb callback to close the media, or nullptr if unnecessary
-     *
-     * \return the newly created media.
+     * \param cbs pre-built \ref Media::Callbacks object
      *
      * \throw std::runtime_error if the media creation fails
      *
@@ -282,36 +432,20 @@ public:
      * \warning The callbacks may be used until all or any player instances
      * that were supplied the media item are stopped.
      *
+     * \warning The application must ensure that the Callbacks object supplied to this constructor
+     * remains valid and unmodified until all player instances that were supplied the media item are stopped.
+     *
      * \see ExpectedMediaOpenCb
      * \see ExpectedMediaReadCb
      * \see ExpectedMediaSeekCb
      * \see ExpectedMediaCloseCb
      *
-     * \version LibVLC 3.0.0 and later.
+     * \version LibVLC 4.0.0 and later.
      */
-    template <typename OpenCb, typename ReadCb, typename SeekCb, typename CloseCb>
-    Media( OpenCb&& openCb, ReadCb&& readCb, SeekCb&& seekCb, CloseCb&& closeCb )
+    Media( const Callbacks& cbs )
     {
-        static_assert( signature_match_or_nullptr<OpenCb, ExpectedMediaOpenCb>::value, "Mismatched Open callback prototype" );
-        static_assert( signature_match_or_nullptr<SeekCb, ExpectedMediaSeekCb>::value, "Mismatched Seek callback prototype" );
-        static_assert( signature_match_or_nullptr<CloseCb, ExpectedMediaCloseCb>::value, "Mismatched Close callback prototype" );
-        static_assert( signature_match<ReadCb, ExpectedMediaReadCb>::value, "Mismatched Read callback prototype" );
-
-        auto ptr = libvlc_media_new_callbacks(
-            imem::CallbackWrapper<(unsigned int)CallbackIdx::Open, libvlc_media_open_cb>::
-                wrap<imem::GuessBoxingStrategy<OpenCb, imem::BoxingStrategy::Setup>::Strategy>(
-                    *m_callbacks, std::forward<OpenCb>( openCb ) ),
-            imem::CallbackWrapper<(unsigned int)CallbackIdx::Read, libvlc_media_read_cb>::
-                wrap<imem::GuessBoxingStrategy<OpenCb, imem::BoxingStrategy::Unbox>::Strategy>(
-                    *m_callbacks, std::forward<ReadCb>( readCb ) ),
-            imem::CallbackWrapper<(unsigned int)CallbackIdx::Seek, libvlc_media_seek_cb>::
-                wrap<imem::GuessBoxingStrategy<OpenCb, imem::BoxingStrategy::Unbox>::Strategy>(
-                    *m_callbacks, std::forward<SeekCb>( seekCb ) ),
-            imem::CallbackWrapper<(unsigned int)CallbackIdx::Close, libvlc_media_close_cb>::
-                wrap<imem::GuessBoxingStrategy<OpenCb, imem::BoxingStrategy::Cleanup>::Strategy>(
-                    *m_callbacks, std::forward<CloseCb>( closeCb ) ),
-            m_callbacks.get()
-        );
+        cbs.build();
+        auto ptr = libvlc_media_new_callbacks( &cbs.m_cbs, cbs.m_callbacks.get() );
         if ( ptr == nullptr )
             throw std::runtime_error( "Failed to create media" );
         m_obj.reset( ptr, libvlc_media_release );
@@ -756,4 +890,3 @@ inline VLC::Media::ParseFlags operator|(Media::ParseFlags l, Media::ParseFlags r
 } // namespace VLC
 
 #endif
-
