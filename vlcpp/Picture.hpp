@@ -40,6 +40,40 @@ public:
         Rgba = libvlc_picture_Rgba,
     };
 
+    class List
+    {
+    private:
+        libvlc_picture_list_t* m_list;
+
+        explicit List( libvlc_picture_list_t* list )
+            : m_list( list )
+        {
+        }
+
+    public:
+
+        /**
+         * Returns the number of pictures in the list
+         */
+        size_t count() const
+        {
+            return libvlc_picture_list_count( m_list );
+        }
+
+        /**
+         * Returns the picture at the provided index.
+         *
+         * If the index is out of bound, the result is undefined.
+         */
+        Picture at( size_t index ) const
+        {
+            return Picture(libvlc_picture_list_at(m_list, index));
+        }
+
+        template <size_t, typename ...>
+        friend struct CallbackWrapper;
+    };
+
     Picture() = default;
 
     explicit Picture( Internal::InternalPtr ptr )
