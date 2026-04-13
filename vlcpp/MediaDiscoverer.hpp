@@ -75,6 +75,83 @@ public:
         std::string m_longName;
         Category m_category;
     };
+
+    /**
+     * Callback prototype that notify when the discoverer added a media
+     *
+     * \param parent parent of the new added media or nullptr if there is no
+     * parents (more likely)
+     * \param media the new added media
+     */
+    using ExpectedMediaAddedCb = void(MediaPtr parent, MediaPtr media);
+
+    /**
+     * Callback prototype that notify when the discoverer removed a media
+     *
+     * \param media the removed media
+     */
+    using ExpectedMediaRemovedCb = void(MediaPtr media);
+
+    class Callbacks : protected CallbackOwner<2>
+    {
+    private:
+        enum class CallbackIdx : unsigned int
+        {
+            MediaAdded,
+            MediaRemoved,
+        };
+
+        friend class MediaDiscoverer;
+        libvlc_media_discoverer_cbs m_cbs;
+
+    public:
+
+        /**
+         * Default constructor to initialize all callbacks to nullptr.
+         */
+        Callbacks()
+        {
+            m_cbs = {};
+            m_cbs.version = 0;
+        }
+
+        /**
+         * Sets the on media added callback.
+         * 
+         * \param cb callback to notify when a media is added to the discoverer
+         * The callback must match the \ref ExpectedMediaAddedCb prototype
+         * \return reference to this Callbacks object for chaining
+         */
+        template <typename MediaAddedCb>
+        Callbacks& onMediaAdded( MediaAddedCb&& cb )
+        {
+            static_assert( signature_match<MediaAddedCb, ExpectedMediaAddedCb>::value,
+                           "Mismatched onMediaAdded callback prototype" );
+            m_cbs.on_media_added = CallbackWrapper<(unsigned int)CallbackIdx::MediaAdded,
+                                   decltype(libvlc_media_discoverer_cbs::on_media_added)>::
+                                   wrap<MediaPtr, MediaPtr>( *m_callbacks, std::forward<MediaAddedCb>( cb ) );
+            return *this;
+        }
+
+        /**
+         * Sets the on media removed callback.
+         * 
+         * \param cb callback to notify when a media is removed from the discoverer
+         * The callback must match the \ref ExpectedMediaRemovedCb prototype
+         * \return reference to this Callbacks object for chaining
+         */
+        template <typename MediaRemovedCb>
+        Callbacks& onMediaRemoved( MediaRemovedCb&& cb )
+        {
+            static_assert( signature_match<MediaRemovedCb, ExpectedMediaRemovedCb>::value,
+                           "Mismatched onMediaRemoved callback prototype" );
+            m_cbs.on_media_removed = CallbackWrapper<(unsigned int)CallbackIdx::MediaRemoved,
+                                     decltype(libvlc_media_discoverer_cbs::on_media_removed)>::
+                                     wrap<MediaPtr>( *m_callbacks, std::forward<MediaRemovedCb>( cb ) );
+            return *this;
+        }
+    };
+
     /**
      * Discover media service by name.
      *
@@ -83,9 +160,28 @@ public:
      * \param psz_name  service name
      */
     MediaDiscoverer(const Instance& inst, const std::string& name)
-        : Internal{ libvlc_media_discoverer_new(getInternalPtr<libvlc_instance_t>( inst ), name.c_str()),
-                    libvlc_media_discoverer_release }
+        : Internal{ libvlc_media_discoverer_new(getInternalPtr<libvlc_instance_t>( inst ), name.c_str(),
+                                                nullptr, nullptr), libvlc_media_discoverer_destroy }
     {
+    }
+
+    /**
+     * Discover media service by name and callback to listen to events.
+     *
+     * \param p_inst libvlc instance
+     * \param psz_name service name
+     * \param cbs pre-built \ref Callbacks object
+     *
+     * \warning The application must ensure that the Callbacks object supplied
+     * remains valid and unmodified until the media discoverer is destroyed.
+     */
+    MediaDiscoverer( const Instance& inst, const std::string& name, const Callbacks& cbs )
+    {
+        auto ptr = libvlc_media_discoverer_new( getInternalPtr<libvlc_instance_t>( inst ),
+                                                name.c_str(), &cbs.m_cbs, cbs.m_callbacks.get() );
+        if ( ptr == nullptr )
+            throw std::runtime_error( "Failed to create media discoverer" );
+        m_obj.reset( ptr, libvlc_media_discoverer_destroy );
     }
 
     /**
@@ -149,4 +245,3 @@ private:
 } // namespace VLC
 
 #endif
-
