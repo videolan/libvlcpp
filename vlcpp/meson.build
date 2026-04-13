@@ -11,6 +11,7 @@ libvlcpp_headers = files(
     'MediaList.hpp',
     'MediaListPlayer.hpp',
     'MediaPlayer.hpp',
+    'Parser.hpp',
     'Picture.hpp',
     'RendererDiscoverer.hpp',
     'common.hpp',

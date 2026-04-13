@@ -83,32 +83,6 @@ public:
     static const FromType AsNode = FromType::AsNode;
 #endif
 
-    enum class ParseFlags
-    {
-        /**
-         * Parse media if it's a local file
-         */
-        Local = libvlc_media_parse_local,
-        /**
-         * Parse media even if it's a network file
-         */
-        Network = libvlc_media_parse_network,
-        /**
-         * Fetch meta and covert art using local resources
-         */
-        FetchLocal = libvlc_media_fetch_local,
-        /**
-         * Fetch meta and covert art using network resources
-         */
-        FetchNetwork = libvlc_media_fetch_network,
-        /**
-         * Interact with the user (via libvlc_dialog_cbs) when preparsing this item
-         * (and not its sub items). Set this flag in order to receive a callback
-         * when the input is asking for credentials.
-         */
-        Interact = libvlc_media_do_interact,
-    };
-
     enum class Type
     {
         Unknown = libvlc_media_type_unknown,
@@ -119,16 +93,6 @@ public:
         Playlist = libvlc_media_type_playlist,
     };
 
-    enum class ParsedStatus
-    {
-        None = libvlc_media_parsed_status_none,
-        Pending = libvlc_media_parsed_status_pending,
-        Skipped = libvlc_media_parsed_status_skipped,
-        Failed = libvlc_media_parsed_status_failed,
-        Timeout = libvlc_media_parsed_status_timeout,
-        Cancelled = libvlc_media_parsed_status_cancelled,
-        Done = libvlc_media_parsed_status_done,
-    };
     /**
      * @brief Media Constructs a libvlc Media instance
      * @param instance  A libvlc instance
@@ -638,48 +602,13 @@ public:
     }
 
     /**
-     * Parse the media asynchronously with options.
+     * Whether the media has been parsed.
      *
-     * This fetches (local or network) art, meta data and/or tracks information.
-     * This method is the extended version of libvlc_media_parse_async().
-     *
-     * To track when this is over you can listen to libvlc_MediaParsedStatus
-     * event. However if this functions returns an error, you will not receive any
-     * events.
-     *
-     * It uses a flag to specify parse options (see libvlc_media_parse_flag_t). All
-     * these flags can be combined. By default, media is parsed if it's a local
-     * file.
-     *
-     * \see ParsedStatus
-     * \see meta()
-     * \see tracks()
-     * \see parsedStatus
-     * \see ParseFlag
-     *
-     * \return true on success, false otherwise
-     * \param flags parse options
-     * \param timeout maximum time allowed to preparse the media. If -1, the
-     *      default "preparse-timeout" option will be used as a timeout. If 0, it will
-     *      wait indefinitely. If > 0, the timeout will be used (in milliseconds).
-     * \version LibVLC 3.0.0 or later
+     * \return true if the media has been parsed, false otherwise
      */
-    bool parseRequest( const Instance& instance, ParseFlags flags, int timeout )
+    bool isParsed()
     {
-        return libvlc_media_parse_request( getInternalPtr<libvlc_instance_t>( instance ),
-            *this, static_cast<libvlc_media_parse_flag_t>( flags ), timeout ) == 0;
-    }
-
-    ParsedStatus parsedStatus( const Instance& instance )
-    {
-        return static_cast<ParsedStatus>( getInternalPtr<libvlc_instance_t>( instance ),
-                                        libvlc_media_get_parsed_status( *this ) );
-    }
-
-    void parseStop( const Instance& instance )
-    {
-        libvlc_media_parse_stop( getInternalPtr<libvlc_instance_t>( instance ),
-                                 *this );
+        return libvlc_media_is_parsed( *this );
     }
 
     /**
@@ -876,17 +805,6 @@ private:
 private:
     std::shared_ptr<MediaEventManager> m_eventManager;
 };
-
-inline VLC::Media::ParseFlags operator|(Media::ParseFlags l, Media::ParseFlags r)
-{
-#if !defined(_MSC_VER) || _MSC_VER >= 1900
-    using T = typename std::underlying_type<Media::ParseFlags>::type;
-#else
-    using T = std::underlying_type<Media::ParseFlags>::type;
-#endif
-    return static_cast<Media::ParseFlags>( static_cast<T>( l ) | static_cast<T>( r ) );
-}
-
 } // namespace VLC
 
 #endif
