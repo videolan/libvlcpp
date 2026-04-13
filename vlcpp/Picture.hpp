@@ -36,6 +36,8 @@ public:
         Argb = libvlc_picture_Argb,
         Jpg = libvlc_picture_Jpg,
         Png = libvlc_picture_Png,
+        WebP = libvlc_picture_WebP,
+        Rgba = libvlc_picture_Rgba,
     };
 
     Picture() = default;
