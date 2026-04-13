@@ -62,17 +62,6 @@ public:
     }
 
     /**
-     * Get media service discover media list.
-     *
-     * \param p_mdis  media service discover object
-     */
-    MediaList(MediaDiscoverer& mdis)
-        : Internal{ libvlc_media_discoverer_media_list( getInternalPtr<libvlc_media_discoverer_t>( mdis ) ),
-                    libvlc_media_list_release }
-    {
-    }
-
-    /**
      * Create an empty media list.
      *
      * \param p_instance  libvlc instance
