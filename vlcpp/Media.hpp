@@ -734,46 +734,6 @@ public:
         return res;
     }
 
-    using ThumbnailRequest = libvlc_media_thumbnail_request_t;
-
-    enum class ThumbnailSeekSpeed
-    {
-        Precise = libvlc_media_thumbnail_seek_precise,
-        Fast = libvlc_media_thumbnail_seek_fast,
-    };
-
-    ThumbnailRequest* thumbnailRequestByTime( const Instance& inst, libvlc_time_t time, ThumbnailSeekSpeed speed,
-                                              uint32_t width, uint32_t height, bool crop,
-                                              Picture::Type type, libvlc_time_t timeout )
-    {
-        return libvlc_media_thumbnail_request_by_time(
-                    getInternalPtr<libvlc_instance_t>( inst ), *this, time,
-                    static_cast<libvlc_thumbnailer_seek_speed_t>( speed ), width,
-                    height, crop, static_cast<libvlc_picture_type_t>( type ), timeout );
-    }
-
-    ThumbnailRequest* thumbnailRequestByPos( const Instance& inst, float pos, ThumbnailSeekSpeed speed,
-                                             uint32_t width, uint32_t height, bool crop,
-                                             Picture::Type type, libvlc_time_t timeout )
-    {
-        return libvlc_media_thumbnail_request_by_pos(
-                    getInternalPtr<libvlc_instance_t>( inst ), *this, pos,
-                    static_cast<libvlc_thumbnailer_seek_speed_t>( speed ), width,
-                    height, crop, static_cast<libvlc_picture_type_t>( type ), timeout );
-    }
-
-    /**
-     * @brief thumbnailRequestDestroy Destroy and cancel a thumbnailing request
-     * @param request An opaque thumbnail request object.
-     *
-     * This will also cancel the thumbnail request, no events will be emitted after
-     * this call.
-     */
-    void thumbnailRequestDestroy( ThumbnailRequest* request )
-    {
-        libvlc_media_thumbnail_request_destroy( request );
-    }
-
     enum class FileStat : uint8_t
     {
         Mtime = libvlc_media_filestat_mtime,
