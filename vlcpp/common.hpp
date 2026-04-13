@@ -37,6 +37,7 @@ using ssize_t = long int;
 namespace VLC
 {
     class Media;
+    class Picture;
     using MediaPtr = std::shared_ptr<Media>;
 
     // Work around cross class dependencies
@@ -190,7 +191,15 @@ namespace VLC
             return static_cast<Wrapper>(arg);
         }
 
-        /* 2. Wrapper is MediaPtr */
+        /* 2. Wrapper is Picture */
+        template <typename Wrapper, typename Arg>
+        static typename std::enable_if<std::is_same<Wrapper, Picture>::value, Wrapper>::type
+        argWrapper(Arg arg)
+        {
+            return arg == nullptr ? Wrapper() : Wrapper(arg);
+        }
+
+        /* 3. Wrapper is MediaPtr */
         template <typename Wrapper, typename Arg>
         static typename std::enable_if<std::is_same<Wrapper, MediaPtr>::value, Wrapper>::type
         argWrapper(Arg arg)
@@ -198,18 +207,19 @@ namespace VLC
             return arg == nullptr ? nullptr : std::make_shared<Media>(arg, true);
         }
 
-        /* 3. Wrapper is a class type (but not MediaPtr) */
+        /* 4. Wrapper is a class type (but not MediaPtr or Picture) */
         template <typename Wrapper, typename Arg>
         static typename std::enable_if<
             std::is_class<Wrapper>::value &&
-            !std::is_same<Wrapper, MediaPtr>::value, Wrapper
+            !std::is_same<Wrapper, MediaPtr>::value &&
+            !std::is_same<Wrapper, Picture>::value, Wrapper
         >::type
         argWrapper(Arg arg)
         {
-            return Wrapper{arg};
+            return Wrapper(arg);
         }
 
-        /* 4. Everything else */
+        /* 5. Everything else */
         template <typename Wrapper, typename Arg>
         static typename std::enable_if<
             !std::is_enum<Wrapper>::value &&
