@@ -1609,6 +1609,14 @@ public:
                                            ctracks.size() );
     }
 
+    MediaTrack getTrackFromId(const std::string& id)
+    {
+        auto track = libvlc_media_player_get_track_from_id( *this, id.c_str() );
+        if ( track == nullptr )
+            throw std::runtime_error("Track not found");
+        return MediaTrack{ track };
+    }
+
     void selectTrack( const MediaTrack& track )
     {
         libvlc_media_player_select_track( *this, track );
