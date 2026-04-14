@@ -540,7 +540,7 @@ public:
         return m_name;
     }
 
-    explicit ChapterDescription( libvlc_chapter_description_t* c )
+    explicit ChapterDescription( const libvlc_chapter_description_t* c )
         : m_duration( c->i_duration ), m_starttime( c->i_time_offset )
     {
         if ( c->psz_name != nullptr )
