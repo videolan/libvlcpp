@@ -40,7 +40,6 @@ template <typename T, typename Releaser = void(*)(T*)>
 class Internal
 {
     public:
-        using InternalType  = T;
         using InternalPtr   = T*;
         using Pointer       = std::shared_ptr<T>;
 
