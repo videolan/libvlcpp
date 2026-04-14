@@ -32,7 +32,6 @@ namespace VLC
 {
 
 class Media;
-class MediaListEventManager;
 class MediaDiscoverer;
 
 class MediaList : public Internal<libvlc_media_list_t>
@@ -192,25 +191,6 @@ public:
     {
         libvlc_media_list_unlock( *this );
     }
-
-    /**
-     * Get libvlc_event_manager from this media list instance. The
-     * p_event_manager is immutable, so you don't have to hold the lock
-     *
-     * \return libvlc_event_manager
-     */
-    MediaListEventManager& eventManager()
-    {
-        if ( m_eventManager == nullptr )
-        {
-            libvlc_event_manager_t* obj = libvlc_media_list_event_manager( *this );
-            m_eventManager = std::make_shared<MediaListEventManager>( obj, *this );
-        }
-        return *m_eventManager;
-    }
-
-private:
-    std::shared_ptr<MediaListEventManager> m_eventManager;
 };
 
 } // namespace VLC

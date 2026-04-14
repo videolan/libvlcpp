@@ -33,7 +33,6 @@
 #include "MediaList.hpp"
 #include "RendererDiscoverer.hpp"
 #include "MediaPlayer.hpp"
-#include "EventManager.hpp"
 #include "Parser.hpp"
 #include "structures.hpp"
 

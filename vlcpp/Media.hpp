@@ -32,7 +32,6 @@
 namespace VLC
 {
 
-class MediaEventManager;
 class Instance;
 class MediaList;
 class TrackList;
@@ -576,22 +575,6 @@ public:
     }
 
     /**
-     * Get event manager from media descriptor object. NOTE: this function
-     * doesn't increment reference counting.
-     *
-     * \return event manager object
-     */
-    MediaEventManager& eventManager()
-    {
-        if ( m_eventManager == nullptr )
-        {
-            libvlc_event_manager_t* obj = libvlc_media_event_manager(*this);
-            m_eventManager = std::make_shared<MediaEventManager>( obj, *this );
-        }
-        return *m_eventManager;
-    }
-
-    /**
      * Get duration (in ms) of media descriptor object item.
      *
      * \return duration of media item or -1 on error
@@ -760,10 +743,6 @@ private:
         if ( isValid() )
             libvlc_media_retain(*this);
     }
-
-
-private:
-    std::shared_ptr<MediaEventManager> m_eventManager;
 };
 } // namespace VLC
 

@@ -32,7 +32,6 @@
 namespace VLC
 {
 
-class MediaListPlayerEventManager;
 class MediaList;
 
 class MediaListPlayer : public Internal<libvlc_media_list_player_t>
@@ -83,21 +82,6 @@ public:
      * Calling any method on such an instance is undefined.
     */
     MediaListPlayer() = default;
-
-    /**
-     * Return the event manager of this media_list_player.
-     *
-     * \return the event manager
-     */
-    MediaListPlayerEventManager& eventManager()
-    {
-        if ( m_eventManager == nullptr )
-        {
-            libvlc_event_manager_t* obj = libvlc_media_list_player_event_manager(*this);
-            m_eventManager = std::make_shared<MediaListPlayerEventManager>( obj, *this );
-        }
-        return *m_eventManager;
-    }
 
     /**
      * Set the media list associated with the player
@@ -200,10 +184,6 @@ public:
     {
         libvlc_media_list_player_set_playback_mode(*this, e_mode);
     }
-
-private:
-    std::shared_ptr<MediaListPlayerEventManager> m_eventManager;
-
 };
 
 } // namespace VLC

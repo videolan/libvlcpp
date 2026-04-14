@@ -39,7 +39,6 @@ class AudioOutputDeviceDescription;
 class Equalizer;
 class Instance;
 class Media;
-class MediaPlayerEventManager;
 class TrackDescription;
 class TrackList;
 
@@ -909,21 +908,6 @@ public:
         if ( media == nullptr )
             return nullptr;
         return std::make_shared<Media>( media, false );
-    }
-
-    /**
-     * Get the Event Manager from which the media player send event.
-     *
-     * \return the event manager associated with p_mi
-     */
-    MediaPlayerEventManager& eventManager()
-    {
-        if ( m_eventManager == nullptr )
-        {
-            libvlc_event_manager_t* obj = libvlc_media_player_event_manager( *this );
-            m_eventManager = std::make_shared<MediaPlayerEventManager>( obj, *this );
-        }
-        return *m_eventManager;
     }
 
     /**
@@ -2399,9 +2383,6 @@ public:
         libvlc_media_player_unselect_track_type( *this,
                                     static_cast<libvlc_track_type_t>( type ) );
     }
-
-private:
-    std::shared_ptr<MediaPlayerEventManager> m_eventManager;
 };
 
 } // namespace VLC

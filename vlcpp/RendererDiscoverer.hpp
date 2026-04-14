@@ -28,8 +28,6 @@
 namespace VLC
 {
 
-class RendererDiscovererEventManager;
-
 class RendererDiscoverer : public Internal<libvlc_renderer_discoverer_t>
 {
 public:
@@ -168,19 +166,6 @@ public:
     {
         libvlc_renderer_discoverer_stop( *this );
     }
-
-    RendererDiscovererEventManager& eventManager()
-    {
-        if ( m_eventManager == nullptr )
-        {
-            libvlc_event_manager_t* obj = libvlc_renderer_discoverer_event_manager( *this );
-            m_eventManager = std::make_shared<RendererDiscovererEventManager>( obj, *this );
-        }
-        return *m_eventManager;
-    }
-
-private:
-    std::shared_ptr<RendererDiscovererEventManager> m_eventManager;
 };
 
 }

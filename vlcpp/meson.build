@@ -3,7 +3,6 @@
 libvlcpp_headers = files(
     'Dialog.hpp',
     'Equalizer.hpp',
-    'EventManager.hpp',
     'Instance.hpp',
     'Internal.hpp',
     'Media.hpp',
