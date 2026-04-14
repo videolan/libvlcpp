@@ -1,5 +1,5 @@
 /*****************************************************************************
- * RendererDiscovery.hpp: Media Discoverer API
+ * RendererDiscoverer.hpp: Renderer Discoverer API
  *****************************************************************************
  * Copyright © 2015-2018 libvlcpp authors & VideoLAN
  *
@@ -38,7 +38,7 @@ public:
     private:
         Item( InternalPtr item ) : Internal( item, libvlc_renderer_item_release )
         {
-            libvlc_renderer_item_hold( *this );
+            libvlc_renderer_item_retain( *this );
         }
 
     public:
@@ -70,13 +70,93 @@ public:
                      LIBVLC_RENDERER_CAN_AUDIO ) != 0;
         }
 
-        friend RendererDiscovererEventManager;
+        template <size_t, typename ...>
+        friend struct CallbackWrapper;
     };
 
-    RendererDiscoverer( const Instance& instance, const std::string& name )
-        : Internal( libvlc_renderer_discoverer_new( getInternalPtr<libvlc_instance_t>( instance ),
-                                                    name.c_str() ), libvlc_renderer_discoverer_release )
+    /**
+     * Callback prototype that notify when the discoverer added an item
+     *
+     * \param item the new added item
+     */
+    using ExpectedItemAddedCb = void(const Item& item);
+
+    /**
+     * Callback prototype that notify when the discoverer removed an item
+     *
+     * \param item the removed item
+     */
+    using ExpectedItemRemovedCb = void(const Item& item);
+
+    class Callbacks : protected CallbackOwner<2>
     {
+    private:
+        enum class CallbackIdx : unsigned int
+        {
+            ItemAdded,
+            ItemRemoved,
+        };
+
+        libvlc_renderer_discoverer_cbs m_cbs;
+        friend class RendererDiscoverer;
+
+    public:
+        Callbacks() = delete;
+
+        /**
+         * Constructor with the mandatory on_item_added callback.
+         * 
+         * \param itemAddedCb the callback to be called when an item is added to the discoverer
+         * The callback must match the prototype defined by \ref ExpectedItemAddedCb.
+         */
+        template <typename ItemAddedCb>
+        Callbacks( ItemAddedCb&& itemAddedCb )
+        {
+            static_assert( signature_match<ItemAddedCb, ExpectedItemAddedCb>::value,
+                           "Mismatched on_item_added callback prototype" );
+            m_cbs = {};
+            m_cbs.version = 0;
+            m_cbs.on_item_added = CallbackWrapper<(unsigned int)CallbackIdx::ItemAdded,
+                                  decltype(libvlc_renderer_discoverer_cbs::on_item_added)>::
+                                  wrap<Item>( *m_callbacks, std::forward<ItemAddedCb>( itemAddedCb ) );
+        }
+
+        /**
+         * Sets the on_item_removed callback.
+         *
+         * \param cb the callback to be called when an item is removed from the discoverer.
+         * The callback must match the prototype defined by \ref ExpectedItemRemovedCb.
+         * \return reference to this Callbacks object for chaining
+         */
+        template <typename ItemRemovedCb>
+        Callbacks& onItemRemoved( ItemRemovedCb&& itemRemovedCb )
+        {
+            static_assert( signature_match<ItemRemovedCb, ExpectedItemRemovedCb>::value,
+                           "Mismatched on_item_removed callback prototype" );
+            m_cbs.on_item_removed = CallbackWrapper<(unsigned int)CallbackIdx::ItemRemoved,
+                                    decltype(libvlc_renderer_discoverer_cbs::on_item_removed)>::
+                                    wrap<Item>( *m_callbacks, std::forward<ItemRemovedCb>( itemRemovedCb ) );
+            return *this;
+        }
+    };
+
+    /**
+     * Create a renderer discoverer object by name and callback to listen to events.
+     *
+     * \param instance libvlc instance
+     * \param name service name
+     * \param cbs pre-built \ref Callbacks object
+     *
+     * \warning The application must ensure that the Callbacks object supplied
+     * remains valid and unmodified until the renderer discoverer is destroyed.
+     */
+    RendererDiscoverer( const Instance& instance, const std::string& name, const Callbacks& cbs )
+    {
+        auto ptr = libvlc_renderer_discoverer_new( getInternalPtr<libvlc_instance_t>( instance ),
+                                                   name.c_str(), &cbs.m_cbs, cbs.m_callbacks.get() );
+        if ( ptr == nullptr )
+            throw std::runtime_error( "Failed to create renderer discoverer" );
+        m_obj.reset( ptr, libvlc_renderer_discoverer_destroy );
     }
 
     bool start()
