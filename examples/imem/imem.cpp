@@ -3,6 +3,7 @@
 #include <cstring>
 #include <cstdio>
 #include <iostream>
+#include <cassert>
 
 struct ImemOpaque
 {
@@ -20,16 +21,8 @@ int main(int ac, char**av)
     auto instance = VLC::Instance(0, nullptr);
     auto dummyOpaque = new ImemOpaque{};
     dummyOpaque->path = av[1];
-    auto imemMedia = VLC::Media(
-        // Open
-        [dummyOpaque]( void*, void** opaque, uint64_t* p_size ) -> int {
-            dummyOpaque->file = fopen( dummyOpaque->path.c_str(), "rb" );
-            *opaque = dummyOpaque;
-            fseek(dummyOpaque->file, 0, SEEK_END);
-            *p_size = ftell( dummyOpaque->file );
-            rewind( dummyOpaque->file );
-            return 0;
-        },
+
+    VLC::Media::Callbacks imemCbs(
         // Read:
         []( void* opaque, unsigned char* buf, size_t size ) -> ssize_t {
             auto context = reinterpret_cast<ImemOpaque*>( opaque );
@@ -37,37 +30,47 @@ int main(int ac, char**av)
             if ( res == 0 )
                 return feof( context->file ) != 0 ? 0 : -1;
             return res;
-        },
-        []( void* opaque, uint64_t seek ) -> int {
+        });
+        imemCbs.open( [dummyOpaque]( void*, void** opaque, uint64_t* p_size ) -> int {
+            dummyOpaque->file = fopen( dummyOpaque->path.c_str(), "rb" );
+            *opaque = dummyOpaque;
+            fseek(dummyOpaque->file, 0, SEEK_END);
+            *p_size = ftell( dummyOpaque->file );
+            rewind( dummyOpaque->file );
+            return 0;
+        })
+        .seek( []( void* opaque, uint64_t seek ) -> int {
             auto context = reinterpret_cast<ImemOpaque*>( opaque );
             if ( fseek( context->file, seek, SEEK_SET ) < 0 )
                 return -1;
             return 0;
-        },
-        []( void* opaque ) {
+        })
+        .close( []( void* opaque ) {
             auto context = reinterpret_cast<ImemOpaque*>( opaque );
             fclose( context->file );
         });
+    VLC::Media imemMedia( imemCbs );
 
     auto opaque2 = new ImemOpaque{};
     opaque2->file = fopen( av[2], "rb" );
 
     // Do not use a user defined opaque
     // This is mostly meant to test that our nullptr overload are functionnal
-    auto imemMedia2 = VLC::Media(
-        nullptr,
+    VLC::Media::Callbacks imemCbs2(
         [opaque2]( void* opaque, unsigned char* buf, size_t size ) -> ssize_t {
             assert( opaque == nullptr );
             auto res = fread( buf, 1, size, opaque2->file );
             if ( res == 0 )
                 return feof( opaque2->file ) != 0 ? 0 : -1;
             return res;
-        },
-        [opaque2]( void*, uint64_t offset ) {
+        });
+        imemCbs2.seek( [opaque2]( void*, uint64_t offset ) -> int {
             if ( fseek( opaque2->file, offset, SEEK_CUR ) < -1 )
                 return -1;
             return 0;
-        }, nullptr );
+        });
+
+    VLC::Media imemMedia2( imemCbs2 );
 
     auto mp = VLC::MediaPlayer( instance, imemMedia );
     mp.play();

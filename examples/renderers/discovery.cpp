@@ -28,18 +28,18 @@
 int main()
 {
     VLC::Instance inst( 0, nullptr );
-    VLC::RendererDiscoverer disc( inst, "microdns" );
-
-    auto& em = disc.eventManager();
-    em.onItemAdded( []( const VLC::RendererDiscoverer::Item& item ) {
-        std::cout << "New item discovered: " << item.name() << '\n'
-                  << "\tType: " << item.type() << '\n';
-        if ( item.canRenderVideo() )
-            std::cout << "\tCan render video\n";
-        if ( item.canRenderAudio() )
-            std::cout << "\tCan render audio\n";
-        std::cout << std::endl;
-    });
+    VLC::RendererDiscoverer::Callbacks cbs(
+        []( const VLC::RendererDiscoverer::Item& item ) {
+            std::cout << "New item discovered: " << item.name() << '\n'
+                      << "\tType: " << item.type() << '\n';
+            if ( item.canRenderVideo() )
+                std::cout << "\tCan render video\n";
+            if ( item.canRenderAudio() )
+                std::cout << "\tCan render audio\n";
+            std::cout << std::endl;
+        }
+    );
+    VLC::RendererDiscoverer disc( inst, "microdns", cbs );
     if ( disc.start() == false )
         abort();
     std::this_thread::sleep_for( std::chrono::seconds{ 10 } );
