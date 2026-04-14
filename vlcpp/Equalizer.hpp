@@ -150,7 +150,8 @@ public:
      */
     static std::string presetName( unsigned index )
     {
-        return libvlc_audio_equalizer_get_preset_name( index );
+        auto name = libvlc_audio_equalizer_get_preset_name( index );
+        return name != nullptr ? name : std::string{};
     }
 
     /**

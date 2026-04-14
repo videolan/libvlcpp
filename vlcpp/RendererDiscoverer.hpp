@@ -54,7 +54,8 @@ public:
 
         std::string iconUri() const
         {
-            return libvlc_renderer_item_icon_uri( *this );
+            auto uri = libvlc_renderer_item_icon_uri( *this );
+            return uri != nullptr ? uri : std::string{};
         }
 
         bool canRenderVideo() const
