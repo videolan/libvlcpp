@@ -73,6 +73,733 @@ public:
         Enabled  =  1
     };
 
+    enum class Capability : unsigned int
+    {
+        Seek       = libvlc_capability_seek,
+        Pause      = libvlc_capability_pause,
+        ChangeRate = libvlc_capability_change_rate,
+        Rewind     = libvlc_capability_rewind,
+    };
+
+    enum class LibvlcState : unsigned int
+    {
+        NothingSpecial = libvlc_NothingSpecial,
+        Opening        = libvlc_Opening,
+        Playing        = libvlc_Playing,
+        Paused         = libvlc_Paused,
+        Stopped        = libvlc_Stopped,
+        Stopping       = libvlc_Stopping,
+        Error          = libvlc_Error
+    };
+
+    enum class MediaStoppingReason : unsigned int
+    {
+        Error = libvlc_stopping_reason_error,
+        Eos = libvlc_stopping_reason_eos,
+        User = libvlc_stopping_reason_user,
+    };
+
+    enum class ListAction : unsigned int
+    {
+        Added = libvlc_list_action_added,
+        Removed = libvlc_list_action_removed,
+        Updated = libvlc_list_action_updated,
+    };
+
+    /**
+     * Callback prototype that notify when the player changed media
+     *
+     * \param media new played media
+     */
+    using ExpectedMediaChangedCb = void(MediaPtr);
+
+    /**
+     * Callback prototype that notify when the player will stop the current
+     * media.
+     *
+     * This can be called from the PLAYING state, before the
+     * player requests the next media, or from the STOPPING state, ie.
+     * when the player is stopping, or by an internal transition
+     * (e.g., when the media reaches the end of file or errors out).
+     *
+     * \param media stopping media
+     * \param stopping_reason reason why the media is stopping
+     */
+    using ExpectedMediaStoppingCb = void(MediaPtr, MediaStoppingReason);
+
+    /**
+     * Callback prototype that notify when the player state changed
+     *
+     * \param state new player state
+     */
+    using ExpectedStateChangedCb = void(LibvlcState);
+
+    /**
+     * Callback prototype that notify when the player buffering changed
+     *
+     * This event is always called with the 0 and 1 values before a playback
+     * (in case of success). Values in between depends on the media type.
+     *
+     * \param buffering buffering in the range [0:1]
+     */
+    using ExpectedBufferingChangedCb = void(float);
+
+    /**
+     * Callback prototype that notify when the player capabilities changed
+     *
+     * \param old_caps old player capabilities
+     * \param new_caps new player capabilities
+     */
+    using ExpectedCapabilitiesChangedCb = void(Capability, Capability);
+
+    /**
+     * Callback prototype that notify when the player position changed
+     *
+     * \param time a valid time or 0 (in ms)
+     * \param pos a valid position
+     */
+    using ExpectedPositionChangedCb = void(int64_t, double);
+
+    /**
+     * Callback prototype that notify when the player length changed
+     *
+     * May be called when the media is opening or during playback.
+     * A started and playing media doesn't have necessarily a valid length.
+     *
+     * \param length a valid length or 0 (in ms)
+     */
+    using ExpectedLengthChangedCb = void(int64_t);
+
+    /**
+     * Callback prototype that notify when the player added, removed or updated
+     * a track
+     *
+     * \param action added, removed or updated
+     * \param type type of the track
+     * \param id valid track id, call MediaPlayer::getTrackFromId()
+     * to get the track description.
+     */
+    using ExpectedTrackListChangedCb = void(ListAction, MediaTrack::Type, std::string&&);
+
+    /**
+     * Callback prototype that notify when a track is selected or unselected
+     * by the player
+     *
+     * \param type type of tracks being unselected or selected
+     * \param unselected_id valid track id or empty (when nothing is unselected)
+     * \param selected_id valid track id or empty (when nothing is selected),
+     * call MediaPlayer::getTrackFromId() to get the track description.
+     */
+    using ExpectedTrackSelectionChangedCb = void(MediaTrack::Type, std::string&&, std::string&&);
+
+    /**
+     * Callback prototype that notify when the player added, removed or updated
+     * a program
+     *
+     * \param action added, removed or updated
+     * \param group_id valid group id
+     */
+    using ExpectedProgramListChangedCb = void(ListAction, int);
+
+    /**
+     * Callback prototype that notify when a program is selected or unselected
+     * by the player
+     *
+     * \param unselected_group_id valid group id
+     * \param selected_group_id valid group id
+     */
+    using ExpectedProgramSelectionChangedCb = void(int, int);
+
+    /**
+     * Callback prototype that notify when the player changed titles
+     *
+     * Call MediaPlayer::getTitleDescriptions() to get the
+     * description of new titles.
+     */
+    using ExpectedTitlesChangedCb = void();
+
+    /**
+     * Callback prototype that notify when the player selected a new title
+     *
+     * \param title description of the new selected title, valid only from this
+     * callback, safe to copy
+     * \param idx index of the new title
+     */
+    using ExpectedTitleSelectionChangedCb = void(const TitleDescription&, unsigned);
+
+    /**
+     * Callback prototype that notify when the player selected a new chapter
+     *
+     * \param title description of the new selected title, valid only from this
+     * callback, safe to copy
+     * \param title_idx index of the title
+     * \param chapter description of the new selected chapter, valid only from this
+     * callback, safe to copy
+     * \param chapter_idx index of the new selected chapter
+     */
+    using ExpectedChapterSelectionChangedCb = void(const TitleDescription&, unsigned, const ChapterDescription&, unsigned);
+
+    /**
+     * Callback prototype that notify when the player recording state changed
+     *
+     * \param recording true if recording is enabled
+     * \param file_path file path of the recording, only valid when the
+     * recording ends (recording == false), else empty string
+     */
+    using ExpectedRecordingChangedCb = void(bool, std::string&&);
+
+    /**
+     * Callback prototype that notify when the player took a screenshot
+     *
+     * \param file_path file path of the screenshot
+     */
+    using ExpectedScreenshotTakenCb = void(std::string&&);
+
+    /**
+     * Callback prototype that notify when the player parsed the current media
+     *
+     * Called once per media, this won't be called if the media has already
+     * been parsed by the parser.
+     *
+     * \param media media being played/parsed
+     */
+    using ExpectedMediaParsedCb = void(MediaPtr);
+
+    /**
+     * Callback prototype that notify when metadata were update by the player
+     *
+     * \param media media being played/parsed, call Media::getMeta() to
+     * get new metadata
+     */
+    using ExpectedMediaMetaChangedCb = void(MediaPtr);
+
+    /**
+     * Callback prototype that notify when the player added new subitems to the
+     * current media
+     *
+     * \param media media being played/parsed, call Media::getSubitems() to
+     * get sub items
+     */
+    using ExpectedMediaSubitemsChangedCb = void(MediaPtr);
+
+    /**
+     * Callback prototype that notify when the player added new attachments to
+     * the current media.
+     *
+     * \note It can be called several times for one playback. The array
+     * contains only new elements after a second call.
+     *
+     * \param media media being played/parsed
+     * \param list list of pictures, the list is only valid from this callback,
+     * each Picture object can be copied safely with list.at(index) method
+     */
+    using ExpectedMediaAttachmentsAddedCb = void(MediaPtr, const Picture::List&);
+
+    /**
+     * Callback prototype that notify when a new player vout is added or removed
+     *
+     * \param vout_count number of active vouts
+     */
+    using ExpectedVoutChangedCb = void(unsigned);
+
+    /**
+     * Callback prototype that notify when the player is corked/uncorked
+     *
+     * The player can be corked when the audio output loose focus or when a
+     * renderer was paused from the outside.
+     *
+     * \param corked true if the player is corked. In that case, the user
+     * should pause the player and release all external resource needed by the
+     * player
+     */
+    using ExpectedCorkChangedCb = void(bool);
+
+    /**
+     * Callback prototype that notify when the audio volume has changed
+     *
+     * \param new_volume volume in the range [0;2.f]
+     */
+    using ExpectedAudioVolumeChangedCb = void(float);
+
+    /**
+     * Callback prototype that notify when the audio mute state has changed
+     *
+     * \param muted true if muted
+     */
+    using ExpectedAudioMuteChangedCb = void(bool);
+
+    /**
+     * Callback prototype that notify when the audio device state has changed
+     *
+     * \param device the device name
+     */
+    using ExpectedAudioDeviceChangedCb = void(std::string&&);
+
+    class Callbacks : protected CallbackOwner<25>
+    {
+    private:
+        enum class Idx : unsigned int
+        {
+            MediaChanged, MediaStopping, StateChanged, BufferingChanged,
+            CapabilitiesChanged, PositionChanged, LengthChanged,
+            TrackListChanged, TrackSelectionChanged,
+            ProgramListChanged, ProgramSelectionChanged,
+            TitlesChanged, TitleSelectionChanged, ChapterSelectionChanged,
+            RecordingChanged, ScreenshotTaken,
+            MediaParsed, MediaMetaChanged, MediaSubitemsChanged, MediaAttachmentsAdded,
+            VoutChanged, CorkChanged,
+            AudioVolumeChanged, AudioMuteChanged, AudioDeviceChanged,
+        };
+
+        libvlc_media_player_cbs m_cbs;
+        friend class MediaPlayer;
+
+    public:
+
+        /**
+         * Default constructor to initialize all callbacks to nullptr.
+         */
+        Callbacks()
+        {
+            m_cbs = {};
+            m_cbs.version = 0;
+        }
+
+        /**
+         * Sets the on_media_changed callback.
+         *
+         * \param mediaChangedCb \ref ExpectedMediaChangedCb
+         * \return reference to this Callbacks object for chaining
+         */
+        template <typename MediaChangedCb>
+        Callbacks& onMediaChanged( MediaChangedCb&& mediaChangedCb )
+        {
+            static_assert( signature_match<MediaChangedCb, ExpectedMediaChangedCb>::value,
+                           "Mismatched on_media_changed callback prototype" );
+            m_cbs.on_media_changed = CallbackWrapper<(unsigned int)Idx::MediaChanged,
+                                     decltype(libvlc_media_player_cbs::on_media_changed)>::wrap<MediaPtr>(
+                                     *m_callbacks, std::forward<MediaChangedCb>( mediaChangedCb ) );
+            return *this;
+        }
+
+        /**
+         * Sets the on_media_stopping callback.
+         *
+         * \param mediaStoppingCb \ref ExpectedMediaStoppingCb
+         * \return reference to this Callbacks object for chaining
+         */
+        template <typename MediaStoppingCb>
+        Callbacks& onMediaStopping( MediaStoppingCb&& mediaStoppingCb )
+        {
+            static_assert( signature_match<MediaStoppingCb, ExpectedMediaStoppingCb>::value,
+                           "Mismatched on_media_stopping callback prototype" );
+            m_cbs.on_media_stopping = CallbackWrapper<(unsigned int)Idx::MediaStopping,
+                                      decltype(libvlc_media_player_cbs::on_media_stopping)>::wrap<
+                                      MediaPtr, MediaStoppingReason>( *m_callbacks,
+                                      std::forward<MediaStoppingCb>( mediaStoppingCb ) );
+            return *this;
+        }
+
+        /**
+         * Sets the on_state_changed callback.
+         *
+         * \param stateChangedCb \ref ExpectedStateChangedCb
+         * \return reference to this Callbacks object for chaining
+         */
+        template <typename StateChangedCb>
+        Callbacks& onStateChanged( StateChangedCb&& stateChangedCb )
+        {
+            static_assert( signature_match<StateChangedCb, ExpectedStateChangedCb>::value,
+                           "Mismatched on_state_changed callback prototype" );
+            m_cbs.on_state_changed = CallbackWrapper<(unsigned int)Idx::StateChanged,
+                                     decltype(libvlc_media_player_cbs::on_state_changed)>::wrap<LibvlcState>(
+                                     *m_callbacks, std::forward<StateChangedCb>( stateChangedCb ) );
+            return *this;
+        }
+
+        /**
+         * Sets the on_buffering_changed callback.
+         *
+         * \param bufferingChangedCb \ref ExpectedBufferingChangedCb
+         * \return reference to this Callbacks object for chaining
+         */
+        template <typename BufferingChangedCb>
+        Callbacks& onBufferingChanged( BufferingChangedCb&& bufferingChangedCb )
+        {
+            static_assert( signature_match<BufferingChangedCb, ExpectedBufferingChangedCb>::value,
+                           "Mismatched on_buffering_changed callback prototype" );
+            m_cbs.on_buffering_changed = CallbackWrapper<(unsigned int)Idx::BufferingChanged,
+                                         decltype(libvlc_media_player_cbs::on_buffering_changed)>::wrap(
+                                         *m_callbacks, std::forward<BufferingChangedCb>( bufferingChangedCb ) );
+            return *this;
+        }
+
+        /**
+         * Sets the on_capabilities_changed callback.
+         *
+         * \param capabilitiesChangedCb \ref ExpectedCapabilitiesChangedCb
+         * \return reference to this Callbacks object for chaining
+         */
+        template <typename CapabilitiesChangedCb>
+        Callbacks& onCapabilitiesChanged( CapabilitiesChangedCb&& capabilitiesChangedCb )
+        {
+            static_assert( signature_match<CapabilitiesChangedCb, ExpectedCapabilitiesChangedCb>::value,
+                           "Mismatched on_capabilities_changed callback prototype" );
+            m_cbs.on_capabilities_changed = CallbackWrapper<(unsigned int)Idx::CapabilitiesChanged,
+                                            decltype(libvlc_media_player_cbs::on_capabilities_changed)>::wrap<
+                                            Capability, Capability>( *m_callbacks,
+                                            std::forward<CapabilitiesChangedCb>( capabilitiesChangedCb ) );
+            return *this;
+        }
+
+        /**
+         * Sets the on_position_changed callback.
+         *
+         * \param positionChangedCb \ref ExpectedPositionChangedCb
+         * \return reference to this Callbacks object for chaining
+         */
+        template <typename PositionChangedCb>
+        Callbacks& onPositionChanged( PositionChangedCb&& positionChangedCb )
+        {
+            static_assert( signature_match<PositionChangedCb, ExpectedPositionChangedCb>::value,
+                           "Mismatched on_position_changed callback prototype" );
+            m_cbs.on_position_changed = CallbackWrapper<(unsigned int)Idx::PositionChanged,
+                                        decltype(libvlc_media_player_cbs::on_position_changed)>::wrap(
+                                        *m_callbacks, std::forward<PositionChangedCb>( positionChangedCb ) );
+            return *this;
+        }
+
+        /**
+         * Sets the on_length_changed callback.
+         *
+         * \param lengthChangedCb \ref ExpectedLengthChangedCb
+         * \return reference to this Callbacks object for chaining
+         */
+        template <typename LengthChangedCb>
+        Callbacks& onLengthChanged( LengthChangedCb&& lengthChangedCb )
+        {
+            static_assert( signature_match<LengthChangedCb, ExpectedLengthChangedCb>::value,
+                           "Mismatched on_length_changed callback prototype" );
+            m_cbs.on_length_changed = CallbackWrapper<(unsigned int)Idx::LengthChanged,
+                                      decltype(libvlc_media_player_cbs::on_length_changed)>::wrap(
+                                      *m_callbacks, std::forward<LengthChangedCb>( lengthChangedCb ) );
+            return *this;
+        }
+
+        /**
+         * Sets the on_track_list_changed callback.
+         *
+         * \param trackListChangedCb \ref ExpectedTrackListChangedCb
+         * \return reference to this Callbacks object for chaining
+         */
+        template <typename TrackListChangedCb>
+        Callbacks& onTrackListChanged( TrackListChangedCb&& trackListChangedCb )
+        {
+            static_assert( signature_match<TrackListChangedCb, ExpectedTrackListChangedCb>::value,
+                           "Mismatched on_track_list_changed callback prototype" );
+            m_cbs.on_track_list_changed = CallbackWrapper<(unsigned int)Idx::TrackListChanged,
+                                          decltype(libvlc_media_player_cbs::on_track_list_changed)>::wrap<
+                                          ListAction, MediaTrack::Type, std::string>(
+                                          *m_callbacks, std::forward<TrackListChangedCb>( trackListChangedCb ) );
+            return *this;
+        }
+
+        /**
+         * Sets the on_track_selection_changed callback.
+         *
+         * \param trackSelectionChangedCb \ref ExpectedTrackSelectionChangedCb
+         * \return reference to this Callbacks object for chaining
+         */
+        template <typename TrackSelectionChangedCb>
+        Callbacks& onTrackSelectionChanged( TrackSelectionChangedCb&& trackSelectionChangedCb )
+        {
+            static_assert( signature_match<TrackSelectionChangedCb, ExpectedTrackSelectionChangedCb>::value,
+                           "Mismatched on_track_selection_changed callback prototype" );
+            m_cbs.on_track_selection_changed = CallbackWrapper<(unsigned int)Idx::TrackSelectionChanged,
+                                               decltype(libvlc_media_player_cbs::on_track_selection_changed)>::wrap<
+                                               MediaTrack::Type, std::string, std::string>( *m_callbacks,
+                                               std::forward<TrackSelectionChangedCb>( trackSelectionChangedCb ) );
+            return *this;
+        }
+
+        /**
+         * Sets the on_program_list_changed callback.
+         *
+         * \param programListChangedCb \ref ExpectedProgramListChangedCb
+         * \return reference to this Callbacks object for chaining
+         */
+        template <typename ProgramListChangedCb>
+        Callbacks& onProgramListChanged( ProgramListChangedCb&& programListChangedCb )
+        {
+            static_assert( signature_match<ProgramListChangedCb, ExpectedProgramListChangedCb>::value,
+                           "Mismatched on_program_list_changed callback prototype" );
+            m_cbs.on_program_list_changed = CallbackWrapper<(unsigned int)Idx::ProgramListChanged,
+                                            decltype(libvlc_media_player_cbs::on_program_list_changed)>::wrap<
+                                            ListAction, int>( *m_callbacks, std::forward<ProgramListChangedCb>(
+                                            programListChangedCb ) );
+            return *this;
+        }
+
+        /**
+         * Sets the on_program_selection_changed callback.
+         *
+         * \param programSelectionChangedCb \ref ExpectedProgramSelectionChangedCb
+         * \return reference to this Callbacks object for chaining
+         */
+        template <typename ProgramSelectionChangedCb>
+        Callbacks& onProgramSelectionChanged( ProgramSelectionChangedCb&& programSelectionChangedCb )
+        {
+            static_assert( signature_match<ProgramSelectionChangedCb, ExpectedProgramSelectionChangedCb>::value,
+                           "Mismatched on_program_selection_changed callback prototype" );
+            m_cbs.on_program_selection_changed = CallbackWrapper<(unsigned int)Idx::ProgramSelectionChanged,
+                                                 decltype(libvlc_media_player_cbs::on_program_selection_changed)>::wrap(
+                                                 *m_callbacks, std::forward<ProgramSelectionChangedCb>(
+                                                 programSelectionChangedCb ) );
+            return *this;
+        }
+
+        /**
+         * Sets the on_titles_changed callback.
+         *
+         * \param titlesChangedCb \ref ExpectedTitlesChangedCb
+         * \return reference to this Callbacks object for chaining
+         */
+        template <typename TitlesChangedCb>
+        Callbacks& onTitlesChanged( TitlesChangedCb&& titlesChangedCb )
+        {
+            static_assert( signature_match<TitlesChangedCb, ExpectedTitlesChangedCb>::value,
+                           "Mismatched on_titles_changed callback prototype" );
+            m_cbs.on_titles_changed = CallbackWrapper<(unsigned int)Idx::TitlesChanged,
+                                      decltype(libvlc_media_player_cbs::on_titles_changed)>::wrap(
+                                      *m_callbacks, std::forward<TitlesChangedCb>( titlesChangedCb ) );
+            return *this;
+        }
+
+        /**
+         * Sets the on_title_selection_changed callback.
+         *
+         * \param titleSelectionChangedCb \ref ExpectedTitleSelectionChangedCb
+         * \return reference to this Callbacks object for chaining
+         */
+        template <typename TitleSelectionChangedCb>
+        Callbacks& onTitleSelectionChanged( TitleSelectionChangedCb&& titleSelectionChangedCb )
+        {
+            static_assert( signature_match<TitleSelectionChangedCb, ExpectedTitleSelectionChangedCb>::value,
+                           "Mismatched on_title_selection_changed callback prototype" );
+            m_cbs.on_title_selection_changed = CallbackWrapper<(unsigned int)Idx::TitleSelectionChanged,
+                                               decltype(libvlc_media_player_cbs::on_title_selection_changed)>::wrap<
+                                               TitleDescription, unsigned>( *m_callbacks, std::forward<TitleSelectionChangedCb>( titleSelectionChangedCb ) );
+            return *this;
+        }
+
+        /**
+         * Sets the on_chapter_selection_changed callback.
+         *
+         * \param chapterSelectionChangedCb \ref ExpectedChapterSelectionChangedCb
+         * \return reference to this Callbacks object for chaining
+         */
+        template <typename ChapterSelectionChangedCb>
+        Callbacks& onChapterSelectionChanged( ChapterSelectionChangedCb&& chapterSelectionChangedCb )
+        {
+            static_assert( signature_match<ChapterSelectionChangedCb, ExpectedChapterSelectionChangedCb>::value,
+                           "Mismatched on_chapter_selection_changed callback prototype" );
+            m_cbs.on_chapter_selection_changed = CallbackWrapper<(unsigned int)Idx::ChapterSelectionChanged,
+                                                 decltype(libvlc_media_player_cbs::on_chapter_selection_changed)>::wrap<
+                                                 TitleDescription, unsigned, ChapterDescription, unsigned>(
+                                                 *m_callbacks, std::forward<ChapterSelectionChangedCb>(
+                                                 chapterSelectionChangedCb ) );
+            return *this;
+        }
+
+        /**
+         * Sets the on_recording_changed callback.
+         *
+         * \param recordingChangedCb \ref ExpectedRecordingChangedCb
+         * \return reference to this Callbacks object for chaining
+         */
+        template <typename RecordingChangedCb>
+        Callbacks& onRecordingChanged( RecordingChangedCb&& recordingChangedCb )
+        {
+            static_assert( signature_match<RecordingChangedCb, ExpectedRecordingChangedCb>::value,
+                           "Mismatched on_recording_changed callback prototype" );
+            m_cbs.on_recording_changed = CallbackWrapper<(unsigned int)Idx::RecordingChanged,
+                                         decltype(libvlc_media_player_cbs::on_recording_changed)>::wrap(
+                                         *m_callbacks, std::forward<RecordingChangedCb>( recordingChangedCb ) );
+            return *this;
+        }
+
+        /**
+         * Sets the on_screenshot_taken callback.
+         *
+         * \param screenshotTakenCb \ref ExpectedScreenshotTakenCb
+         * \return reference to this Callbacks object for chaining
+         */
+        template <typename ScreenshotTakenCb>
+        Callbacks& onScreenshotTaken( ScreenshotTakenCb&& screenshotTakenCb )
+        {
+            static_assert( signature_match<ScreenshotTakenCb, ExpectedScreenshotTakenCb>::value,
+                           "Mismatched on_screenshot_taken callback prototype" );
+            m_cbs.on_screenshot_taken = CallbackWrapper<(unsigned int)Idx::ScreenshotTaken,
+                                        decltype(libvlc_media_player_cbs::on_screenshot_taken)>::wrap(
+                                        *m_callbacks, std::forward<ScreenshotTakenCb>( screenshotTakenCb ) );
+            return *this;
+        }
+
+        /**
+         * Sets the on_media_parsed callback.
+         *
+         * \param mediaParsedCb \ref ExpectedMediaParsedCb
+         * \return reference to this Callbacks object for chaining
+         */
+        template <typename MediaParsedCb>
+        Callbacks& onMediaParsed( MediaParsedCb&& mediaParsedCb )
+        {
+            static_assert( signature_match<MediaParsedCb, ExpectedMediaParsedCb>::value,
+                           "Mismatched on_media_parsed callback prototype" );
+            m_cbs.on_media_parsed = CallbackWrapper<(unsigned int)Idx::MediaParsed,
+                                    decltype(libvlc_media_player_cbs::on_media_parsed)>::wrap<MediaPtr>(
+                                    *m_callbacks, std::forward<MediaParsedCb>( mediaParsedCb ) );
+            return *this;
+        }
+
+        /**
+         * Sets the on_media_meta_changed callback.
+         *
+         * \param mediaMetaChangedCb \ref ExpectedMediaMetaChangedCb
+         * \return reference to this Callbacks object for chaining
+         */
+        template <typename MediaMetaChangedCb>
+        Callbacks& onMediaMetaChanged( MediaMetaChangedCb&& mediaMetaChangedCb )
+        {
+            static_assert( signature_match<MediaMetaChangedCb, ExpectedMediaMetaChangedCb>::value,
+                           "Mismatched on_media_meta_changed callback prototype" );
+            m_cbs.on_media_meta_changed = CallbackWrapper<(unsigned int)Idx::MediaMetaChanged,
+                                          decltype(libvlc_media_player_cbs::on_media_meta_changed)>::wrap<MediaPtr>(
+                                          *m_callbacks, std::forward<MediaMetaChangedCb>( mediaMetaChangedCb ) );
+            return *this;
+        }
+
+        /**
+         * Sets the on_media_subitems_changed callback.
+         *
+         * \param mediaSubitemsChangedCb \ref ExpectedMediaSubitemsChangedCb
+         * \return reference to this Callbacks object for chaining
+         */
+        template <typename MediaSubitemsChangedCb>
+        Callbacks& onMediaSubitemsChanged( MediaSubitemsChangedCb&& mediaSubitemsChangedCb )
+        {
+            static_assert( signature_match<MediaSubitemsChangedCb, ExpectedMediaSubitemsChangedCb>::value,
+                           "Mismatched on_media_subitems_changed callback prototype" );
+            m_cbs.on_media_subitems_changed = CallbackWrapper<(unsigned int)Idx::MediaSubitemsChanged,
+                                              decltype(libvlc_media_player_cbs::on_media_subitems_changed)>::wrap<MediaPtr>(
+                                              *m_callbacks, std::forward<MediaSubitemsChangedCb>( mediaSubitemsChangedCb ) );
+            return *this;
+        }
+
+        /**
+         * Sets the on_media_attachments_added callback.
+         *
+         * \param mediaAttachmentsAddedCb \ref ExpectedMediaAttachmentsAddedCb
+         * \return reference to this Callbacks object for chaining
+         */
+        template <typename MediaAttachmentsAddedCb>
+        Callbacks& onMediaAttachmentsAdded( MediaAttachmentsAddedCb&& mediaAttachmentsAddedCb )
+        {
+            static_assert( signature_match<MediaAttachmentsAddedCb, ExpectedMediaAttachmentsAddedCb>::value,
+                           "Mismatched on_media_attachments_added callback prototype" );
+            m_cbs.on_media_attachments_added = CallbackWrapper<(unsigned int)Idx::MediaAttachmentsAdded,
+                                               decltype(libvlc_media_player_cbs::on_media_attachments_added)>::wrap<
+                                               MediaPtr, Picture::List>(
+                                               *m_callbacks, std::forward<MediaAttachmentsAddedCb>( mediaAttachmentsAddedCb ) );
+            return *this;
+        }
+
+        /**
+         * Sets the on_vout_changed callback.
+         *
+         * \param voutChangedCb \ref ExpectedVoutChangedCb
+         * \return reference to this Callbacks object for chaining
+         */
+        template <typename VoutChangedCb>
+        Callbacks& onVoutChanged( VoutChangedCb&& voutChangedCb )
+        {
+            static_assert( signature_match<VoutChangedCb, ExpectedVoutChangedCb>::value,
+                           "Mismatched on_vout_changed callback prototype" );
+            m_cbs.on_vout_changed = CallbackWrapper<(unsigned int)Idx::VoutChanged,
+                                    decltype(libvlc_media_player_cbs::on_vout_changed)>::wrap(
+                                    *m_callbacks, std::forward<VoutChangedCb>( voutChangedCb ) );
+            return *this;
+        }
+
+        /**
+         * Sets the on_cork_changed callback.
+         *
+         * \param corkChangedCb \ref ExpectedCorkChangedCb
+         * \return reference to this Callbacks object for chaining
+         */
+        template <typename CorkChangedCb>
+        Callbacks& onCorkChanged( CorkChangedCb&& corkChangedCb )
+        {
+            static_assert( signature_match<CorkChangedCb, ExpectedCorkChangedCb>::value,
+                           "Mismatched on_cork_changed callback prototype" );
+            m_cbs.on_cork_changed = CallbackWrapper<(unsigned int)Idx::CorkChanged,
+                                    decltype(libvlc_media_player_cbs::on_cork_changed)>::wrap(
+                                    *m_callbacks, std::forward<CorkChangedCb>( corkChangedCb ) );
+            return *this;
+        }
+
+        /**
+         * Sets the on_audio_volume_changed callback.
+         *
+         * \param audioVolumeChangedCb \ref ExpectedAudioVolumeChangedCb
+         * \return reference to this Callbacks object for chaining
+         */
+        template <typename AudioVolumeChangedCb>
+        Callbacks& onAudioVolumeChanged( AudioVolumeChangedCb&& audioVolumeChangedCb )
+        {
+            static_assert( signature_match<AudioVolumeChangedCb, ExpectedAudioVolumeChangedCb>::value,
+                           "Mismatched on_audio_volume_changed callback prototype" );
+            m_cbs.on_audio_volume_changed = CallbackWrapper<(unsigned int)Idx::AudioVolumeChanged,
+                                            decltype(libvlc_media_player_cbs::on_audio_volume_changed)>::wrap(
+                                            *m_callbacks, std::forward<AudioVolumeChangedCb>( audioVolumeChangedCb ) );
+            return *this;
+        }
+
+        /**
+         * Sets the on_audio_mute_changed callback.
+         *
+         * \param audioMuteChangedCb \ref ExpectedAudioMuteChangedCb
+         * \return reference to this Callbacks object for chaining
+         */
+        template <typename AudioMuteChangedCb>
+        Callbacks& onAudioMuteChanged( AudioMuteChangedCb&& audioMuteChangedCb )
+        {
+            static_assert( signature_match<AudioMuteChangedCb, ExpectedAudioMuteChangedCb>::value,
+                           "Mismatched on_audio_mute_changed callback prototype" );
+            m_cbs.on_audio_mute_changed = CallbackWrapper<(unsigned int)Idx::AudioMuteChanged,
+                                          decltype(libvlc_media_player_cbs::on_audio_mute_changed)>::wrap(
+                                          *m_callbacks, std::forward<AudioMuteChangedCb>( audioMuteChangedCb ) );
+            return *this;
+        }
+
+        /**
+         * Sets the on_audio_device_changed callback.
+         *
+         * \param audioDeviceChangedCb \ref ExpectedAudioDeviceChangedCb
+         * \return reference to this Callbacks object for chaining
+         */
+        template <typename AudioDeviceChangedCb>
+        Callbacks& onAudioDeviceChanged( AudioDeviceChangedCb&& audioDeviceChangedCb )
+        {
+            static_assert( signature_match<AudioDeviceChangedCb, ExpectedAudioDeviceChangedCb>::value,
+                           "Mismatched on_audio_device_changed callback prototype" );
+            m_cbs.on_audio_device_changed = CallbackWrapper<(unsigned int)Idx::AudioDeviceChanged,
+                                            decltype(libvlc_media_player_cbs::on_audio_device_changed)>::wrap(
+                                            *m_callbacks, std::forward<AudioDeviceChangedCb>( audioDeviceChangedCb ) );
+            return *this;
+        }
+    };
+
     /**
      * Check if 2 MediaPlayer objects contain the same libvlc_media_player_t.
      * \param another another MediaPlayer
@@ -90,23 +817,66 @@ public:
      * Player should be created.
      */
     MediaPlayer( const Instance& instance )
-        : Internal{ libvlc_media_player_new( getInternalPtr<libvlc_instance_t>( instance ) ),
+        : Internal{ libvlc_media_player_new( getInternalPtr<libvlc_instance_t>( instance ),
+                                             nullptr, nullptr ),
                     libvlc_media_player_release }
     {
     }
 
     /**
+     * Create an empty Media Player object with callbacks to listen to events.
+     *
+     * \param inst  the libvlc instance
+     * \param cbs pre-built \ref Callbacks object
+     *
+     * \warning The application must ensure that the Callbacks object supplied
+     * remains valid and unmodified until the media player is destroyed.
+     */
+    MediaPlayer( const Instance& instance, const Callbacks& cbs )
+    {
+        auto ptr = libvlc_media_player_new( getInternalPtr<libvlc_instance_t>( instance ),
+                                            &cbs.m_cbs, cbs.m_callbacks.get() );
+        if ( ptr == nullptr )
+            throw std::runtime_error( "Failed to create media player" );
+        m_obj.reset( ptr, libvlc_media_player_release );
+    }
+
+    /**
      * Create a Media Player object from a Media
      *
-     * \param p_md  the media. Afterwards the p_md can be safely destroyed.
+     * \param inst the libvlc instance
+     * \param md   the media. Afterwards the p_md can be safely destroyed.
      */
     MediaPlayer( const Instance& inst, Media& md )
         : Internal{ libvlc_media_player_new_from_media(
                         getInternalPtr<libvlc_instance_t>( inst ),
-                        getInternalPtr<libvlc_media_t>( md ) ),
+                        getInternalPtr<libvlc_media_t>( md ),
+                        nullptr, nullptr ),
                     libvlc_media_player_release }
     {
     }
+
+    /**
+     * Create a Media Player object from a Media with callbacks to listen to events.
+     *
+     * \param inst the libvlc instance
+     * \param md   the media. Afterwards the p_md can be safely destroyed.
+     * \param cbs  pre-built \ref Callbacks object
+     *
+     * \warning The application must ensure that the Callbacks object supplied
+     * remains valid and unmodified until the media player is destroyed.
+     */
+    MediaPlayer( const Instance& inst, Media& md, const Callbacks& cbs )
+    {
+        auto ptr = libvlc_media_player_new_from_media(
+                        getInternalPtr<libvlc_instance_t>( inst ),
+                        getInternalPtr<libvlc_media_t>( md ),
+                        &cbs.m_cbs, cbs.m_callbacks.get() );
+        if ( ptr == nullptr )
+            throw std::runtime_error( "Failed to create media player" );
+        m_obj.reset( ptr, libvlc_media_player_release );
+    }
+
     /**
      * Create an empty VLC MediaPlayer instance.
      *
