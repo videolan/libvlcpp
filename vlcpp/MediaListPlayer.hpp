@@ -27,6 +27,7 @@
 #include <string>
 
 #include "common.hpp"
+#include "MediaPlayer.hpp"
 
 namespace VLC
 {
@@ -53,9 +54,27 @@ public:
      * \param p_instance  libvlc instance
      */
     MediaListPlayer(const Instance& instance)
-        : Internal{ libvlc_media_list_player_new( getInternalPtr<libvlc_instance_t>( instance ) ),
+        : Internal{ libvlc_media_list_player_new( getInternalPtr<libvlc_instance_t>( instance ), nullptr, nullptr ),
                     libvlc_media_list_player_release }
     {
+    }
+
+    /**
+     * Create new media_list_player with callbacks.
+     *
+     * \param inst libvlc instance
+     * \param cbs pre-built \ref MediaPlayer::Callbacks object
+     *
+     * \warning The application must ensure that the Callbacks object supplied
+     * remains valid and unmodified until the media list player is destroyed.
+     */
+    MediaListPlayer( const Instance& inst, const MediaPlayer::Callbacks& cbs )
+    {
+        auto ptr = libvlc_media_list_player_new( getInternalPtr<libvlc_instance_t>( inst ),
+                                                 &cbs.m_cbs, cbs.m_callbacks.get() );
+        if ( ptr == nullptr )
+            throw std::runtime_error( "Failed to create media list player" );
+        m_obj.reset( ptr, libvlc_media_list_player_release );
     }
 
     /**

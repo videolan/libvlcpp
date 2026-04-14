@@ -30,6 +30,7 @@
 #include <memory>
 
 #include "common.hpp"
+#include "RendererDiscoverer.hpp"
 
 namespace VLC
 {
@@ -353,6 +354,7 @@ public:
 
         libvlc_media_player_cbs m_cbs;
         friend class MediaPlayer;
+        friend class MediaListPlayer;
 
     public:
 
