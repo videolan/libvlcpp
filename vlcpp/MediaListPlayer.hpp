@@ -32,7 +32,6 @@ namespace VLC
 {
 
 class MediaListPlayerEventManager;
-class MediaPlayer;
 class MediaList;
 
 class MediaListPlayer : public Internal<libvlc_media_list_player_t>
@@ -79,18 +78,6 @@ public:
             m_eventManager = std::make_shared<MediaListPlayerEventManager>( obj, *this );
         }
         return *m_eventManager;
-    }
-
-
-    /**
-     * Replace media player in media_list_player with this instance.
-     *
-     * \param p_mi  media player instance
-     */
-    void setMediaPlayer(const MediaPlayer& mi)
-    {
-        libvlc_media_list_player_set_media_player( *this,
-                        getInternalPtr<libvlc_media_player_t>( mi ) );
     }
 
     /**
