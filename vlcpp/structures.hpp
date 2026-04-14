@@ -389,7 +389,7 @@ public:
     /// \note The track will he held and released automatically.
     ///
     explicit MediaTrack(libvlc_media_track_t* c)
-        : Internal{ libvlc_media_track_hold( c ), libvlc_media_track_release }
+        : Internal{ libvlc_media_track_retain( c ), libvlc_media_track_release }
     {
     }
 };
