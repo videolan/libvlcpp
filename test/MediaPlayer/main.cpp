@@ -56,7 +56,7 @@ void testBasicCallbacks(VLC::Instance& instance, const char* mediaPath)
             stateCv.notify_all();
         }
     })
-    .onPositionChanged([&](int64_t, double) {
+    .onPositionChanged([&](std::chrono::microseconds, double) {
         ++positionChanges;
     });
 
@@ -100,7 +100,7 @@ void testCopyAssignSharesUnderlyingPlayer(VLC::Instance& instance,
         if (state == VLC::MediaPlayer::LibvlcState::Playing)
             reachedPlaying.store(true);
     })
-    .onPositionChanged([&](int64_t, double) {
+    .onPositionChanged([&](std::chrono::microseconds, double) {
         ++positionChanges;
     });
 

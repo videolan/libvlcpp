@@ -58,7 +58,7 @@ int main(int ac, char** av)
         assert(*queuedTaskId == task);
         auto media = task.getMedia();
         assert(media.isValid());
-        reportedDuration.store(media.duration());
+        reportedDuration.store(media.duration().count());
         parserStatus = status;
         parsingFinished = true;
         stateCv.notify_all();

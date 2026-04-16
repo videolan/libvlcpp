@@ -31,6 +31,7 @@ using ssize_t = long int;
 #include <vlc/vlc.h>
 #include <array>
 #include <cassert>
+#include <chrono>
 #include <memory>
 #include <type_traits>
 

@@ -143,11 +143,11 @@ public:
     }
 
     /**
-     * Returns the time at which this picture was generated, in milliseconds
+     * Returns the time at which this picture was generated, in microseconds (us)
      */
-    libvlc_time_t time() const
+    std::chrono::microseconds time() const
     {
-        return libvlc_picture_get_time( *this );
+        return std::chrono::microseconds{ libvlc_picture_get_time( *this ) };
     }
 };
 

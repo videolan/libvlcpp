@@ -469,11 +469,11 @@ class TitleDescription
 {
 public:
     ///
-    /// \brief duration The title duration in (ms)
+    /// \brief duration The title duration in (us)
     ///
-    int64_t duration() const
+    std::chrono::microseconds duration() const
     {
-        return m_duration;
+        return std::chrono::microseconds{ m_duration };
     }
 
     ///
@@ -517,19 +517,19 @@ class ChapterDescription
 {
 public:
     ///
-    /// \brief timeoffset The chapter start time in (ms)
+    /// \brief timeoffset The chapter start time in (us)
     ///
-    int64_t starttime() const
+    std::chrono::microseconds starttime() const
     {
-        return m_starttime;
+        return std::chrono::microseconds{ m_starttime };
     }
 
     ///
-    /// \brief duration The chapter duration in (ms)
+    /// \brief duration The chapter duration in (us)
     ///
-    int64_t duration() const
+    std::chrono::microseconds duration() const
     {
-        return m_duration;
+        return std::chrono::microseconds{ m_duration };
     }
 
     ///

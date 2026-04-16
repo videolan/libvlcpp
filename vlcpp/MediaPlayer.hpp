@@ -156,10 +156,10 @@ public:
     /**
      * Callback prototype that notify when the player position changed
      *
-     * \param time a valid time or 0 (in ms)
+     * \param time a valid time or 0 (in us)
      * \param pos a valid position
      */
-    using ExpectedPositionChangedCb = void(int64_t, double);
+    using ExpectedPositionChangedCb = void(std::chrono::microseconds, double);
 
     /**
      * Callback prototype that notify when the player length changed
@@ -167,9 +167,9 @@ public:
      * May be called when the media is opening or during playback.
      * A started and playing media doesn't have necessarily a valid length.
      *
-     * \param length a valid length or 0 (in ms)
+     * \param length a valid length or 0 (in us)
      */
-    using ExpectedLengthChangedCb = void(int64_t);
+    using ExpectedLengthChangedCb = void(std::chrono::microseconds);
 
     /**
      * Callback prototype that notify when the player added, removed or updated
@@ -466,7 +466,8 @@ public:
             static_assert( signature_match<PositionChangedCb, ExpectedPositionChangedCb>::value,
                            "Mismatched on_position_changed callback prototype" );
             m_cbs.on_position_changed = CallbackWrapper<(unsigned int)Idx::PositionChanged,
-                                        decltype(libvlc_media_player_cbs::on_position_changed)>::wrap(
+                                        decltype(libvlc_media_player_cbs::on_position_changed)>::wrap<
+                                        std::chrono::microseconds, double>(
                                         *m_callbacks, std::forward<PositionChangedCb>( positionChangedCb ) );
             return *this;
         }
@@ -483,7 +484,8 @@ public:
             static_assert( signature_match<LengthChangedCb, ExpectedLengthChangedCb>::value,
                            "Mismatched on_length_changed callback prototype" );
             m_cbs.on_length_changed = CallbackWrapper<(unsigned int)Idx::LengthChanged,
-                                      decltype(libvlc_media_player_cbs::on_length_changed)>::wrap(
+                                      decltype(libvlc_media_player_cbs::on_length_changed)>::wrap<
+                                      std::chrono::microseconds>(
                                       *m_callbacks, std::forward<LengthChangedCb>( lengthChangedCb ) );
             return *this;
         }
@@ -1052,38 +1054,38 @@ public:
     }
 
     /**
-     * Get the current movie length (in ms).
+     * Get the current movie length (in us).
      *
-     * \return the movie length (in ms), or -1 if there is no media.
+     * \return the movie length (in us), or -1 if there is no media.
      */
-    libvlc_time_t length()
+    std::chrono::microseconds length()
     {
-        return libvlc_media_player_get_length(*this);
+        return std::chrono::microseconds{ libvlc_media_player_get_length(*this) };
     }
 
     /**
-     * Get the current movie time (in ms).
+     * Get the current movie time (in us).
      *
-     * \return the movie time (in ms), or -1 if there is no media.
+     * \return the movie time (in us), or -1 if there is no media.
      */
-    libvlc_time_t time()
+    std::chrono::microseconds time()
     {
-        return  libvlc_media_player_get_time(*this);
+        return std::chrono::microseconds{ libvlc_media_player_get_time(*this) };
     }
 
     /**
-     * Set the movie time (in ms). This has no effect if no media is being
+     * Set the movie time (in us). This has no effect if no media is being
      * played. Not all formats and protocols support this.
      *
      * \version{2.x}
      * \version{3.x}
-     * \param i_time  the movie time (in ms).
+     * \param i_time  the movie time (in us).
      * \version{4.x}
      * \param b_fast  prefer fast seeking or precise seeking
      */
-    void setTime(libvlc_time_t i_time, bool b_fast)
+    void setTime(std::chrono::microseconds i_time, bool b_fast)
     {
-        libvlc_media_player_set_time(*this, i_time, b_fast);
+        libvlc_media_player_set_time(*this, i_time.count(), b_fast);
     }
 
     /**
@@ -1703,9 +1705,9 @@ public:
      *
      * \version LibVLC 1.1.1 or later
      */
-    int64_t audioDelay()
+    std::chrono::microseconds audioDelay()
     {
-        return libvlc_audio_get_delay(*this);
+        return std::chrono::microseconds{ libvlc_audio_get_delay(*this) };
     }
 
     /**
@@ -1716,9 +1718,9 @@ public:
      *
      * \version LibVLC 1.1.1 or later
      */
-    bool setAudioDelay(int64_t i_delay)
+    bool setAudioDelay(std::chrono::microseconds i_delay)
     {
-        return libvlc_audio_set_delay(*this, i_delay) == 0;
+        return libvlc_audio_set_delay(*this, i_delay.count()) == 0;
     }
 
     /**
@@ -1948,9 +1950,9 @@ public:
      *
      * \version LibVLC 2.0.0 or later
      */
-    int64_t spuDelay()
+    std::chrono::microseconds spuDelay()
     {
-        return libvlc_video_get_spu_delay(*this);
+        return std::chrono::microseconds{ libvlc_video_get_spu_delay(*this) };
     }
 
     /**
@@ -1968,9 +1970,9 @@ public:
      *
      * \version LibVLC 2.0.0 or later
      */
-    int setSpuDelay(int64_t i_delay)
+    int setSpuDelay(std::chrono::microseconds i_delay)
     {
-        return libvlc_video_set_spu_delay(*this, i_delay);
+        return libvlc_video_set_spu_delay(*this, i_delay.count());
     }
 
     /**

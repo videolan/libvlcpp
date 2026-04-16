@@ -575,13 +575,13 @@ public:
     }
 
     /**
-     * Get duration (in ms) of media descriptor object item.
+     * Get duration (in us) of media descriptor object item.
      *
      * \return duration of media item or -1 on error
      */
-    libvlc_time_t duration()
+    std::chrono::microseconds duration()
     {
-        return libvlc_media_get_duration(*this);
+        return std::chrono::microseconds{ libvlc_media_get_duration(*this) };
     }
 
     /**

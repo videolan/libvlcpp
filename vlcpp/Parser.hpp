@@ -188,12 +188,12 @@ public:
         }
 
         /**
-         * Set the timeout of the parser in milliseconds. 0 means no limits.
-         * 
+         * Set the timeout of the parser in microseconds. 0 means no limits.
+         *
          * \param timeout the timeout to set for the parser
          * \return reference to this Config object for chaining
          */
-        Config& setTimeout( std::chrono::milliseconds timeout )
+        Config& setTimeout( std::chrono::microseconds timeout )
         {
             m_cfg.timeout = timeout.count();
             return *this;
@@ -381,11 +381,11 @@ public:
         /**
          * Seek to a given time before generating the thumbnail.
          *
-         * \param time the seek time (in milliseconds)
+         * \param time the seek time (in microseconds)
          * \param speed the seek speed \ref ThumbnailSeekSpeed (Precise by default)
          * \return reference to this ThumbnailerRequest object for chaining
          */
-        ThumbnailerRequest& setSeekTime( std::chrono::milliseconds time,
+        ThumbnailerRequest& setSeekTime( std::chrono::microseconds time,
                                          ThumbnailSeekSpeed speed = ThumbnailSeekSpeed::Precise )
         {
             m_req.seek.type = libvlc_thumbnailer_seek_time;
