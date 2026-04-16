@@ -19,6 +19,13 @@ install_headers(
 
 libvlc_dep = dependency('libvlc', version: '>=3.0')
 
+libvlcpp_dep = declare_dependency(
+    include_directories: include_directories('.'),
+    dependencies: [libvlc_dep],
+)
+
+meson.override_dependency('libvlcpp', libvlcpp_dep)
+
 pkg = import('pkgconfig')
 pkg.generate(
     version: meson.project_version(),
