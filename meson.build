@@ -5,7 +5,7 @@ project(
     ['cpp'],
     license: 'LGPL-2.1-or-later',
     license_files: ['COPYING'],
-    version: '4.0.0+vlc.933ecc78a1',
+    version: '4.0.0+vlc.266f1fe08a',
     meson_version: '>=1.1.0',
     default_options: ['cpp_std=c++11'],
 )
