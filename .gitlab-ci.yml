@@ -1,5 +1,5 @@
 variables:
-  VLC40_IMAGE: registry.videolan.org/vlc-debian-unstable:20230705133021
+  VLC40_IMAGE: registry.videolan.org/vlc-debian-unstable:20260217105256
 
 build:
   image: $VLC40_IMAGE
