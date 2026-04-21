@@ -30,6 +30,7 @@
 #include <memory>
 
 #include "common.hpp"
+#include "Media.hpp"
 #include "RendererDiscoverer.hpp"
 
 namespace VLC
@@ -111,7 +112,7 @@ public:
      *
      * \param media new played media
      */
-    using ExpectedMediaChangedCb = void(MediaPtr);
+    using ExpectedMediaChangedCb = void(Media&&);
 
     /**
      * Callback prototype that notify when the player will stop the current
@@ -125,7 +126,7 @@ public:
      * \param media stopping media
      * \param stopping_reason reason why the media is stopping
      */
-    using ExpectedMediaStoppingCb = void(MediaPtr, MediaStoppingReason);
+    using ExpectedMediaStoppingCb = void(Media&&, MediaStoppingReason);
 
     /**
      * Callback prototype that notify when the player state changed
@@ -263,7 +264,7 @@ public:
      *
      * \param media media being played/parsed
      */
-    using ExpectedMediaParsedCb = void(MediaPtr);
+    using ExpectedMediaParsedCb = void(Media&&);
 
     /**
      * Callback prototype that notify when metadata were update by the player
@@ -271,7 +272,7 @@ public:
      * \param media media being played/parsed, call Media::getMeta() to
      * get new metadata
      */
-    using ExpectedMediaMetaChangedCb = void(MediaPtr);
+    using ExpectedMediaMetaChangedCb = void(Media&&);
 
     /**
      * Callback prototype that notify when the player added new subitems to the
@@ -280,7 +281,7 @@ public:
      * \param media media being played/parsed, call Media::getSubitems() to
      * get sub items
      */
-    using ExpectedMediaSubitemsChangedCb = void(MediaPtr);
+    using ExpectedMediaSubitemsChangedCb = void(Media&&);
 
     /**
      * Callback prototype that notify when the player added new attachments to
@@ -293,7 +294,7 @@ public:
      * \param list list of pictures, the list is only valid from this callback,
      * each Picture object can be copied safely with list.at(index) method
      */
-    using ExpectedMediaAttachmentsAddedCb = void(MediaPtr, const Picture::List&);
+    using ExpectedMediaAttachmentsAddedCb = void(Media&&, const Picture::List&);
 
     /**
      * Callback prototype that notify when a new player vout is added or removed
@@ -378,7 +379,7 @@ public:
             static_assert( signature_match<MediaChangedCb, ExpectedMediaChangedCb>::value,
                            "Mismatched on_media_changed callback prototype" );
             m_cbs.on_media_changed = CallbackWrapper<(unsigned int)Idx::MediaChanged,
-                                     decltype(libvlc_media_player_cbs::on_media_changed)>::wrap<MediaPtr>(
+                                     decltype(libvlc_media_player_cbs::on_media_changed)>::wrap<Media>(
                                      *m_callbacks, std::forward<MediaChangedCb>( mediaChangedCb ) );
             return *this;
         }
@@ -396,7 +397,7 @@ public:
                            "Mismatched on_media_stopping callback prototype" );
             m_cbs.on_media_stopping = CallbackWrapper<(unsigned int)Idx::MediaStopping,
                                       decltype(libvlc_media_player_cbs::on_media_stopping)>::wrap<
-                                      MediaPtr, MediaStoppingReason>( *m_callbacks,
+                                      Media, MediaStoppingReason>( *m_callbacks,
                                       std::forward<MediaStoppingCb>( mediaStoppingCb ) );
             return *this;
         }
@@ -658,7 +659,7 @@ public:
             static_assert( signature_match<MediaParsedCb, ExpectedMediaParsedCb>::value,
                            "Mismatched on_media_parsed callback prototype" );
             m_cbs.on_media_parsed = CallbackWrapper<(unsigned int)Idx::MediaParsed,
-                                    decltype(libvlc_media_player_cbs::on_media_parsed)>::wrap<MediaPtr>(
+                                    decltype(libvlc_media_player_cbs::on_media_parsed)>::wrap<Media>(
                                     *m_callbacks, std::forward<MediaParsedCb>( mediaParsedCb ) );
             return *this;
         }
@@ -675,7 +676,7 @@ public:
             static_assert( signature_match<MediaMetaChangedCb, ExpectedMediaMetaChangedCb>::value,
                            "Mismatched on_media_meta_changed callback prototype" );
             m_cbs.on_media_meta_changed = CallbackWrapper<(unsigned int)Idx::MediaMetaChanged,
-                                          decltype(libvlc_media_player_cbs::on_media_meta_changed)>::wrap<MediaPtr>(
+                                          decltype(libvlc_media_player_cbs::on_media_meta_changed)>::wrap<Media>(
                                           *m_callbacks, std::forward<MediaMetaChangedCb>( mediaMetaChangedCb ) );
             return *this;
         }
@@ -692,7 +693,7 @@ public:
             static_assert( signature_match<MediaSubitemsChangedCb, ExpectedMediaSubitemsChangedCb>::value,
                            "Mismatched on_media_subitems_changed callback prototype" );
             m_cbs.on_media_subitems_changed = CallbackWrapper<(unsigned int)Idx::MediaSubitemsChanged,
-                                              decltype(libvlc_media_player_cbs::on_media_subitems_changed)>::wrap<MediaPtr>(
+                                              decltype(libvlc_media_player_cbs::on_media_subitems_changed)>::wrap<Media>(
                                               *m_callbacks, std::forward<MediaSubitemsChangedCb>( mediaSubitemsChangedCb ) );
             return *this;
         }
@@ -710,7 +711,7 @@ public:
                            "Mismatched on_media_attachments_added callback prototype" );
             m_cbs.on_media_attachments_added = CallbackWrapper<(unsigned int)Idx::MediaAttachmentsAdded,
                                                decltype(libvlc_media_player_cbs::on_media_attachments_added)>::wrap<
-                                               MediaPtr, Picture::List>(
+                                               Media, Picture::List>(
                                                *m_callbacks, std::forward<MediaAttachmentsAddedCb>( mediaAttachmentsAddedCb ) );
             return *this;
         }
@@ -899,15 +900,15 @@ public:
     /**
      * Get the media used by the media_player.
      *
-     * \return the media associated with p_mi, or a nullptr shared_ptr if no
+     * \return the media associated with p_mi, or an empty Media object if no
      * media is associated
      */
-    MediaPtr media()
+    Media media()
     {
         auto media = libvlc_media_player_get_media(*this);
         if ( media == nullptr )
-            return nullptr;
-        return std::make_shared<Media>( media, false );
+            return Media();
+        return Media( media, false );
     }
 
     /**

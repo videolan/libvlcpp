@@ -140,14 +140,14 @@ public:
      *
      * \param i_pos  position in array where to insert
      *
-     * \return media instance at position i_pos, or nullptr if not found.
+     * \return media instance at position i_pos, or an empty Media if not found.
      */
-    MediaPtr itemAtIndex(int i_pos)
+    Media itemAtIndex(int i_pos)
     {
         auto ptr = libvlc_media_list_item_at_index(*this,i_pos);
         if ( ptr == nullptr )
-            return nullptr;
-        return std::make_shared<Media>( ptr, false );
+            return Media();
+        return Media( ptr, false );
     }
 
     /**

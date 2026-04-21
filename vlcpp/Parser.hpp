@@ -55,10 +55,10 @@ public:
          *
          * \return the media associated with the task
          */
-        MediaPtr getMedia() const
+        Media getMedia() const
         {
             auto media = libvlc_parser_task_get_media( *this );
-            return std::make_shared<Media>( media, true );
+            return Media( media, true );
         }
 
         template <size_t, typename ...>
@@ -96,10 +96,10 @@ public:
          *
          * \return the media associated with the task
          */
-        MediaPtr getMedia() const
+        Media getMedia() const
         {
             auto media = libvlc_parser_task_get_media( m_task );
-            return std::make_shared<Media>( media, true );
+            return Media( media, true );
         }
 
         friend class Parser;

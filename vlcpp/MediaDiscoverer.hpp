@@ -78,18 +78,19 @@ public:
     /**
      * Callback prototype that notify when the discoverer added a media
      *
-     * \param parent parent of the new added media or nullptr if there is no
-     * parents (more likely)
+     * \param parent parent of the new added media or empty Media if there is no
+     * parents (more likely). User should check if the Media is valid by
+     * calling parent.isValid()
      * \param media the new added media
      */
-    using ExpectedMediaAddedCb = void(MediaPtr parent, MediaPtr media);
+    using ExpectedMediaAddedCb = void(Media&& parent, Media&& media);
 
     /**
      * Callback prototype that notify when the discoverer removed a media
      *
      * \param media the removed media
      */
-    using ExpectedMediaRemovedCb = void(MediaPtr media);
+    using ExpectedMediaRemovedCb = void(Media&& media);
 
     class Callbacks : protected CallbackOwner<2>
     {
@@ -128,7 +129,7 @@ public:
                            "Mismatched onMediaAdded callback prototype" );
             m_cbs.on_media_added = CallbackWrapper<(unsigned int)CallbackIdx::MediaAdded,
                                    decltype(libvlc_media_discoverer_cbs::on_media_added)>::
-                                   wrap<MediaPtr, MediaPtr>( *m_callbacks, std::forward<MediaAddedCb>( cb ) );
+                                   wrap<Media, Media>( *m_callbacks, std::forward<MediaAddedCb>( cb ) );
             return *this;
         }
 
@@ -146,7 +147,7 @@ public:
                            "Mismatched onMediaRemoved callback prototype" );
             m_cbs.on_media_removed = CallbackWrapper<(unsigned int)CallbackIdx::MediaRemoved,
                                      decltype(libvlc_media_discoverer_cbs::on_media_removed)>::
-                                     wrap<MediaPtr>( *m_callbacks, std::forward<MediaRemovedCb>( cb ) );
+                                     wrap<Media>( *m_callbacks, std::forward<MediaRemovedCb>( cb ) );
             return *this;
         }
     };

@@ -38,7 +38,6 @@ namespace VLC
 {
     class Media;
     class Picture;
-    using MediaPtr = std::shared_ptr<Media>;
 
     // Work around cross class dependencies
     // Class A needs to access B's internal pointer
@@ -199,19 +198,19 @@ namespace VLC
             return arg == nullptr ? Wrapper() : Wrapper(arg);
         }
 
-        /* 3. Wrapper is MediaPtr */
+        /* 3. Wrapper is Media */
         template <typename Wrapper, typename Arg>
-        static typename std::enable_if<std::is_same<Wrapper, MediaPtr>::value, Wrapper>::type
+        static typename std::enable_if<std::is_same<Wrapper, Media>::value, Wrapper>::type
         argWrapper(Arg arg)
         {
-            return arg == nullptr ? nullptr : std::make_shared<Media>(arg, true);
+            return arg == nullptr ? Wrapper() : Wrapper(arg, true);
         }
 
-        /* 4. Wrapper is a class type (but not MediaPtr or Picture) */
+        /* 4. Wrapper is a class type (but not Media or Picture) */
         template <typename Wrapper, typename Arg>
         static typename std::enable_if<
             std::is_class<Wrapper>::value &&
-            !std::is_same<Wrapper, MediaPtr>::value &&
+            !std::is_same<Wrapper, Media>::value &&
             !std::is_same<Wrapper, Picture>::value, Wrapper
         >::type
         argWrapper(Arg arg)
@@ -238,7 +237,7 @@ namespace VLC
 
            The number of ArgWrapper types must match the number of callback arguments (Args).
            Example: CallbackWrapper<Idx, void(*)(void*, libvlc_state_t, libvlc_media_t*)>
-                        ::wrap<MediaState, MediaPtr>(callbacks, myFunc); */
+                        ::wrap<MediaState, Media>(callbacks, myFunc); */
         template <typename... ArgWrapper, size_t NbEvents, typename Func>
         static typename std::enable_if<sizeof...(ArgWrapper) != 0, Wrapped>::type
         wrap(CallbackArray<NbEvents>& callbacks, Func&& func)
