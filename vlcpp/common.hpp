@@ -338,29 +338,6 @@ namespace VLC
             Cleanup,
         };
 
-        /// Base case: this is an identity function.
-        template <typename OpenCb, BoxingStrategy Strategy_>
-        struct GuessBoxingStrategy
-        {
-#if !defined(_MSC_VER) || _MSC_VER >= 1900
-            static constexpr BoxingStrategy Strategy = Strategy_;
-#else
-            static const BoxingStrategy Strategy = Strategy_;
-#endif
-        };
-
-        // In case the user provides a nullptr open callback, there's nothing
-        // to box, as we get the original opaque (which is our CallbackArray*)
-        template <BoxingStrategy Strategy_>
-        struct GuessBoxingStrategy<std::nullptr_t, Strategy_>
-        {
-#if !defined(_MSC_VER) || _MSC_VER >= 1900
-            static constexpr BoxingStrategy Strategy = BoxingStrategy::NoBoxing;
-#else
-            static const BoxingStrategy Strategy = BoxingStrategy::NoBoxing;
-#endif
-        };
-
         template <size_t NbEvents, BoxingStrategy Strategy>
         struct BoxOpaque;
 
