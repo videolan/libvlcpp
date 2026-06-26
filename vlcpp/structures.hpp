@@ -249,7 +249,7 @@ public:
     uint32_t channels() const
     {
         assert( m_obj->i_type == libvlc_track_audio );
-        return m_obj->audio->i_channels;
+        return m_obj->u.audio->i_channels;
     }
 
     ///
@@ -258,7 +258,7 @@ public:
     uint32_t rate() const
     {
         assert( m_obj->i_type == libvlc_track_audio );
-        return m_obj->audio->i_rate;
+        return m_obj->u.audio->i_rate;
     }
 
     ////////////////////////////////////////////////////////////////////////////
@@ -271,7 +271,7 @@ public:
     uint32_t height() const
     {
         assert( m_obj->i_type == libvlc_track_video );
-        return m_obj->video->i_height;
+        return m_obj->u.video->i_height;
     }
 
     ///
@@ -280,7 +280,7 @@ public:
     uint32_t width() const
     {
         assert( m_obj->i_type == libvlc_track_video );
-        return m_obj->video->i_width;
+        return m_obj->u.video->i_width;
     }
 
     ///
@@ -291,7 +291,7 @@ public:
     uint32_t sarNum() const
     {
         assert( m_obj->i_type == libvlc_track_video );
-        return m_obj->video->i_sar_num;
+        return m_obj->u.video->i_sar_num;
     }
 
     ///
@@ -302,7 +302,7 @@ public:
     uint32_t sarDen() const
     {
         assert( m_obj->i_type == libvlc_track_video );
-        return m_obj->video->i_sar_den;
+        return m_obj->u.video->i_sar_den;
     }
 
     ///
@@ -313,7 +313,7 @@ public:
     uint32_t fpsNum() const
     {
         assert( m_obj->i_type == libvlc_track_video );
-        return m_obj->video->i_frame_rate_num;
+        return m_obj->u.video->i_frame_rate_num;
     }
 
     ///
@@ -324,7 +324,7 @@ public:
     uint32_t fpsDen() const
     {
         assert( m_obj->i_type == libvlc_track_video );
-        return m_obj->video->i_frame_rate_den;
+        return m_obj->u.video->i_frame_rate_den;
     }
 
     ///
@@ -335,7 +335,7 @@ public:
     Orientation orientation() const
     {
         assert( m_obj->i_type == libvlc_track_video );
-        return static_cast<Orientation>( m_obj->video->i_orientation );
+        return static_cast<Orientation>( m_obj->u.video->i_orientation );
     }
 
     ///
@@ -346,7 +346,7 @@ public:
     Projection projection() const
     {
         assert( m_obj->i_type == libvlc_track_video );
-        return static_cast<Projection>( m_obj->video->i_projection );
+        return static_cast<Projection>( m_obj->u.video->i_projection );
     }
 
     std::string idStr() const
@@ -379,7 +379,7 @@ public:
     std::string encoding() const
     {
         assert( m_obj->i_type == libvlc_track_text );
-        return m_obj->subtitle->psz_encoding ? m_obj->subtitle->psz_encoding : "";
+        return m_obj->u.subtitle->psz_encoding ? m_obj->u.subtitle->psz_encoding : "";
     }
 
     ///
