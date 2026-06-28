@@ -434,7 +434,8 @@ public:
 #endif
         libvlc_dialog_set_error_callback(*this,
             CallbackWrapper<(unsigned int)CallbackIdx::ErrorDisplay, libvlc_dialog_error_cbs>::wrap(
-                *m_callbacks, std::forward(error)));
+                *m_callbacks, std::forward<Error>(error)),
+            m_callbacks.get());
     }
     /**
      * Unset all callbacks
