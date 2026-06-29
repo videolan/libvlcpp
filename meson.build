@@ -5,7 +5,7 @@ project(
     ['cpp'],
     license: 'LGPL-2.1-or-later',
     license_files: ['COPYING'],
-    version: '0.1.0',
+    version: '3.0.0',
     meson_version: '>=1.1.0',
     default_options: ['cpp_std=c++11'],
 )
