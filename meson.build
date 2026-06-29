@@ -5,7 +5,7 @@ project(
     ['cpp'],
     license: 'LGPL-2.1-or-later',
     license_files: ['COPYING'],
-    version: '0.1.0',
+    version: '4.0.0+vlc.933ecc78a1',
     meson_version: '>=1.1.0',
     default_options: ['cpp_std=c++11'],
 )
@@ -17,7 +17,7 @@ install_headers(
     subdir: 'vlcpp',
 )
 
-libvlc_dep = dependency('libvlc', version: '>=3.0')
+libvlc_dep = dependency('libvlc', version: '>=4.0')
 
 libvlcpp_dep = declare_dependency(
     include_directories: include_directories('.'),
@@ -29,7 +29,7 @@ meson.override_dependency('libvlcpp', libvlcpp_dep)
 pkg = import('pkgconfig')
 pkg.generate(
     version: meson.project_version(),
-    requires: ['libvlc>=3.0'],
+    requires: ['libvlc>=4.0'],
     name: 'libvlcpp',
     description: 'libvlc C++ bindings',
 )
