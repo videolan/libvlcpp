@@ -1,18 +1,17 @@
 variables:
   VLC30_IMAGE: registry.videolan.org/medialibrary-3.0:20231017192545
-  VLC40_IMAGE: registry.videolan.org/vlc-debian-unstable:20230705133021
 
-.common_build:
+build:
+  image: $VLC30_IMAGE
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-    - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "$CI_DEFAULT_BRANCH@videolan/libvlcpp"'
+    - if: '$CI_PIPELINE_SOURCE == "push" && $CI_PROJECT_PATH == "videolan/libvlcpp" && $CI_COMMIT_BRANCH == "3.0.x"'
   tags:
     - docker
     - amd64
   script:
     - export CXXFLAGS="-Werror" # Mainly to fail on deprecation errors.
-    - export VLC_PLUGIN_PATH="${CI_PROJECT_DIR}/build/subprojects/libvlc/modules/"
-    - meson setup build -Dexamples=enabled -Dtests=enabled --native-file subprojects/packagefiles/libvlc/libvlc-minimal.ini
+    - meson setup build -Dexamples=enabled -Dtests=enabled
     - meson compile -C build
     - meson test -C build "libvlcpp:"
   artifacts:
@@ -21,13 +20,3 @@ variables:
     paths:
       - ${CI_PROJECT_DIR}/build/meson-logs/testlog.txt
     when: always
-
-
-continuous_build_4.0:
-  extends: .common_build
-  image: $VLC40_IMAGE
-
-continuous_build_3.0:
-  extends: .common_build
-  image: $VLC30_IMAGE
-
